@@ -13,6 +13,7 @@ gem 'rails', '4.1.1'
 #gem 'rack-mini-profiler'
 gem 'bcrypt-ruby'
 gem 'bootstrap-sass'
+gem 'bunny', ">= 1.3"
 gem 'capybara', group: [:test]
 gem 'coffee-rails'
 gem 'factory_girl', group: [:development, :test]
@@ -30,6 +31,7 @@ gem 'kramdown'
 gem 'newrelic_rpm'
 gem 'pry', group: [:development, :test]
 gem 'psych', platform: :mri # (j)psych is yet directly included in jruby, change when gemified
+gem 'puma'
 gem 'rails_config'
 gem 'rest-client'
 gem 'rspec-rails', group: [:development, :test]
@@ -38,9 +40,5 @@ gem 'sdoc', group: [:doc], require: false
 gem 'selenium-webdriver'
 gem 'textacular', git:  'https://github.com/DrTom/textacular.git', ref: 'ab1f5677539b1014f238dc2c644c2e4ef9c56c12'
 gem 'therubyrhino', platform: :jruby
-gem 'torquebox', '3.1.0', platform: :jruby
-gem 'torquebox-messaging', '3.1.0', platform: 'jruby'
-gem 'torquebox-rake-support', '3.1.0', platform: :jruby
-gem 'torquebox-server', '3.1.0', platform: 'jruby'
 gem 'uglifier', '>= 1.3.0'
 gem 'uuidtools'

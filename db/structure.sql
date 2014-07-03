@@ -551,6 +551,16 @@ CREATE TABLE executors_with_load (
 
 
 --
+-- Name: json_test; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE json_test (
+    id integer,
+    data json
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1151,6 +1161,13 @@ CREATE TRIGGER update_updated_at_column_of_commits BEFORE UPDATE ON commits FOR 
 
 
 --
+-- Name: update_updated_at_column_of_trials; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_trials BEFORE UPDATE ON trials FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
 -- Name: attachments_trial_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1343,4 +1360,6 @@ INSERT INTO schema_migrations (version) VALUES ('82');
 INSERT INTO schema_migrations (version) VALUES ('84');
 
 INSERT INTO schema_migrations (version) VALUES ('85');
+
+INSERT INTO schema_migrations (version) VALUES ('86');
 

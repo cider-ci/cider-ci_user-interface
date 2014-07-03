@@ -10,11 +10,22 @@ This component runs in the application server under the
 
 It is possible to run this part of Cider-CI in development mode without
 connecting it to the other Cider-CI services. It is also possible to use MRI
-ruby (instead of JRuby, or the whole Torquebox stack even) in development mode. 
+ruby (instead of JRuby) in development mode. 
 
-There will be no real interaction, e.g. creating or even running an execution.
-It is therefore generally helpful to load some data into the database, e.g.
-from a dump of your production server. 
+    RAILS_RELATIVE_URL_ROOT=/cider-ci-dev rails s -p 8888
+
+
+### Messaging 
+
+The application will try to open a connection to the configured message broker.
+It will continue when in `development` or `test` environment with a warning
+(to the console and log) if the connection could not be established.
+
+Message consumers are bound if and only if `MESSAGING_BIND_CONSUMERS` is
+set and not blank! It is advisable to bind the consumers in a second
+process during development, e.g.
+
+    MESSAGING_BIND_CONSUMERS=true rails c
 
 
 ## License

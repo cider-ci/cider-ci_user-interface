@@ -34,7 +34,7 @@ module CiderCI
     # config.i18n.default_locale = :de
     
     config.autoload_paths += \
-      %w(lib services).map{|dir| Rails.root.join("app",dir)} 
+      %w(lib services messaging).map{|dir| Rails.root.join("app",dir)} 
 
     config.active_record.schema_format = :sql
 
@@ -49,7 +49,7 @@ module CiderCI
 
     config.log_tags = [:port, :remote_ip, lambda{|req| Time.now.strftime("%T")} ]
 
-    config.action_controller.relative_url_root = ENV['RAILS_RELATIVE_URL_ROOT'] or ''
+    config.action_controller.relative_url_root = ENV['RAILS_RELATIVE_URL_ROOT'] or '/cider-ci'
 
     if defined?(Torquebox)  
       config.cache_store = :torquebox_store, {expires_in: (60*60*24*7)}

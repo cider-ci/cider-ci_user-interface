@@ -1,4 +1,25 @@
 
+-- SCRIPTS to be cleaned
+
+SELECT * FROM trials
+
+UPDATE trials SET scripts = '[]'
+WHERE json_array_length(scripts) > 0
+AND trials.created_at < 
+  (SELECT now() - 
+    (SELECT max(trial_scripts_retention_time_days)  FROM timeout_settings) 
+      * interval '1 day') ;
+
+SELECT * FROM trials
+WHERE trials.state = 'pending'
+AND trials.created_at < 
+  (SELECT now() - 
+    (SELECT max(trial_dispatch_timeout_minutes)  FROM timeout_settings) 
+      * interval '1 Minute') ;
+
+
+trial_execution_timeout_minutes
+
 -- ######################################
 
 
