@@ -69,6 +69,11 @@ class Workspace::ExecutionsController < WorkspaceController
     @execution_cache_signatures = ExecutionCacheSignature \
       .where(%[ execution_id IN (#{@executions.map(&:id).map{|id| "'#{id}'"}.join(",").non_blank_or("NULL")}) ])\
       .select(:execution_id,:stats_signature,:commits_signature,:branches_signature,:tags_signature)
+      
+    respond_to do |format|
+     format.html
+     format.json { render json: @executions }
+   end
   end
 
 

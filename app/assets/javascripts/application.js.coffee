@@ -24,6 +24,9 @@
 #= require logger
 #= require_tree ./reload
 #= require_tree ./misc 
+#= require react
+#= require react_ujs
+#= require ./components
 
 
 $ -> 

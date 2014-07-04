@@ -1,6 +1,6 @@
 $ ->
 
-  reloadEnabled= true
+  reloadEnabled= false
 
   logger= Logger.create namespace: 'Reloader', level: 'warn'
 

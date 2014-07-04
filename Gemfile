@@ -42,3 +42,6 @@ gem 'textacular', git:  'https://github.com/DrTom/textacular.git', ref: 'ab1f567
 gem 'therubyrhino', platform: :jruby
 gem 'uglifier', '>= 1.3.0'
 gem 'uuidtools'
+
+gem 'react-rails', git: 'https://github.com/reactjs/react-rails.git', ref: 'master'
+gem "therubyracer", :platforms => :ruby
