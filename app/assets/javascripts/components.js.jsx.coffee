@@ -1,8 +1,8 @@
 ###* @jsx React.DOM ###
-{div, ul, li, dl, dt, dd, b } = React.DOM
+{div, ul, li, dl, dt, dd, h3 } = React.DOM
 ui = if window? then window else global
 
-fallback = "?"
+fallback = "???"
 
 # # React UI Components
 
@@ -12,8 +12,8 @@ ui.Execution = React.createClass
     title = @props.data.substituted_specification_data?.name ? fallback
     
     (li {}, [
-     (b {}, title),
-     (dl {}, wanted.map (item) => [
+     (h3 {}, title),
+     (dl {className: "dl-horizontal"}, wanted.map (item) => [
         (dt {}, item),
         (dd {}, @props.data[item] ? fallback)
        ]
