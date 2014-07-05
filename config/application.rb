@@ -32,6 +32,12 @@ module CiderCI
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
+     
+    # Turn time stamping off,  there is an issue with timezones (in dev. mode
+    # at least) etc.  ; 
+    # timestamping is handled via triggers and defaults in
+    # postgres
+    config.active_record.record_timestamps = false
     
     config.autoload_paths += \
       %w(lib services messaging).map{|dir| Rails.root.join("app",dir)} 

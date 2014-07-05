@@ -192,8 +192,8 @@ CREATE TABLE attachments (
     content_length integer,
     content_type character varying(255) DEFAULT 'application/octet-stream'::character varying NOT NULL,
     content text,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now(),
     id uuid DEFAULT uuid_generate_v4() NOT NULL
 );
 
@@ -207,8 +207,8 @@ CREATE TABLE branch_update_triggers (
     definition_id uuid NOT NULL,
     branch_id uuid NOT NULL,
     active boolean DEFAULT true NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
 );
 
 
@@ -290,8 +290,8 @@ CREATE TABLE executions (
     definition_name character varying(255) NOT NULL,
     priority integer DEFAULT 5,
     error text DEFAULT ''::text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
 );
 
 
@@ -307,8 +307,8 @@ CREATE TABLE repositories (
     git_fetch_and_update_interval integer DEFAULT 60,
     git_update_interval integer,
     transient_properties_id uuid DEFAULT uuid_generate_v4(),
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
 );
 
 
@@ -403,8 +403,8 @@ CREATE TABLE tasks (
     traits character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
     name character varying(255),
     error text DEFAULT ''::text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
 );
 
 
@@ -449,8 +449,8 @@ CREATE TABLE executions_tags (
 CREATE TABLE tags (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     tag character varying(255),
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
 );
 
 
@@ -467,8 +467,8 @@ CREATE TABLE trials (
     scripts json DEFAULT '[]'::json NOT NULL,
     started_at timestamp without time zone,
     finished_at timestamp without time zone,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
 );
 
 
@@ -518,8 +518,8 @@ CREATE TABLE executors (
     app_version character varying(255),
     traits character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
     last_ping_at timestamp without time zone,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
 );
 
 
@@ -551,16 +551,6 @@ CREATE TABLE executors_with_load (
 
 
 --
--- Name: json_test; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE json_test (
-    id integer,
-    data json
-);
-
-
---
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -576,8 +566,8 @@ CREATE TABLE schema_migrations (
 CREATE TABLE specifications (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     data text NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
 );
 
 
@@ -591,8 +581,8 @@ CREATE TABLE timeout_settings (
     trial_dispatch_timeout_minutes integer DEFAULT 60 NOT NULL,
     trial_end_state_timeout_minutes integer DEFAULT 180 NOT NULL,
     trial_execution_timeout_minutes integer DEFAULT 5 NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now(),
     trial_scripts_retention_time_days integer DEFAULT 10 NOT NULL,
     CONSTRAINT attachment_retention_time_hours_positive CHECK ((attachment_retention_time_hours > 0)),
     CONSTRAINT one_and_only_one CHECK ((id = 0)),
@@ -613,7 +603,9 @@ CREATE TABLE users (
     login_downcased character varying(255) NOT NULL,
     last_name character varying(255) NOT NULL,
     first_name character varying(255) NOT NULL,
-    is_admin boolean DEFAULT false NOT NULL
+    is_admin boolean DEFAULT false NOT NULL,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
 );
 
 
@@ -625,8 +617,8 @@ CREATE TABLE welcome_page_settings (
     id integer NOT NULL,
     welcome_message text,
     radiator_config json,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now(),
     CONSTRAINT one_and_only_one CHECK ((id = 0))
 );
 
@@ -1147,6 +1139,20 @@ CREATE RULE "_RETURN" AS
 
 
 --
+-- Name: update_updated_at_column_of_attachments; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_attachments BEFORE UPDATE ON attachments FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_branch_update_triggers; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_branch_update_triggers BEFORE UPDATE ON branch_update_triggers FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
 -- Name: update_updated_at_column_of_branches; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1161,10 +1167,73 @@ CREATE TRIGGER update_updated_at_column_of_commits BEFORE UPDATE ON commits FOR 
 
 
 --
+-- Name: update_updated_at_column_of_executions; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_executions BEFORE UPDATE ON executions FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_executors; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_executors BEFORE UPDATE ON executors FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_repositories; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_repositories BEFORE UPDATE ON repositories FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_specifications; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_specifications BEFORE UPDATE ON specifications FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_tags; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_tags BEFORE UPDATE ON tags FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_tasks; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_tasks BEFORE UPDATE ON tasks FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_timeout_settings; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_timeout_settings BEFORE UPDATE ON timeout_settings FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
 -- Name: update_updated_at_column_of_trials; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER update_updated_at_column_of_trials BEFORE UPDATE ON trials FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_users; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_users BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_welcome_page_settings; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE ON welcome_page_settings FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1362,4 +1431,6 @@ INSERT INTO schema_migrations (version) VALUES ('84');
 INSERT INTO schema_migrations (version) VALUES ('85');
 
 INSERT INTO schema_migrations (version) VALUES ('86');
+
+INSERT INTO schema_migrations (version) VALUES ('87');
 
