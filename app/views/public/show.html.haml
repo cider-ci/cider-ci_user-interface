@@ -42,12 +42,15 @@
 
   %p#release-info
     Version  
+    =Settings.release.version_major
+    %span<>.
+    =Settings.release.version_minor
+    %span<>.#{Settings.release.version_patch}
+    %span<>#{Settings.release.version_pre}
+    %span<>#{Settings.release.version_build}
 
-    =Rails.configuration.release_info[:version_major]
-    %span<>.
-    =Rails.configuration.release_info[:version_minor]
-    %span<>.
-    =Rails.configuration.release_info[:version_patch]
+
+
 
 
   %p

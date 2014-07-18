@@ -15,10 +15,6 @@ class Admin::RepositoriesController < AdminController
   def create
     begin
       @repository = Repository.create! permited_repository_params(params)
-      if defined? TorqueBox
-        queue= TorqueBox.fetch('/queues/re_initialize_repository')
-        queue.publish(@repository.attributes,encoding: :edn)
-      end
       redirect_to admin_repositories_path, flash: {success: "The repository has been created. It will be initialized in the background."}
     rescue => e
       redirect_to new_admin_repository_path(params), flash: {error: e.to_s}
@@ -74,10 +70,6 @@ class Admin::RepositoriesController < AdminController
   def re_initialize_git
     begin
       @repository = Repository.find(params[:repository_id])
-      if defined? TorqueBox
-        queue= TorqueBox.fetch('/queues/re_initialize_repository')
-        queue.publish(@repository.attributes,encoding: :edn)
-      end
       redirect_to admin_repository_path(@repository,anchor: @repository.transient_properties_id), flash: {success: "The repository will be re-initialized in the background."}
     rescue => e
       redirect_to admin_repositories_path, flash: {error: e.to_s}
@@ -86,7 +78,6 @@ class Admin::RepositoriesController < AdminController
 
   def show
     @repository = Repository.find(params[:id])
-    @transient_properties = (CiderCI::Cache.get(@repository.transient_properties_id) or {}).deep_symbolize_keys
   end
 
 end

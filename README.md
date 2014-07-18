@@ -1,9 +1,9 @@
-Cider-CI Server-TB
-==================
+Cider-CI User-Interface (and Background-Processor)
+==================================================
 
-Part of [Cider-CI](https://github.com/DrTom/cider-ci). 
-This component runs in the application server under the 
-[TorqueBox](http://torquebox.org/) stack.
+Part of [Cider-CI](https://github.com/cider-ci/cider-ci). This in ruby on rails
+implemented component serves all of the user interface. This component also
+includes code which builds executions and does a few other things. 
 
 
 ## Developing the frontend only
@@ -12,18 +12,21 @@ It is possible to run this part of Cider-CI in development mode without
 connecting it to the other Cider-CI services. It is also possible to use MRI
 ruby (instead of JRuby) in development mode. 
 
-    RAILS_RELATIVE_URL_ROOT=/cider-ci-dev rails s -p 8888
+    RAILS_RELATIVE_URL_ROOT=/cider-ci rails s -p 8880
 
 
 ### Messaging 
 
 The application will try to open a connection to the configured message broker.
-It will continue when in `development` or `test` environment with a warning
-(to the console and log) if the connection could not be established.
+It will continue when in `development` or `test` environment with a warning (to
+the console and log) if the connection could not be established. 
 
-Message consumers are bound if and only if `MESSAGING_BIND_CONSUMERS` is
-set and not blank! It is advisable to bind the consumers in a second
-process during development, e.g.
+Message producers are always used if the connection to the broker could
+be established.
+
+Message consumers are bound if and only if `MESSAGING_BIND_CONSUMERS` is set
+and not blank! It is advisable to bind the consumers in a second process during
+development, e.g.
 
     MESSAGING_BIND_CONSUMERS=true rails c
 

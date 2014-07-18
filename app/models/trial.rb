@@ -10,6 +10,11 @@ class Trial < ActiveRecord::Base
 
   has_many :attachments, lambda{reorder(:path)}, dependent: :destroy
 
+  
+  def trial_attachments
+    TrialAttachment.where("path like '/#{id}/%'")
+  end
+
   validates :state, inclusion: {in: Constants.TRIAL_STATES}
 
   after_create do

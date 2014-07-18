@@ -9,12 +9,6 @@
   url: admin_timeout_settings_path(id: @timeout_settings.id), 
   html: {class: "form-horizontal"} do |form| 
 
-  = form_group "Attachment retention time (hours)", 
-    control_id: 'timeout_settings_attachment_retention_time_hours',
-    cols_label: 5 do
-    = form.number_field :attachment_retention_time_hours, 
-      class: 'from-control'
-
   = form_group "Trial-Scripts retention time (days)", 
     control_id: 'trial_scripts_retention_time_days',
     cols_label: 5 do

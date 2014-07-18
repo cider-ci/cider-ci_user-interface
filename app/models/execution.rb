@@ -4,10 +4,6 @@
 
 class Execution < ActiveRecord::Base
 
-  if defined? TorqueBox
-    always_background :create_tasks_and_trials_for
-  end
-
   has_one :execution_stat
   has_one :execution_cache_signature
 

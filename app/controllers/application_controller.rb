@@ -13,10 +13,6 @@ class ApplicationController < ActionController::Base
     Rack::MiniProfiler.authorize_request if session[:mini_profiler_enabled]
   end
 
-  if defined?  TorqueBox::Injectors
-    include TorqueBox::Injectors
-  end
-
   def redirect
     redirect_to public_path
   end

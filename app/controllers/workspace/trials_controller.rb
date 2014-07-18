@@ -4,11 +4,6 @@
 
 class Workspace::TrialsController < WorkspaceController 
 
-  def get_attachment
-    @attachment = Attachment.find_by trial_id: params.require(:id), path: params.require(:path)
-    send_data Base64.decode64(@attachment.content), type: @attachment.content_type, filename: @attachment.path, disposition: params['disposition']
-  end
-
   def destroy
     begin
       @trial = Trial.find(params[:id])

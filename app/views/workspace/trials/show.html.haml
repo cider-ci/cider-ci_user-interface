@@ -3,7 +3,7 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - trial ||= @trial 
-- cache trial do
+- cache [trial,trial.trial_attachments.collection_cache_tag] do
   %h1 
     %i.icon-trial
     Trial for the task "#{trial.task.data['name']}"
@@ -41,16 +41,16 @@
     %pre
       %code= trial.error
 
-  - cache trial.attachments.collection_cache_tag do
-    - if trial.attachments.count > 0
-      .attachments 
+  - cache trial.trial_attachments.collection_cache_tag do
+    - if trial.trial_attachments.count > 0
+      .trial_attachments 
         %h2 
           %i.icon-paperclip
-          Attachments 
+          Attachments
         %table.table.table-striped
           %thead
           %tbody
-            =render partial: 'attachment', collection: trial.attachments, as: :attachment
+            =render partial: 'trial_attachment', collection: trial.trial_attachments, as: :trial_attachment
 
 
   .scripts

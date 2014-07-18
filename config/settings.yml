@@ -1,5 +1,14 @@
+release: 
+  version_major: 1
+  version_minor: 5
+  version_patch: 0 
+  version_pre: '-development'
+  version_build: ''
+
 git:
   repositories_path: "/Users/thomas/Programming/CIDER-CI/tmp/repositories"
+
+trial_attachments_http_prefix: http://127.0.0.1:8883/cider-ci/storage/trial-attachments
 
 http_server:
   host: 127.0.0.1
@@ -11,12 +20,10 @@ messaging:
 
   connection: 
 
-    vhost: cider-ci-dev 
-    username: user
-    password: user
-    host: 192.168.0.102
-
-  default_message_expiration: 1
+    vhost: cider-ci
+    username: guest
+    password: guest
+    host: 127.0.0.1
 
   exchanges:
     - name: branch_event_topic

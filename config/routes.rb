@@ -1,24 +1,5 @@
 CiderCI::Application.routes.draw do
 
-  namespace :executors_api_v1 do
-
-    resources :trials do
-      member do
-        put 'attachments/*path', action: 'put_attachment', format: false, as: :attachment
-      end
-    end
-
-    resources :repositories , only: [] do
-      member do
-        get 'git', as: 'git_root'
-        get 'git/*path', action: 'get_git_file', format: false
-      end
-    end
-
-    resources :scripts, only: [:update]
-  end
-
-
   get '/workspace/dashboard', controller: "workspace" , action: "dashboard"
 
 
@@ -32,7 +13,7 @@ CiderCI::Application.routes.draw do
 
     resource :session, only: [:edit,:update]
 
-    # TODO: doesn't work of the tag contains dots o_O
+    # TODO: doesn't work if the tag contains dots o_O
     resources :tags, only: [:index, :show]
 
     get 'branch_heads' #, controller: "workspace" 
@@ -47,7 +28,6 @@ CiderCI::Application.routes.draw do
 
     resources :trials do
       member do
-        get 'attachments/*path', action: 'get_attachment', format: false, as: :attachment
         post 'set_failed'
       end
     end

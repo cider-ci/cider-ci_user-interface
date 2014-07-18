@@ -183,22 +183,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: attachments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE attachments (
-    trial_id uuid NOT NULL,
-    path text NOT NULL,
-    content_length integer,
-    content_type character varying(255) DEFAULT 'application/octet-stream'::character varying NOT NULL,
-    content text,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now(),
-    id uuid DEFAULT uuid_generate_v4() NOT NULL
-);
-
-
---
 -- Name: branch_update_triggers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -577,18 +561,31 @@ CREATE TABLE specifications (
 
 CREATE TABLE timeout_settings (
     id integer NOT NULL,
-    attachment_retention_time_hours integer DEFAULT 8 NOT NULL,
     trial_dispatch_timeout_minutes integer DEFAULT 60 NOT NULL,
     trial_end_state_timeout_minutes integer DEFAULT 180 NOT NULL,
     trial_execution_timeout_minutes integer DEFAULT 5 NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     trial_scripts_retention_time_days integer DEFAULT 10 NOT NULL,
-    CONSTRAINT attachment_retention_time_hours_positive CHECK ((attachment_retention_time_hours > 0)),
     CONSTRAINT one_and_only_one CHECK ((id = 0)),
     CONSTRAINT trial_dispatch_timeout_minutes_positive CHECK ((trial_dispatch_timeout_minutes > 0)),
     CONSTRAINT trial_end_state_timeout_minutes_positive CHECK ((trial_end_state_timeout_minutes > 0)),
     CONSTRAINT trial_execution_timeout_minutes_positive CHECK ((trial_execution_timeout_minutes > 0))
+);
+
+
+--
+-- Name: trial_attachments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE trial_attachments (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    path text NOT NULL,
+    content_length text,
+    content_type text,
+    to_be_retained_before timestamp without time zone,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -621,14 +618,6 @@ CREATE TABLE welcome_page_settings (
     updated_at timestamp without time zone DEFAULT now(),
     CONSTRAINT one_and_only_one CHECK ((id = 0))
 );
-
-
---
--- Name: attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY attachments
-    ADD CONSTRAINT attachments_pkey PRIMARY KEY (id);
 
 
 --
@@ -736,6 +725,14 @@ ALTER TABLE ONLY timeout_settings
 
 
 --
+-- Name: trial_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY trial_attachments
+    ADD CONSTRAINT trial_attachments_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: trials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -820,13 +817,6 @@ CREATE INDEX email_addresses_to_tsvector_idx ON email_addresses USING gin (to_ts
 --
 
 CREATE INDEX email_addresses_to_tsvector_idx1 ON email_addresses USING gin (to_tsvector('english'::regconfig, (searchable)::text));
-
-
---
--- Name: index_attachments_on_trial_id_and_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_attachments_on_trial_id_and_path ON attachments USING btree (trial_id, path);
 
 
 --
@@ -1019,6 +1009,13 @@ CREATE INDEX index_tasks_on_traits ON tasks USING btree (traits);
 
 
 --
+-- Name: index_trial_attachments_on_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_trial_attachments_on_path ON trial_attachments USING btree (path);
+
+
+--
 -- Name: index_trials_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1139,13 +1136,6 @@ CREATE RULE "_RETURN" AS
 
 
 --
--- Name: update_updated_at_column_of_attachments; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_attachments BEFORE UPDATE ON attachments FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-
-
---
 -- Name: update_updated_at_column_of_branch_update_triggers; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1216,6 +1206,13 @@ CREATE TRIGGER update_updated_at_column_of_timeout_settings BEFORE UPDATE ON tim
 
 
 --
+-- Name: update_updated_at_column_of_trial_attachments; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_trial_attachments BEFORE UPDATE ON trial_attachments FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
 -- Name: update_updated_at_column_of_trials; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1234,14 +1231,6 @@ CREATE TRIGGER update_updated_at_column_of_users BEFORE UPDATE ON users FOR EACH
 --
 
 CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE ON welcome_page_settings FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-
-
---
--- Name: attachments_trial_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY attachments
-    ADD CONSTRAINT attachments_trial_id_fk FOREIGN KEY (trial_id) REFERENCES trials(id) ON DELETE CASCADE;
 
 
 --
@@ -1433,4 +1422,8 @@ INSERT INTO schema_migrations (version) VALUES ('85');
 INSERT INTO schema_migrations (version) VALUES ('86');
 
 INSERT INTO schema_migrations (version) VALUES ('87');
+
+INSERT INTO schema_migrations (version) VALUES ('88');
+
+INSERT INTO schema_migrations (version) VALUES ('89');
 

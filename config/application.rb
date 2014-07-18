@@ -57,14 +57,8 @@ module CiderCI
 
     config.action_controller.relative_url_root = ENV['RAILS_RELATIVE_URL_ROOT'] or '/cider-ci'
 
-    if defined?(Torquebox)  
-      config.cache_store = :torquebox_store, {expires_in: (60*60*24*7)}
-    else
-      config.cache_store = :memory_store
-    end
+    config.cache_store = :memory_store
 
-    config.release_info = YAML.load_file(Rails.root.join "config","release.yml")
-      .with_indifferent_access[:release]
 
   end
 end
