@@ -1,0 +1,20 @@
+
+default: &default
+  adapter: postgresql
+  encoding: unicode
+  host: localhost
+  pool: 3
+  username: postgres
+  password:
+ 
+development:
+  <<: *default
+  database: cider_ci_dev
+
+test: &test
+  <<: *default
+  database: cider_ci_test
+
+production:
+  <<: *default
+

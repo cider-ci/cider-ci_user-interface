@@ -7,30 +7,10 @@
   scripts:
     rspec:
       body: bundle exec rspec "spec/db/branches_commits_functions_spec.rb"
-- name: feature attachments
-  scripts:
-    rspec:
-      body: bundle exec rspec "spec/feature/attachments_spec.rb"
-- name: feature git_repository
-  scripts:
-    rspec:
-      body: bundle exec rspec "spec/feature/git_repository_spec.rb"
-- name: jobs attachments_sweeper
-  scripts:
-    rspec:
-      body: bundle exec rspec "spec/jobs/attachments_sweeper_spec.rb"
-- name: jobs trial_state_sweeper
-  scripts:
-    rspec:
-      body: bundle exec rspec "spec/jobs/trial_state_sweeper_spec.rb"
 - name: lib dfs
   scripts:
     rspec:
       body: bundle exec rspec "spec/lib/dfs_spec.rb"
-- name: models attachment
-  scripts:
-    rspec:
-      body: bundle exec rspec "spec/models/attachment_spec.rb"
 - name: models branch
   scripts:
     rspec:
@@ -71,6 +51,10 @@
   scripts:
     rspec:
       body: bundle exec rspec "spec/models/trial_spec.rb"
+- name: models welcome_page_settings
+  scripts:
+    rspec:
+      body: bundle exec rspec "spec/models/welcome_page_settings_spec.rb"
 - name: models_no_tx task
   scripts:
     rspec:

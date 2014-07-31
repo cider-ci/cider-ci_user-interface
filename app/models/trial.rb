@@ -8,9 +8,6 @@ class Trial < ActiveRecord::Base
   belongs_to :task
   belongs_to :executor
 
-  has_many :attachments, lambda{reorder(:path)}, dependent: :destroy
-
-  
   def trial_attachments
     TrialAttachment.where("path like '/#{id}/%'")
   end
