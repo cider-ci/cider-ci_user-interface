@@ -4,6 +4,18 @@
 
 module ApplicationHelper
 
+  def api_path
+    root_path << Settings.api.sub_context
+  end
+
+  def api_base_url
+
+    (Settings.api.http_server.ssl ? "https" : "http") \
+      << "://"  <<  Settings.api.http_server.host \
+      << ":" << Settings.api.http_server.port.to_s  \
+      << api_path 
+  end
+
   def bootstrap_color_for_state state
     case state
     when 'success'

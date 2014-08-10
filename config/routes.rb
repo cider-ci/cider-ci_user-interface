@@ -106,6 +106,8 @@ CiderCI::Application.routes.draw do
 
   get /.*/, controller: "application", action: "redirect"
 
+  
+  root 'application#redirect'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

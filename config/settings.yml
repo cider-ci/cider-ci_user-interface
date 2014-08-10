@@ -31,3 +31,9 @@ messaging:
       durable: true
 
 
+api: 
+  sub_context: api_v1
+  http_server: 
+    host: 127.0.0.1
+    port: 8885
+    ssl: false
