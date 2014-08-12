@@ -32,15 +32,17 @@ class Execution < ActiveRecord::Base
       .reorder("branches.updated_at").first
   end
 
-  ### deeper associations
-  #def branches
-  #  Branch.joins(commits: :tree).where("trees.id = ?",self.tree_id) \
+  ## deeper associations
+  # def branches
+  #  Branch.joins(commits: :execution).where("trees.id = ?",self.tree_id) \
   #    .reorder(name: :desc).select("DISTINCT branches.*")
-  #end
-  #def respositories
+  # end
+  # 
+  # def respositories
   #  Repository.joins(branches:  {commits: :tree}).where("trees.id = ?",self.tree_id) \
   #   .reorder(name: :asc,created_at: :desc).select("DISTINCT repositories.*")
-  #end
+  # end
+  
   def trials
     Trial.joins(task: :execution) \
       .where("executions.tree_id = ?",tree_id) \

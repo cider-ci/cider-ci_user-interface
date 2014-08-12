@@ -1,5 +1,5 @@
 git:
-  repositories_path: "/Users/thomas/Programming/CIDER-CI/tmp/repositories"
+  repositories_path: "../tmp/repositories"
 
 http_server:
   host: 127.0.0.1

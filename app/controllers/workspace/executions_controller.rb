@@ -58,21 +58,29 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def index
     @link_params = params.slice(:branch,:page,:repository,:execution_tags)
+    
     @executions = Execution.reorder(created_at: :desc).page(params[:page])
-    @executions= @executions.joins({commits: :branches}) \
-      .where(branches:{name: branch_names_filter}) unless branch_names_filter.empty?
+    
+    @executions= @executions.joins({commits: :branches}).where(branches:{name: branch_names_filter}) unless branch_names_filter.empty?
+    
     @executions= @executions.joins({commits: {branches: :repository}}).distinct \
       .where(repositories: {name: repository_names_filter}) unless repository_names_filter.empty?
+    
     @executions= @executions.per(Integer(params[:per_page])) unless params[:per_page].blank?
+    
     @executions= @executions.joins(:tags).where(tags: {tag: execution_tags_filter}) if execution_tags_filter.count > 0
+    
+    @executions= @executions.joins(:branches).where(tags: {tag: execution_tags_filter})
 
     @execution_cache_signatures = ExecutionCacheSignature \
       .where(%[ execution_id IN (#{@executions.map(&:id).map{|id| "'#{id}'"}.join(",").non_blank_or("NULL")}) ])\
       .select(:execution_id,:stats_signature,:commits_signature,:branches_signature,:tags_signature)
       
+    binding.pry
+    
     respond_to do |format|
      format.html
-     format.json { render json: @executions }
+     format.json { render json: @executions.to_json(:include => [:execution_stat, :repositories, :tags, :commits, :branches]) }
    end
   end
 
