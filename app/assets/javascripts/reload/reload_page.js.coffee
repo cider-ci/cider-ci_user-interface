@@ -59,7 +59,7 @@ $ ->
       dataType: 'html'
       success: (data)->
         if $("#reload-page").attr("data-reload-id") == reloadId.toString()
-          replacePageWith(data)
+          replacePageWithReactMagic(data) # <- where the magic happens :)
       complete: ()->
           $("#reload-page").removeAttr("data-reload-id")
 
@@ -82,6 +82,42 @@ $ ->
       reload()
 
     setTimeout reloadLoop, 1000
+
+
+  #### React magic #############################################################
+
+  #
+  # some code borrowed from
+  # <https://github.com/reactjs/react-magic/blob/gh-pages/magic.js>
+  converter= new HTMLtoJSX({createClass: false})
+  container= '#reload-page'
+
+  replacePageWithReactMagic= (data)->
+    if checkIsAfterReplaceLock()
+      newHTML = $(data).find(container).html()
+      reactRender(newHTML)
+
+  reactRender= (html)->
+    processed= reactComponentFromHTML(html)
+    React.renderComponent(processed, $(container)[0])
+
+  reactComponentFromHTML= (html)->
+    jsx = '/** @jsx React.DOM */ ' + converter.convert(html)
+    try
+      return JSXTransformer.exec(jsx)
+    catch error
+      throw new Error('Error transforming HTML to JSX: ' + error)
+      console.log(jsx)
+      do window.location.reload
+
+  do initReactMagic= ->
+    initialHTML = $(container).html()
+    # Re-render existing content using React, so state transitions work
+    # correctly.
+    reactRender(initialHTML)
+
+  #### /React magic ############################################################
+
 
   window.Reloader={}
   window.Reloader.disable= ->

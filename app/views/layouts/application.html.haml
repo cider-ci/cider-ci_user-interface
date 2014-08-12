@@ -10,6 +10,10 @@
     = javascript_include_tag "application", "data-turbolinks-track" => true
     - if Rails.env == 'development'
       = javascript_include_tag "try", "data-turbolinks-track" => true
+    = javascript_include_tag "http://fb.me/react-0.10.0.js"
+    = javascript_include_tag "http://facebook.github.io/react/js/JSXTransformer.js"
+    = javascript_include_tag "http://facebook.github.io/react/js/html-jsx-lib.js"
+
     = csrf_meta_tags
   %body{data: (@body_data || {})}
     .container
@@ -35,6 +39,6 @@
 
       %div#application{data: {env: Rails.env}}
 
-      = yield 
+        = yield 
 
 
