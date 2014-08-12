@@ -1,6 +1,17 @@
 $ ->
 
   reloadEnabled= true
+  
+  reloadCtrl= $('''
+    <li class='navbar-text navbar-form'>
+        <label>
+          <input type="checkbox" checked>
+          Reload
+        </label>
+    </li>''')
+  .on 'change', 'input', (e)->
+    reloadEnabled = e.currentTarget.checked
+  $('.navbar-default').find('.navbar-right').prepend(reloadCtrl)
 
   logger= Logger.create namespace: 'Reloader', level: 'warn'
 
