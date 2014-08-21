@@ -575,6 +575,21 @@ CREATE TABLE timeout_settings (
 
 
 --
+-- Name: tree_attachments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE tree_attachments (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    path text NOT NULL,
+    content_length text,
+    content_type text,
+    to_be_retained_before timestamp without time zone,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: trial_attachments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -722,6 +737,14 @@ ALTER TABLE ONLY tasks
 
 ALTER TABLE ONLY timeout_settings
     ADD CONSTRAINT timeout_settings_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tree_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY tree_attachments
+    ADD CONSTRAINT tree_attachments_pkey PRIMARY KEY (id);
 
 
 --
@@ -1009,6 +1032,13 @@ CREATE INDEX index_tasks_on_traits ON tasks USING btree (traits);
 
 
 --
+-- Name: index_tree_attachments_on_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_tree_attachments_on_path ON tree_attachments USING btree (path);
+
+
+--
 -- Name: index_trial_attachments_on_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1131,7 +1161,7 @@ CREATE RULE "_RETURN" AS
     count(trials.executor_id) AS current_load,
     ((count(trials.executor_id))::double precision / (executors.max_load)::double precision) AS relative_load
    FROM (executors
-   LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY ((ARRAY['dispatching'::character varying, 'executing'::character varying])::text[])))))
+   LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY (ARRAY[('dispatching'::character varying)::text, ('executing'::character varying)::text])))))
   GROUP BY executors.id;
 
 
@@ -1203,6 +1233,13 @@ CREATE TRIGGER update_updated_at_column_of_tasks BEFORE UPDATE ON tasks FOR EACH
 --
 
 CREATE TRIGGER update_updated_at_column_of_timeout_settings BEFORE UPDATE ON timeout_settings FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_tree_attachments; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_tree_attachments BEFORE UPDATE ON tree_attachments FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1426,4 +1463,6 @@ INSERT INTO schema_migrations (version) VALUES ('87');
 INSERT INTO schema_migrations (version) VALUES ('88');
 
 INSERT INTO schema_migrations (version) VALUES ('89');
+
+INSERT INTO schema_migrations (version) VALUES ('90');
 

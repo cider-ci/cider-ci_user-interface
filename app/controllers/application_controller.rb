@@ -7,6 +7,8 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
+  include Concerns::ServiceSession
+
   helper_method :admin_party? ,:current_user, :user?, :users?, :admin?
 
   before_action do
@@ -22,15 +24,16 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    @current_user ||= User.find(session[:user_id]) rescue nil
+    @current_user ||= 
+      validate_services_session_cookie_and_get_user rescue nil
   end
 
   def user? 
-    admin_party? or current_user
+    admin_party? or current_user 
   end
 
   def admin?
-    admin_party? or (current_user and current_user.is_admin)
+    admin_party? or current_user.try(&:is_admin)
   end
 
   def users?

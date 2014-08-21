@@ -3,6 +3,9 @@
 #  See the LICENSE.txt file provided with this software.
 
 class PublicController < ApplicationController
+
+  include Concerns::ServiceSession
+
   def show
     @radiator_rows= 
       begin 
@@ -44,23 +47,29 @@ class PublicController < ApplicationController
     end
   end
 
+
   def sign_in
     begin
       user = find_user_by_login params.require(:sign_in)[:login].downcase
       if user.authenticate(params.require(:sign_in)[:password])
-        session.reset! rescue nil # this seems to fail, but why?
-        session[:user_id]=user.id
+        create_services_session_cookie user
       else
+        reset_session
+        cookies.delete "cider-ci_services-session"
         raise "Password authentication failed!"
       end
       redirect_to public_path, flash: {success: "You have been signed in!"}
     rescue Exception => e
+      reset_session
+      cookies.delete "cider-ci_services-session"
       redirect_to public_path, flash: {error: e.to_s}
     end
   end
 
+
   def sign_out
     reset_session
+    cookies.delete "cider-ci_services-session"
     redirect_to public_path, flash: {success: "You have been signed out!"}
   end
 

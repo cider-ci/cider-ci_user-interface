@@ -1,14 +1,18 @@
 release: 
   version_major: 1
-  version_minor: 6
-  version_patch: 0-development
+  version_minor: 7
+  version_patch: x
   version_pre: null
   version_build: null
 
 git:
-  repositories_path: "/Users/thomas/Programming/CIDER-CI/tmp/repositories"
+  repositories_path: <%= Rails.root.join("..","tmp", "repositories").to_s %>
 
-trial_attachments_http_prefix: http://127.0.0.1:8883/cider-ci/storage/trial-attachments
+storage_http_prefix: http://127.0.0.1:8883/cider-ci/storage
+
+api_http_prefix: http://127.0.0.1:8885
+api_path: '/cider-ci/api/v1'
+
 
 http_server:
   host: 127.0.0.1

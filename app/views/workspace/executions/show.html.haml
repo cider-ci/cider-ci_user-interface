@@ -4,7 +4,9 @@
 
 - execution ||= @execution 
 - cs = execution.execution_cache_signature
-- cache [execution,admin?,cs.stats_signature,cs.repositories_signature,cs.commits_signature,cs.branches_signature,cs.tasks_signature,cs.trials_signature,@tasks_select_condition,@page] do |cache_tag|
+- cache [execution,admin?,cs.stats_signature,cs.repositories_signature, cs.commits_signature, 
+    cs.branches_signature,cs.tasks_signature, cs.trials_signature,@tasks_select_condition,@page,
+    execution.tree_attachments.collection_cache_tag] do |cache_tag|
   - tasks ||= @tasks
 
   - reload_timeout= %w(failed success).include?(execution.state) ? 30 : 3
@@ -53,6 +55,18 @@
                 substitution.
 
               %pre.script!= execution.error
+
+      - cache execution.tree_attachments.collection_cache_tag do
+        - if  execution.tree_attachments.count > 0
+          .tree_attachments 
+            %h2 
+              Attachments
+            %table.table.table-striped
+              %thead
+              %tbody
+                =render partial: 'attachment', collection: execution.tree_attachments, as: :attachment
+
+
 
       = render 'tasks', execution: execution, tasks: tasks
 

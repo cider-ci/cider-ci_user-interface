@@ -1,12 +1,12 @@
 source 'https://rubygems.org'
-source 'http://torquebox.org/rubygems'
+#source 'http://torquebox.org/rubygems'
 #source 'http://torquebox.org/builds/1781/gem-repo/'
 
 gem 'activerecord-jdbcpostgresql-adapter',  platform: :jruby
 gem 'activerecord-jdbc-adapter', platform: :jruby
 
 gem 'pg', platform: 'mri'
-gem 'rails', '4.1.1'
+gem 'rails', '4.1.4'
 
 #gem 'torquebox-backstage', platform: :jruby, group: [:development]
 #gem 'twister', :path=> '/Users/thomas/Programming/ROR/twister'

@@ -4,6 +4,14 @@
 
 module ApplicationHelper
 
+  def api_path
+    Settings.api_path
+  end
+
+  def api_base_url
+    Settings.api_http_prefix + Settings.api_path
+  end
+
   def bootstrap_color_for_state state
     case state
     when 'success'

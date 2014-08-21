@@ -23,6 +23,10 @@ class Execution < ActiveRecord::Base
 
   serialize :substituted_specification_data
 
+  def tree_attachments
+    TreeAttachment.where("path like '/#{tree_id}/%'")
+  end
+
   def repository
     Repository.joins(branches: :commits).where("commits.tree_id  = ?",self.tree_id) \
       .reorder("branches.updated_at").first

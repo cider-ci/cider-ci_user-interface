@@ -45,7 +45,7 @@ executor.reload.update_attributes! traits: traits
 
 repo= Repository.find_or_initialize_by name: "Cider-CI Bash Demo Project"
 repo.update_attributes! \
-  origin_uri: 'https://github.com/DrTom/cider-ci_demo-project-bash.git'
+  origin_uri: 'https://github.com/cider-ci/cider-ci_demo-project-bash.git'
 
 
 welcome_page_settings= WelcomePageSettings.find

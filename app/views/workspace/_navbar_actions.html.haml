@@ -10,3 +10,23 @@
   =link_to workspace_commits_path do
     %i.icon-commits
     Commits
+
+%li.dropdown.admin-frontpage-actions
+  %a.dropdown-toggle{href: "#", data: {toggle: 'dropdown'}} 
+    %i.fa.fa-magic
+    API
+    %b.caret
+
+  %ul.dropdown-menu
+    %li
+      = link_to api_base_url + "/api-browser/browser.html#" + api_path  do
+        %i.fa.fa-globe
+        API Browser 
+
+    %li
+      = link_to api_base_url + "/doc/api/index.html"  do
+        %i.fa.fa-file-text-o
+        API Documentation
+
+
+

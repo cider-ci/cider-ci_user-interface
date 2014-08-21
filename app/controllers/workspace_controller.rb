@@ -4,8 +4,10 @@
 
 class WorkspaceController < ApplicationController
 
+
   before_action do
-    if not admin_party? and not current_user
+    unless user?
+      reset_session
       redirect_to public_path, flash: {error: "You must be signed in to access this resource!"}
     end
   end
