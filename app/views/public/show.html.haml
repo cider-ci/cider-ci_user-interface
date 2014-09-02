@@ -4,7 +4,7 @@
 
 #welcome-page.cider-ci.text-center
 
-  - cache [WelcomePageSettings.find] do 
+  - cache WelcomePageSettings.find.cache_signature do 
     #welcome_message
       =markdown(WelcomePageSettings.find.welcome_message)
 
@@ -12,8 +12,7 @@
 
   #reload-page{data: { reload_timeout: 30}}
 
-
-    %section.radiator
+    %section#radiator.radiator.reload.replace-without-animation
 
       - @radiator_rows.each do |row |
 

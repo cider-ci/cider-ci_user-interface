@@ -1,0 +1,16 @@
+- trial ||= @trial
+.attachments.trial_attachments 
+  %ol.breadcrumb 
+    = render '/breadcrumbs/trial_attachments', trial: trial
+
+  %h2 
+    Attachments
+
+
+  %table.table.table-striped
+    %thead
+    %tbody
+      =render partial: 'attachment', collection: @trial_attachments, as: :attachment
+
+  = paginate @trial_attachments, theme: 'default'
+

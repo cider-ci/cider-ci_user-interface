@@ -8,13 +8,21 @@
 # * have the summary be scheduled for reloading 
 
 $ -> 
-  $(document).on "ajax:beforeSend","a.button.retry", (e)->
-    $target = $(e.target)
-    $target.addClass("disabled")
-    $target.removeAttr("data-remote")
-    $target.attr("href","#")
 
-  $(document).on "ajax:complete","a.button.retry", (e)->
+  $(document).on "ajax:beforeSend", (e)->
     $target = $(e.target)
-    $target.html("OK")
+    if $target.hasClass("retry-tasks")
+      $target.removeAttr("data-remote")
+      $button = $target.find("button")
+      $button.html("sending ...")
+      $button.addClass("disabled")
+      $target.removeClass("btn-primary")
+      Reloader.abortCurrent()
 
+  $(document).on "ajax:success", (e)->
+    $target = $(e.target)
+    if $target.hasClass("retry-tasks")
+      $button= $target.find("button")
+      $button.addClass("btn-success")
+      $button.html("retrying")
+      Reloader.reloadAsap()

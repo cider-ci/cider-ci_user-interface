@@ -2,26 +2,33 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
+
 - task ||= @task
-- cache [task,task.trials] do |cache_tag|
-  %tr.task
+- cs = [task.cache_signature,task.trials.collection_cache_tag]
+
+- cache cs do |cache_tag|
+
+  %tr.task.reload{id: task.id,data: {cache_tag: cs}}
     %td.state
       =link_to workspace_task_path(task) do
         = render "label_for_state", state: task.state
     %td.name
       =link_to workspace_task_path(task) do
         =task.name
-    - cache task.trials.collection_cache_tag do
-      %td.trials
-        %ul.list-inline.trials
-          - task.trials.reorder(:created_at).each do |trial| 
-            - cache trial do
-              - state = trial.state
-              %li.trial
-                = link_to workspace_trial_path(trial), class: "label #{label_class_for_state(state)}" do
-                  %i{class: icon_class_for_state(state)} 
+    %td.trials
+      %ul.list-inline.trials
+        - task.trials.reorder(:created_at).each do |trial| 
+          - state = trial.state
+          %li.trial
+            = link_to workspace_trial_path(trial), class: "label #{label_class_for_state(state)}" do
+              %i{class: icon_class_for_state(state)} 
     %td.actions
-      .pull-right
-        = link_to retry_workspace_task_path(task), remote: true, method: 'POST', data: {task_id: task.id}, class: "retry button reload btn btn-primary btn-xs" do
+
+      = form_tag retry_workspace_task_path(task), method: 'POST', remote: true, class: "retry-tasks"  do
+        = hidden_field_tag :authenticity_token, form_authenticity_token
+        = hidden_field_tag :task_id, task.id
+        = button_tag type: :submit, class: "retry button btn btn-primary btn-xs" do
           %i.icon-retry
           Retry
+
+

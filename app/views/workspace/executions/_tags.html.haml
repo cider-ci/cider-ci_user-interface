@@ -2,8 +2,10 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-.tags
+- raise "id required" unless id
+
+.tags.reload{id: id, data: {cache_tag: tags.map(&:tag)}}
   %ul.list-inline
-    =render partial: "tag_label", collection: execution.tags.sort, as: :tag
+    =render partial: "tag_label", collection: tags, as: :tag
 
 

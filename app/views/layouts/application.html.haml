@@ -11,7 +11,7 @@
     - if Rails.env == 'development'
       = javascript_include_tag "try", "data-turbolinks-track" => true
     = csrf_meta_tags
-  %body{data: (@body_data || {})}
+  %body{data: {session: session.to_hash}}
     .container
 
       = cache [admin_party?,current_user,admin?] do 
@@ -35,6 +35,6 @@
 
       %div#application{data: {env: Rails.env}}
 
-      = yield 
+        = yield 
 
 

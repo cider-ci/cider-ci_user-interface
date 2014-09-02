@@ -51,11 +51,11 @@ module CiderCI
     config.generators.view_specs= false
     config.generators.helper_specs = false
 
-    config.active_record.timestamped_migrations = false
+    # config.active_record.timestamped_migrations = false
 
     config.log_tags = [:port, :remote_ip, lambda{|req| Time.now.strftime("%T")} ]
 
-    config.action_controller.relative_url_root = ENV['RAILS_RELATIVE_URL_ROOT'] or '/cider-ci'
+    config.action_controller.relative_url_root = ENV['RAILS_RELATIVE_URL_ROOT'] or '/cider-ci/ui'
 
     config.cache_store = :memory_store
 

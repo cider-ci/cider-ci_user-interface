@@ -2,8 +2,21 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
+%ol.breadcrumb 
+  %li 
+    =link_to public_path do 
+      Home 
+    %li Administration
+    %li
+      = link_to admin_repositories_path do
+        Repositories
+    %li
+      = link_to admin_repository_path(@repository) do
+        Repository 
+    %li.active edit
+
+
 %h1 
-  %i.icon-repository
   Edit Repository "#{@repository.name}"
 
 = form_for @repository, url: admin_repository_path(@repository) , method: "PUT", html: {class: "form-horizontal"} do |f|

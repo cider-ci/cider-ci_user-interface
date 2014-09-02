@@ -5,7 +5,7 @@
 - commit = branch.current_commit
 - # we should not need the commit; it seems that 
 - # the updated_at on brach is not reliably updated
-- cache [branch,commit,commit.executions.pluck(:updated_at)] do
+- cache [branch.cache_signature,commit.cache_signature,commit.executions.collection_cache_tag] do
   %tr.branch_head
     %td.name.bolder
       =link_to branch.repository, workspace_repository_path(branch.repository)

@@ -5,11 +5,11 @@
 - commit ||= @commit
 - cs = @commit_cache_signatures ? @commit_cache_signatures.select{|cs| cs.commit_id == commit.id}.first :  commit.commit_cache_signature
 
-- cache [commit, cs.branches_signature, cs.executions_signature, cs.repositories_signature] do |cache_tag|
-  - branches = commit.branches.uniq.sort #.reorder("branches.name ASC")
+- cache [commit.cache_signature, cs.branches_signature, cs.executions_signature, cs.repositories_signature] do |cache_tag|
+  - branches = commit.branches.select(:name,:current_commit_id).reorder("branches.name ASC")
   - repositories = commit.repositories.uniq.sort
 
-  %tr.commit
+  %tr.commit.reload{{id: "commit-tr_#{commit.id}",data: {cache_tag: cache_tag}}}
 
     %td.id.links
       -# =link_to workspace_commit_path(commit) do

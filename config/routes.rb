@@ -5,6 +5,12 @@ CiderCI::Application.routes.draw do
 
   namespace 'workspace' do
 
+    get :user 
+
+    namespace 'api' do
+      get :index
+    end
+
     resource :account, only: [:edit,:update] do
       post :email_addresses, to: "accounts#add_email_address"
       delete '/email_address/:email_address', email_address: /[^\/]+/, to: "accounts#delete_email_address", as: 'delete_email_address'
@@ -29,6 +35,7 @@ CiderCI::Application.routes.draw do
     resources :trials do
       member do
         post 'set_failed'
+        get 'attachments'
       end
     end
 
@@ -36,8 +43,9 @@ CiderCI::Application.routes.draw do
     resources :commits
     resources :executions do
       member do
-        post :add_tags
         get :tasks
+        get :tree_attachments
+        post :add_tags
         post :retry_failed
       end
     end
@@ -63,6 +71,8 @@ CiderCI::Application.routes.draw do
   end
 
   namespace 'admin' do
+
+    get :index
 
     resource :timeout_settings
     resource :welcome_page_settings

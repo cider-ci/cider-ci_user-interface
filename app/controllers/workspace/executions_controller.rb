@@ -15,23 +15,22 @@ class Workspace::ExecutionsController < WorkspaceController
       ActiveRecord::Base.transaction do
         @commit = Commit.find params[:commit_id]
         @definition = Definition.find(params[:definition_id])
-        @execution = Execution.create! ({specification: @definition.specification, 
-                                         definition_name: @definition.name,
-                                         tree_id: @commit.tree_id}.merge(params.require(:execution).permit(:priority)))
-        params[:execution][:tags].split(",").map(&:strip).reject(&:blank?).each do |tag|
-          tag = Tag.find_or_create_by(tag: tag)
-          @execution.tags << tag unless @execution.tags.include? tag 
-        end
-        @commit.head_of_branches.each do |branch|
-          tag= Tag.find_or_create_by(tag: Tag.tagify(branch.name))
-          @execution.tags << tag unless @execution.tags.include? tag 
-          tag= Tag.find_or_create_by(tag: Tag.tagify(branch.repository.name))
-          @execution.tags << tag unless @execution.tags.include? tag 
-        end
+        create_map = \
+          {specification: @definition.specification, 
+           definition_name: @definition.name,
+           tree_id: @commit.tree_id}.merge(params.require(:execution).permit(:priority))
+        @execution = Execution.create! create_map
+        @execution.add_strings_as_tags params[:execution][:tags].split(",") 
       end
-      Execution.create_tasks_and_trials_for @execution.id
-      redirect_to workspace_execution_path(@execution), flash: {success: "The execution has been created. Tasks and trials will be created in the background."}
+      branches = @commit.head_of_branches
+      @execution.add_strings_as_tags [branches.map(&:name),
+                                      branches.map(&:repository).map(&:name), 
+                                      @current_user.login].flatten
     end
+    Execution.create_tasks_and_trials_for @execution.id
+    redirect_to workspace_execution_path(@execution), 
+      flash: {success: "The execution has been created. 
+              Tasks and trials will be created in the background."}
   end
 
 
@@ -66,9 +65,11 @@ class Workspace::ExecutionsController < WorkspaceController
     @executions= @executions.per(Integer(params[:per_page])) unless params[:per_page].blank?
     @executions= @executions.joins(:tags).where(tags: {tag: execution_tags_filter}) if execution_tags_filter.count > 0
 
+    @executions = @executions.select(:id,:created_at,:tree_id,:state,:definition_name,:updated_at)
+
     @execution_cache_signatures = ExecutionCacheSignature \
-      .where(%[ execution_id IN (#{@executions.map(&:id).map{|id| "'#{id}'"}.join(",").non_blank_or("NULL")}) ])\
-      .select(:execution_id,:stats_signature,:commits_signature,:branches_signature,:tags_signature)
+      .where(%[ execution_id IN (?)], @executions.map(&:id))
+
   end
 
 
@@ -81,9 +82,15 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def show
     @link_params = params.slice(:branch,:page,:repository,:execution_tags)
-    @execution = Execution.find params[:id]
+    @execution = Execution.select(:id,:state,:updated_at,:definition_name,:tree_id,:error).find(params[:id])
+    @trials= Trial.joins(task: :execution).where("executions.id = ?",@execution.id)
     set_and_filter_tasks params
     set_filter_params params
+  end
+
+  def tree_attachments 
+    @execution = Execution.select(:id,:tree_id).find(params[:id])
+    @tree_attachments= @execution.tree_attachments.page(params[:page])
   end
 
   def retry_failed

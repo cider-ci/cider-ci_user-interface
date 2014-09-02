@@ -3,40 +3,57 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - execution ||= @execution 
-- cs = execution.execution_cache_signature
-- cache [execution,admin?,cs.stats_signature,cs.repositories_signature, cs.commits_signature, 
-    cs.branches_signature,cs.tasks_signature, cs.trials_signature,@tasks_select_condition,@page,
-    execution.tree_attachments.collection_cache_tag] do |cache_tag|
-  - tasks ||= @tasks
+- ecs = execution.execution_cache_signature
+- cs = [execution.cache_signature,admin?,ecs.repositories_signature,ecs.commits_signature,
+    ecs.branches_signature,ecs.tasks_signature,@tasks_select_condition,@page,
+    @trials.collection_cache_tag ]
 
-  - reload_timeout= %w(failed success).include?(execution.state) ? 30 : 3
+- cache cs  do |cache_tag|
+
+  - tasks ||= @tasks
+  - reload_timeout= session_adjust_reload_timeout(%w(failed success).include?(execution.state) ? 30 : 3)
   #reload-page{data: { cache_tag: cache_tag, reload_timeout: reload_timeout}}
+
+    %ol.breadcrumb 
+      = render '/breadcrumbs/execution', execution: execution
+      .pull-right 
+        = link_to tree_attachments_workspace_execution_path(execution) do
+          Attachments
+
 
     #execution.execution
 
       %ul.list-inline.actions.pull-right
         - if admin?
           %li
-            =link_to workspace_execution_path(execution), method: "DELETE", class: "btn btn-danger" do
-              %i.icon-trash
-              Delete
+            = form_tag workspace_execution_path(execution), method: 'DELETE' do
+              = hidden_field_tag :authenticity_token, form_authenticity_token
+              = button_tag type: :submit, class: "btn btn-danger" do
+                %i.icon-trash
+                Delete
         %li
           =link_to edit_workspace_execution_path(execution), class: "btn btn-warning" do
             %i.icon-edit
             Edit
         %li
-          =link_to retry_failed_workspace_execution_path(execution,@filter_params), method: 'POST', class: "btn btn-primary" do
-            %i.icon-retry
-            Retry failed
+          = form_tag retry_failed_workspace_execution_path(execution,@filter_params), method: 'POST', remote: false do
+            = hidden_field_tag :authenticity_token, form_authenticity_token
+            = button_tag type: :submit, class: "btn btn-primary" do
+              %i.icon-retry
+              Retry failed
 
 
       %h1 Execution #{execution.definition_name}
+      
+      .row
+        .col-md-9
+          = render 'summary_speed', execution: execution, cache_tag: cache_tag
+        .col-md-3.text-right
+          = render 'tags', tags: execution.tags.sort, id: "execution-tags"
 
-      = render 'tags', execution: execution, cache_tag: cache_tag
-
-      = render 'new_summary', execution: execution, cache_tag: cache_tag
-
-      .commits
+      = render 'summary_stats', execution: execution, cache_tag: cache_tag
+      
+      #commits.commits.reload.replace-without-animation{data: {cache_tag: ecs.commits_signature}}
         %h2 #{ execution.commits.count > 1 ? "Commits" : "Commit"}
         %table.commits.table.table-striped
           %thead
@@ -56,21 +73,10 @@
 
               %pre.script!= execution.error
 
-      - cache execution.tree_attachments.collection_cache_tag do
-        - if  execution.tree_attachments.count > 0
-          .tree_attachments 
-            %h2 
-              Attachments
-            %table.table.table-striped
-              %thead
-              %tbody
-                =render partial: 'attachment', collection: execution.tree_attachments, as: :attachment
-
-
-
       = render 'tasks', execution: execution, tasks: tasks
 
-      .definition
+      
+-#    .definition
         %h2 Execution Definition
 
         .panel.panel-default

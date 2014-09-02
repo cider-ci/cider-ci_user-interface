@@ -6,7 +6,7 @@
 - link_params ||= @link_params
 
 
-%table.table.executions-table
+%table#executions-table.table.executions-table.reload{data: {cache_tag: executions.map(&:id)}}
   %thead
   %tbody
     -# not particular rails like; but it is much faster for now 

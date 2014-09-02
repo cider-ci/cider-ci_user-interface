@@ -4,11 +4,15 @@
 
 - repositories ||= @repositories
 
+%ol.breadcrumb 
+  = render "/breadcrumbs/admin/repositories"
+
 %ul.actions.list-inline.pull-right
   %li
     = link_to new_admin_repository_path, class: 'btn btn-primary' do
       %i.icon-add
       Add a new repository
+
 
 
 %h1 

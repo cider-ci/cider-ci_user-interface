@@ -14,17 +14,19 @@
 %h1 
   Executors
 
+#reload-page{data: {reload_timeout: session_adjust_reload_timeout(3)}}
 
-%table.table.table-striped.executors
-  %thead
-    %tr
-      %th Enabled
-      %th Online
-      %th Name
-      %th Load
-      %th Provided traits
-  %tbody
-  = render partial: 'executor', collection: executors, as: :executor
 
-= paginate executors, theme: 'default'
+  %table.table.table-striped.executors.reload{data: {cache_tag:  executors.map(&:id)}}
+    %thead
+      %tr
+        %th Enabled
+        %th Online
+        %th Name
+        %th Load
+        %th Provided traits
+    %tbody
+    = render partial: 'executor', collection: executors, as: :executor
+
+  = paginate executors, theme: 'default'
 

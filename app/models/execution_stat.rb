@@ -5,4 +5,7 @@
 class ExecutionStat < ActiveRecord::Base
   self.primary_key= :execution_id
   belongs_to :execution
+  def to_s 
+    attributes.values.to_s
+  end
 end

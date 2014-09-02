@@ -7,7 +7,7 @@ module Constants
   UPDATE_BRANCH_TOPIC_NAME = '/topics/branch_updates'
   class << self
     def TRIAL_STATES 
-      @trial_states ||= %w(pending dispatching executing failed success).sort
+      @trial_states ||= %w(aborted pending dispatching executing failed success).sort
     end
   end
 end

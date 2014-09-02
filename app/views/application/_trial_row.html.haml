@@ -3,7 +3,7 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - trial ||= @trial
-- cache trial do 
+- cache trial.cache_signature do 
   - task = trial.task
   - execution = task.execution
   - state ||= trial.state

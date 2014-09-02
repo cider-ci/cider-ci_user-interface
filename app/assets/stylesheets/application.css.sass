@@ -3,6 +3,7 @@
 
 
 @import bootstrap
+@import font-awesome-sprockets
 @import font-awesome
 @import icons
 
@@ -22,6 +23,37 @@ $cider-ci-executing-color: $brand-warning !default
 .failed 
   color: $cider-ci-failed-color !important
 
+.dropdown-menu > li > a, 
+.dropdown-menu > li > form > .btn
+  // sass can't extend nested selectors :/
+  // @extend .dropdown-menu > li > a
+  display: block
+  padding: 3px 20px 3px 15px
+  clear: both
+  font-weight: normal
+  line-height: 1.42857
+  white-space: nowrap
+
+  width: 100%
+  text-align: left
+
+  .navbar-default &, &
+    &.btn
+      @extend .btn-link
+      color: #333
+      &:hover, &:focus
+        text-decoration: none
+        color: #262626
+        background-color: #F5F5F5
+    
+    // support button variations as needed
+    &.btn-warning
+      [class^="icon-"]
+        color: $brand-warning
+      &:hover, &:focus
+        text-decoration: none
+        color: $gray-darker
+        background-color: hsl(hue($brand-warning), saturation($brand-warning), lightness(#F5F5F5))
 
 .commit-id
   font-family: monospace

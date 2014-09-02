@@ -1,155 +1,127 @@
 @import 'spin_cc'
 @import 'pulse'
 
-@mixin font-awesome
-  display: inline-block
-  font-family: FontAwesome
-  font-style: normal
-  font-weight: normal
-  line-height: 1
-  -webkit-font-smoothing: antialiased
-  -moz-osx-font-smoothing: grayscale
+[class^="icon-"]
+  @extend .fa
+  
+  .navbar &
+    @extend .fa-fw // fixed-width icons
+    
+  .dropdown-menu &
+    margin-left: -10px
 
+.icon-add
+  @extend .fa-plus-circle
 
-.icon-add:before
-  @include font-awesome
-  content: $fa-var-plus-circle
+.icon-admin
+  @extend .fa-user-md
 
-.icon-admin:before
-  @include font-awesome
-  content: $fa-var-user-md
+.icon-administrate
+  @extend .fa-cog
 
-.icon-administrate:before
-  @include font-awesome
-  content: $fa-var-cog
+.icon-branch-head, .icon-branch-heads
+  @extend .fa-anchor
 
-.icon-branch-head:before, .icon-branch-heads:before
-  @include font-awesome
-  content: $fa-var-anchor
+.icon-bitbucket
+  @extend .fa-bitbucket
 
-.icon-bitbucket:before
-  @include font-awesome
-  content: $fa-var-bitbucket
+.icon-checked
+  @extend .fa-check
+  before 
+    content: $fa-var-check 
 
-.icon-checked:before
-  @include font-awesome
-  content: $fa-var-check
+.icon-commit, .icon-commits
+  @extend .fa-code-fork
 
-.icon-commit:before, .icon-commits:before
-  @include font-awesome
-  content: $fa-var-code-fork
+.icon-delete
+  @extend .fa-trash-o
 
-.icon-delete:before
-  @include font-awesome
-  content: $fa-var-trash-o
+.icon-donwload
+  @extend .fa-download
 
-.icon-donwload:before
-  @include font-awesome
-  content: $fa-var-download
+.icon-edit
+  @extend .fa-pencil
 
-.icon-edit:before
-  @include font-awesome
-  content: $fa-var-pencil
+.icon-execution, .icon-executions
+  @extend .fa-cog
 
-.icon-execution:before, .icon-executions:before
-  @include font-awesome
-  content: $fa-var-cog
-
-.icon-executing:before,
-  @include font-awesome
+.icon-executing,
   @include spin-clockwise
-  content: $fa-var-cog
+  @extend .fa-cog
 
-.icon-executor:before
-  @include font-awesome
-  content: $fa-var-cogs
+.icon-executor
+  @extend .fa-cogs
 
-.icon-execution-definition:before
-  @include font-awesome
-  content: $fa-var-indent
+.icon-execution-definition
+  @extend .fa-indent
 
-.icon-failed:before
-  @include font-awesome
-  content: $fa-var-frown-o
+.icon-failed
+  @extend .fa-frown-o
 
-.icon-filter:before
-  @include font-awesome
-  content: $fa-var-filter
+.icon-filter
+  @extend .fa-filter
 
-.icon-github:before
-  @include font-awesome
-  content: $fa-var-github
+.icon-github
+  @extend .fa-github
 
-.icon-offline:before
-  @include font-awesome
-  content: $fa-var-heart-o
+.icon-offline
+  @extend .fa-heart-o
 
-.icon-online:before
-  @include font-awesome
+.icon-online
   @include pulse
-  content: $fa-var-heart
+  @extend .fa-heart
 
-.icon-pending:before
-  @include font-awesome
+.icon-pending
   @include spin-counter-clockwise
-  content: $fa-var-spinner
+  @extend .fa-spinner
 
-.icon-repository:before
-  @include font-awesome
-  content: $fa-var-archive
+.icon-repository
+  @extend .fa-archive
 
-.icon-retry:before
-  @include font-awesome
-  content: $fa-var-repeat
+.icon-retry
+  @extend .fa-repeat
 
-.icon-sign-in:before
-  @include font-awesome
-  content: $fa-var-sign-in
+.icon-sign-in
+  @extend .fa-sign-in
 
-.icon-sign-out:before
-  @include font-awesome
-  content: $fa-var-sign-out
+.icon-sign-out
+  @extend .fa-sign-out
 
-.icon-success:before
-  @include font-awesome
-  content: $fa-var-smile-o
+.icon-success
+  @extend .fa-smile-o
 
-.icon-tag:before
-  @include font-awesome
-  content: $fa_var-tag
+.icon-tag
+  @extend .fa-tag
 
-.icon-tags:before
-  @include font-awesome
-  content: $fa_var-tags
+.icon-tags
+  @extend .fa-tags
 
-.icon-trial:before
-  @include font-awesome
-  content: $fa-var-question-circle
+.icon-trial
+  @extend .fa-question-circle
 
-.icon-trigger:before
-  @include font-awesome
-  content: $fa-var-bolt
+.icon-trigger
+  @extend .fa-bolt
 
-.icon-timeout-settings:before
-  @include font-awesome
-  content: $fa-var-clock-o
+.icon-timeout-settings
+  @extend .fa-clock-o
 
-.icon-unchecked:before
-  @include font-awesome
-  content: $fa-var-minus
+.icon-unchecked
+  @extend .fa-minus
 
-.icon-user:before
-  @include font-awesome
-  content: $fa-var-user
+.icon-user
+  @extend .fa-user
 
-.icon-warning:before
-  @include font-awesome
-  content: $fa-var-exclamation-triangle
+.icon-warning
+  @extend .fa-exclamation-triangle
 
-.icon-welcome-page-settings:before
-  @include font-awesome
-  content: $fa-var-align-center
+.icon-welcome-page-settings
+  @extend .fa-align-center
 
+.icon-browse
+  @extend .fa-globe
 
+.icon-docs
+  @extend .fa-file-text-o
 
-
+.icon-api
+  @extend .fa-magic

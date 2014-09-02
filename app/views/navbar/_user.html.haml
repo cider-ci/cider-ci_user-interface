@@ -25,7 +25,7 @@
   - else
     %ul.nav.navbar-nav.navbar-right
       %li 
-        %a.dropdown-toggle{data: {toggle: :dropdown}, href: "#" } 
+        %a.dropdown-toggle{data: {toggle: :dropdown}, href: workspace_user_path } 
           - if admin?
             %i.icon-admin
           - else
@@ -33,14 +33,6 @@
           = current_user
           %b.caret
         %ul.dropdown-menu
-          %li
-            =link_to public_sign_out_path, method: 'POST' do
-              %i.icon-sign-out
-              Sign out!
-          %li
-            =link_to edit_workspace_account_path do
-              %i.icon-edit
-              Account
-
+          = render '/navbar/user_list_items'
 
 

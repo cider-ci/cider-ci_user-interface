@@ -3,10 +3,10 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - block_output ||= nil
-%tr.executor{ data: {executor: executor.attributes}}
+%tr.executor.reload{id: executor.id,  data: {cache_tag: "#{executor.updated_at}  #{executor.current_load}"}}
   %td.enabled
     - if executor.enabled 
-      %i.success.icon-checked
+      %i.success.fa.fa-check
     - else 
       %i.icon-unchecked
   %td.online
@@ -14,9 +14,9 @@
       %i.icon-offline
     - else
       - if executor.online? 
-        %i.success.icon-online
+        %i.success.icon-online.fa.fa-heart
       - else
-        %i.failed.icon-offline
+        %i.failed.fa.fa-heart-o
   %td.name #{executor.name}
   %td
     .load.badge

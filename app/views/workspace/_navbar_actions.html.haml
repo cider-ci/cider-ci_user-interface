@@ -12,21 +12,12 @@
     Commits
 
 %li.dropdown.admin-frontpage-actions
-  %a.dropdown-toggle{href: "#", data: {toggle: 'dropdown'}} 
-    %i.fa.fa-magic
+  %a.dropdown-toggle{href: workspace_api_index_path, data: {toggle: 'dropdown'}} 
+    %i.icon-api
     API
     %b.caret
 
   %ul.dropdown-menu
-    %li
-      = link_to api_base_url + "/api-browser/browser.html#" + api_path  do
-        %i.fa.fa-globe
-        API Browser 
-
-    %li
-      = link_to api_base_url + "/doc/api/index.html"  do
-        %i.fa.fa-file-text-o
-        API Documentation
-
+    = render partial: '/workspace/api/menu_items.html.haml'
 
 

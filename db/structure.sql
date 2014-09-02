@@ -24,6 +24,20 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -375,6 +389,16 @@ CREATE TABLE email_addresses (
 
 
 --
+-- Name: executions_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE executions_tags (
+    execution_id uuid,
+    tag_id uuid
+);
+
+
+--
 -- Name: tasks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -390,6 +414,29 @@ CREATE TABLE tasks (
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now()
 );
+
+
+--
+-- Name: execution_cache_signatures; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW execution_cache_signatures AS
+ SELECT executions.id AS execution_id,
+    md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
+    md5(string_agg(DISTINCT (commits.updated_at)::text, ', '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
+    md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
+    ( SELECT md5(string_agg((executions_tags.tag_id)::text, ','::text ORDER BY executions_tags.tag_id)) AS md5
+           FROM executions_tags
+          WHERE (executions_tags.execution_id = executions.id)) AS tags_signature,
+    ( SELECT (((count(DISTINCT tasks.id))::text || ' - '::text) || (max(tasks.updated_at))::text)
+           FROM tasks
+          WHERE (tasks.execution_id = executions.id)) AS tasks_signature
+   FROM ((((executions
+   LEFT JOIN commits ON (((executions.tree_id)::text = (commits.tree_id)::text)))
+   LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
+   LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
+   LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
+  GROUP BY executions.id;
 
 
 --
@@ -414,72 +461,6 @@ CREATE VIEW execution_stats AS
            FROM tasks
           WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'success'::text))) AS success
    FROM executions;
-
-
---
--- Name: executions_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE executions_tags (
-    execution_id uuid,
-    tag_id uuid
-);
-
-
---
--- Name: tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE tags (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    tag character varying(255),
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-
---
--- Name: trials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE trials (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    task_id uuid NOT NULL,
-    executor_id uuid,
-    error text,
-    state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    scripts json DEFAULT '[]'::json NOT NULL,
-    started_at timestamp without time zone,
-    finished_at timestamp without time zone,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-
---
--- Name: execution_cache_signatures; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW execution_cache_signatures AS
- SELECT executions.id AS execution_id,
-    ((((((((string_agg(DISTINCT (execution_stats.total)::text, ', '::text) || '-'::text) || string_agg(DISTINCT (execution_stats.pending)::text, ', '::text)) || '-'::text) || string_agg(DISTINCT (execution_stats.executing)::text, ', '::text)) || '-'::text) || string_agg(DISTINCT (execution_stats.failed)::text, ', '::text)) || '-'::text) || string_agg(DISTINCT (execution_stats.success)::text, ', '::text)) AS stats_signature,
-    md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
-    md5(string_agg(DISTINCT (commits.updated_at)::text, ', '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
-    md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
-    md5(string_agg(DISTINCT (tags.updated_at)::text, ', '::text ORDER BY (tags.updated_at)::text)) AS tags_signature,
-    md5(string_agg(DISTINCT (tasks.updated_at)::text, ', '::text ORDER BY (tasks.updated_at)::text)) AS tasks_signature,
-    md5(string_agg(DISTINCT (trials.updated_at)::text, ', '::text ORDER BY (trials.updated_at)::text)) AS trials_signature
-   FROM (((((((((executions
-   JOIN execution_stats ON ((execution_stats.execution_id = executions.id)))
-   LEFT JOIN commits ON (((executions.tree_id)::text = (commits.tree_id)::text)))
-   LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
-   LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
-   LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
-   LEFT JOIN tasks ON ((tasks.execution_id = executions.id)))
-   LEFT JOIN trials ON ((trials.task_id = tasks.id)))
-   LEFT JOIN executions_tags ON ((executions_tags.execution_id = executions.id)))
-   LEFT JOIN tags ON ((executions_tags.tag_id = tags.id)))
-  GROUP BY executions.id;
 
 
 --
@@ -556,6 +537,18 @@ CREATE TABLE specifications (
 
 
 --
+-- Name: tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE tags (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    tag character varying(255),
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
+);
+
+
+--
 -- Name: timeout_settings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -601,6 +594,25 @@ CREATE TABLE trial_attachments (
     to_be_retained_before timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: trials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE trials (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    task_id uuid NOT NULL,
+    executor_id uuid,
+    error text,
+    state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    scripts json DEFAULT '[]'::json NOT NULL,
+    started_at timestamp without time zone,
+    finished_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now(),
+    CONSTRAINT valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'pending'::character varying, 'success'::character varying])::text[])))
 );
 
 
@@ -753,14 +765,6 @@ ALTER TABLE ONLY tree_attachments
 
 ALTER TABLE ONLY trial_attachments
     ADD CONSTRAINT trial_attachments_pkey PRIMARY KEY (id);
-
-
---
--- Name: trials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY trials
-    ADD CONSTRAINT trials_pkey PRIMARY KEY (id);
 
 
 --
@@ -1025,6 +1029,20 @@ CREATE INDEX index_tasks_on_execution_id ON tasks USING btree (execution_id);
 
 
 --
+-- Name: index_tasks_on_execution_id_and_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tasks_on_execution_id_and_state ON tasks USING btree (execution_id, state);
+
+
+--
+-- Name: index_tasks_on_execution_id_and_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tasks_on_execution_id_and_updated_at ON tasks USING btree (execution_id, updated_at);
+
+
+--
 -- Name: index_tasks_on_traits; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1050,6 +1068,13 @@ CREATE UNIQUE INDEX index_trial_attachments_on_path ON trial_attachments USING b
 --
 
 CREATE INDEX index_trials_on_created_at ON trials USING btree (created_at);
+
+
+--
+-- Name: index_trials_on_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_trials_on_state ON trials USING btree (state);
 
 
 --
@@ -1407,6 +1432,10 @@ SET search_path TO "$user",public;
 INSERT INTO schema_migrations (version) VALUES ('1');
 
 INSERT INTO schema_migrations (version) VALUES ('10');
+
+INSERT INTO schema_migrations (version) VALUES ('100');
+
+INSERT INTO schema_migrations (version) VALUES ('102');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
 

@@ -1,0 +1,25 @@
+.attachments.tree_attachments 
+
+  %ol.breadcrumb 
+    %li 
+      =link_to public_path do 
+        Cider-Ci
+    %li
+      = link_to workspace_executions_path do
+        Executions 
+    %li
+      = link_to workspace_execution_path(@execution) do
+        Execution 
+    %li.active Attachments
+
+  %h2 
+    Attachments
+
+
+
+  %table.table.table-striped
+    %thead
+    %tbody
+      =render partial: 'attachment', collection: @trial_attachments, as: :attachment
+
+  = paginate @tree_attachments, theme: 'default'

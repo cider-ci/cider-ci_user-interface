@@ -5,7 +5,7 @@
 - commit ||= @commit
 - cs = @commit_cache_signatures ? @commit_cache_signatures.select{|cs| cs.commit_id == commit.id}.first :  commit.commit_cache_signature
 
-- cache [commit, cs.branches_signature, cs.executions_signature, cs.repositories_signature] do
+- cache [commit.cache_signautre, cs.branches_signature, cs.executions_signature, cs.repositories_signature] do
   - executions = commit.executions
   - branch_heads = commit.branches
   - branches = commit.branches.reorder("branches.name ASC")

@@ -10,6 +10,9 @@ class AdminController < ApplicationController
     end
   end
 
+  def index
+  end
+
   def dispatch_trials
     begin 
       Executor.enabled.each{|executor| executor.ping}

@@ -4,6 +4,10 @@
 
 - repository = @repository
 
+%ol.breadcrumb 
+  = render '/breadcrumbs/admin/repository', repository: repository
+
+
 .pull-right.actions
   %ul.actions.list-inline
     %li.delete

@@ -3,10 +3,20 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - trial ||= @trial 
-- cache [trial,trial.trial_attachments.collection_cache_tag] do
+- cache [trial.cache_signature,trial.trial_attachments.collection_cache_tag] do
+
+  %ol.breadcrumb 
+    =render '/breadcrumbs/trial', trial: trial
+    %li.pull-right 
+      %ul.list-inline.list-unstyled
+        %li 
+          = link_to attachments_workspace_trial_path(trial) do
+            Attachments
+
   %h1 
-    %i.icon-trial
     Trial for the task "#{trial.task.data['name']}"
+
+
 
   %ul.list-inline
     %li{class: "label #{label_class_for_state(trial.state)}"}
@@ -16,14 +26,17 @@
       - if admin?
         %ul.list-inline
           %li 
-            = link_to workspace_trial_path(trial),method: 'DELETE', class: "btn btn-danger btn-sm" do
-              %i.icon-trash
-              Destroy
+            = form_tag workspace_trial_path(trial), method: 'DELETE' do
+              = hidden_field_tag :authenticity_token, form_authenticity_token
+              = button_tag type: :submit, class: "btn btn-sm btn-danger" do
+                %i.icon-trash
+                Delete
           %li 
-            = link_to set_failed_workspace_trial_path(trial),method: 'POST', class: "btn btn-danger btn-sm" do
-              %i.icon-failed
-              Mark as failed
-
+            = form_tag set_failed_workspace_trial_path(trial), method: 'POST' do
+              = hidden_field_tag :authenticity_token, form_authenticity_token
+              = button_tag type: :submit, class: "btn btn-sm btn-danger" do
+                %i.icon-failed
+                Mark as failed
   %p
     Executed 
     -if trial.started_at
@@ -40,17 +53,6 @@
     %h3 Execution Error
     %pre
       %code= trial.error
-
-  - cache trial.trial_attachments.collection_cache_tag do
-    - if trial.trial_attachments.count > 0
-      .trial_attachments 
-        %h2 
-          Attachments
-        %table.table.table-striped
-          %thead
-          %tbody
-            =render partial: 'attachment', collection: trial.trial_attachments, as: :attachment
-
 
 
   .scripts

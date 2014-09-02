@@ -5,11 +5,16 @@
 - executions ||= @executions
 - link_params ||= @link_params
 
+%ol.breadcrumb 
+  = render partial: "/breadcrumbs/executions" 
 
-- cache @execution_cache_signatures.map{|cs| [@executions,cs.commits_signature,cs.branches_signature]} do |cache_tag|
- 
 
-  #reload-page.executions-page{data: {cache_tag: cache_tag, reload_timeout: 5}}
+- cache @execution_cache_signatures.map{|cs| [@executions,
+    cs.tasks_signature, cs.commits_signature,
+    cs.branches_signature, cs.repositories_signature]} do |cache_tag|
+
+
+  #reload-page.executions-page{data: {cache_tag: cache_tag, reload_timeout: session_adjust_reload_timeout(10)}}
 
     .pull-right
       =render 'index_filter_form'
@@ -18,11 +23,11 @@
       Executions
 
 
-
     .clearfix
 
     = render partial: "executions_table", executions: executions, link_params: link_params
 
-    = paginate executions, theme: 'default'
+    #executions-pagination.replace-without-animation.reload{data: {cache_tag: cache_tag}}
+      = paginate executions, theme: 'default'
 
 

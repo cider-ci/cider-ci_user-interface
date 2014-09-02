@@ -14,7 +14,7 @@ class Execution < ActiveRecord::Base
   has_and_belongs_to_many :tags 
 
   has_many :commits, primary_key: 'tree_id', foreign_key: 'tree_id'  #through: :tree
-  has_many :branches, ->{uniq} ,through: :commits
+  has_many :branches, through: :commits
   has_many :repositories, ->{reorder("").uniq}, through: :branches
 
   has_many :tasks #, foreign_key: [:specification_id,:tree_id]
@@ -43,8 +43,7 @@ class Execution < ActiveRecord::Base
   #end
   def trials
     Trial.joins(task: :execution) \
-      .where("executions.tree_id = ?",tree_id) \
-      .where("executions.specification_id = ?", specification_id) \
+      .where("executions.tree_id = ?",tree_id)
   end
   ######################
 
@@ -78,6 +77,17 @@ class Execution < ActiveRecord::Base
       Execution.find(id).update_attributes \
         state: 'failed', error: Formatter.exception_to_log_s(e)
     end
+  end
+
+  def add_strings_as_tags seq_of_strings 
+    seq_of_strings \
+      .map(&:strip).reject(&:blank?).compact.map{|name| Tag.tagify name} \
+      .map{|tagified_name| Tag.find_or_create_by(tag: tagified_name)} \
+      .each{|tag| self.add_tag tag}
+  end
+
+  def add_tag tag
+    tags << tag unless tags.include? tag 
   end
 
   def create_tasks_and_trials

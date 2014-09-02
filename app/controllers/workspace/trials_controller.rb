@@ -50,5 +50,9 @@ class Workspace::TrialsController < WorkspaceController
     @scripts = @trial.scripts
   end
 
+  def attachments
+    @trial = Trial.find params[:id]
+    @trial_attachments = @trial.trial_attachments.page(params[:page])
+  end
 
 end

@@ -12,7 +12,7 @@ It is possible to run this part of Cider-CI in development mode without
 connecting it to the other Cider-CI services. It is also possible to use MRI
 ruby (instead of JRuby) in development mode. 
 
-    RAILS_RELATIVE_URL_ROOT=/cider-ci rails s -p 8880
+    RAILS_RELATIVE_URL_ROOT=/cider-ci/ui rails s -p 8880
 
 
 ### Messaging 

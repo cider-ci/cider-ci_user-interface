@@ -14,6 +14,22 @@
         .checkbox 
           = check_box_tag :mini_profiler_enabled, "1", session[:mini_profiler_enabled]
 
+      = form_group "Reload strategy", control_id: "reload_strategy" do
+        = select_tag :reload_strategy, 
+          options_for_select([["Default",:default],
+            ["Disabled",:disabled]],
+            session[:reload_strategy]),
+          class: "form-control"
+
+      = form_group "Reload frequency", control_id: "reload_frequency" do
+        = select_tag :reload_frequency, 
+          options_for_select( [["Aggressive",:aggressive],
+            ["Default",:default], ["Slow",:slow]],
+            session[:reload_frequency] || :default),
+          class: "form-control"
+
+
+
       = form_group "" do
         .pull-right
           = button_tag type: 'submit', class: "btn btn-primary" do

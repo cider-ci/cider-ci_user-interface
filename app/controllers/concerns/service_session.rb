@@ -1,4 +1,3 @@
-
 module Concerns
   module ServiceSession 
     extend ActiveSupport::Concern

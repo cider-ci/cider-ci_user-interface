@@ -1,4 +1,177 @@
 
+
+explain ANALYZE
+SELECT id
+FROM trials
+WHERE STATE NOT IN ('aborted',
+                    'success',
+                    'failed')
+  AND trials.created_at <
+    (SELECT now() -
+       (SELECT max(trial_end_state_timeout_minutes)
+        FROM timeout_settings) * interval '1 Minute');
+
+explain ANALYZE
+SELECT id
+FROM trials
+WHERE STATE IN ('executing', 'pending', 'dispatching')
+  AND trials.created_at <
+    (SELECT now() -
+       (SELECT max(trial_end_state_timeout_minutes)
+        FROM timeout_settings) * interval '1 Minute');
+
+
+select distinct state from trials;
+
+ALTER TABLE trials ADD CONSTRAINT valid_state CHECK ( state in ('failed', 'success'));
+
+ALTER TABLE trials DROP CONSTRAINT valid_state;
+
+
+explain analyze SELECT commits.id AS commit_id,
+       count(branches.id)::text || ' - ' ||  max(branches.updated_at)::text as branches_signature,
+       md5(string_agg(DISTINCT repositories.updated_at::text,', 'ORDER BY repositories.updated_at::text)) AS repositories_signature,
+       md5(string_agg(DISTINCT executions.updated_at::text,', 'ORDER BY executions.updated_at::text)) AS executions_signature
+FROM commits
+LEFT OUTER JOIN branches_commits ON branches_commits.commit_id = commits.id
+LEFT OUTER JOIN branches ON branches_commits.branch_id= branches.id
+LEFT OUTER JOIN executions ON executions.tree_id = commits.tree_id
+LEFT OUTER JOIN repositories ON branches.repository_id= repositories.id
+WHERE commits.id = '9525afe09976766eb5d8c881d173f7269675f24b'
+GROUP BY commits.id;
+
+-- #################################################################
+
+explain analyze SELECT DISTINCT "commits".*
+FROM "commits"
+INNER JOIN "branches_commits" ON "branches_commits"."commit_id" = "commits"."id"
+INNER JOIN "branches" ON "branches"."id" = "branches_commits"."branch_id"
+INNER JOIN "repositories" ON "repositories"."id" = "branches"."repository_id"
+WHERE "repositories"."name" IN ('Madek')
+  AND  "commits"."committer_date"  > ( now() - interval '1000 Days')
+ORDER BY "commits"."committer_date" DESC,
+         "commits"."depth" DESC LIMIT 12
+;
+
+
+explain analyze SELECT DISTINCT "commits".*
+FROM "commits"
+INNER JOIN "branches_commits" ON "branches_commits"."commit_id" = "commits"."id"
+INNER JOIN "branches" ON "branches"."id" = "branches_commits"."branch_id"
+INNER JOIN "repositories" ON "repositories"."id" = "branches"."repository_id"
+WHERE "branches"."name" IN ('next')
+  AND "repositories"."name" IN ('Madek')
+  AND  "commits"."committer_date"  > ( now() - interval '100 Days')
+ORDER BY "commits"."committer_date" DESC,
+         "commits"."depth" DESC LIMIT 12
+OFFSET 0
+;
+
+
+
+
+
+OFFSET 0
+-- TODO test/add (tasks.execution_id, tasks.updated_at) index 
+-- TODO test/add (tasks.execution_id, tasks.state ) index 
+-- TODO add tasks.updated_at index 
+-- TODO add tasks.state index
+
+
+explain analyze SELECT * FROM execution_stats 
+where execution_id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'; 
+
+explain analyze SELECT "execution_cache_signatures".*
+FROM "execution_cache_signatures"
+WHERE (execution_id IN ('78d5fca7-2b45-47b6-be4e-e1d43cdb4b12',
+                        '9083e49f-20df-4f7d-ada7-403e6477b879',
+                        '73909e12-02b3-47ae-a4bc-cab93e3ba071',
+                        'ded35229-12dc-4471-9b9d-288fc33fc67d',
+                        '4f28e3ec-2700-43d3-ae6b-3bcb785b7d0a',
+                        '4daf28dd-1c38-45e6-a765-3a813b4898c7',
+                        'ea6c4117-425f-491a-9db6-f3a04f82abb1',
+                        '5c812397-8b51-4ed3-a956-32cf6d04522e',
+                        'a95df42a-cfbb-4853-93a4-169ba5e5d7fa',
+                        'c05d19e4-55b6-4078-831d-76cf77f5f9dd',
+                        '6aba2625-1918-4ebb-8d02-9604da06044f',
+                        'a95f4bd6-afb4-4abc-879b-a5c3eaa7d8f2'))
+                    ;
+
+explain analyze SELECT executions.id as execution_id,
+md5(string_agg(DISTINCT branches.updated_at::text,', 'ORDER BY branches.updated_at::text)) AS branches_signature,
+md5(string_agg(DISTINCT commits.updated_at::text,', 'ORDER BY commits.updated_at::text)) AS commits_signature,
+md5(string_agg(DISTINCT repositories.updated_at::text,', 'ORDER BY repositories.updated_at::text)) AS repositories_signature,
+md5(string_agg(DISTINCT tags.updated_at::text,', 'ORDER BY tags.updated_at::text)) AS tags_signature,
+count(DISTINCT tasks.id)::text || ' - ' ||  max(tasks.updated_at)::text as tasks_signature
+FROM executions
+LEFT OUTER JOIN commits ON executions.tree_id = commits.tree_id
+LEFT OUTER JOIN branches_commits ON branches_commits.commit_id = commits.id
+LEFT OUTER JOIN branches ON branches_commits.branch_id= branches.id
+LEFT OUTER JOIN repositories ON branches.repository_id= repositories.id
+LEFT OUTER JOIN tasks ON tasks.execution_id = executions.id
+LEFT OUTER JOIN executions_tags ON executions_tags.execution_id = executions.id
+LEFT OUTER JOIN tags ON executions_tags.tag_id = tags.id
+WHERE executions.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
+GROUP BY executions.id;
+
+explain analyze SELECT executions.id as execution_id,
+md5(string_agg(DISTINCT branches.updated_at::text,', 'ORDER BY branches.updated_at::text)) AS branches_signature,
+md5(string_agg(DISTINCT commits.updated_at::text,', 'ORDER BY commits.updated_at::text)) AS commits_signature,
+md5(string_agg(DISTINCT repositories.updated_at::text,', 'ORDER BY repositories.updated_at::text)) AS repositories_signature,
+(SELECT (md5(string_agg(executions_tags.tag_id::text,',' ORDER BY tag_id))) FROM executions_tags WHERE executions_tags.execution_id = executions.id) AS tags_signature,
+(SELECT (count(DISTINCT tasks.id)::text || ' - ' || max(tasks.updated_at)::text ) FROM tasks WHERE tasks.execution_id = executions.id) as tasks_signature,
+(SELECT ( count(trials.id)::text || ' - ' ||  max(trials.updated_at)::text ) FROM tasks JOIN trials ON trials.task_id = tasks.id WHERE tasks.execution_id = executions.id) AS trials_signature,
+(SELECT concat_ws(':', total,failed,executing,pending,success) FROM execution_stats WHERE execution_id = executions.id) as stats_signature
+FROM executions
+LEFT OUTER JOIN commits ON executions.tree_id = commits.tree_id
+LEFT OUTER JOIN branches_commits ON branches_commits.commit_id = commits.id
+LEFT OUTER JOIN branches ON branches_commits.branch_id= branches.id
+LEFT OUTER JOIN repositories ON branches.repository_id= repositories.id
+WHERE executions.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
+GROUP BY executions.id;
+
+
+explain analyze SELECT concat_ws(':', total,failed,executing,pending,success)  FROM execution_stats
+WHERE execution_id = 'ded35229-12dc-4471-9b9d-288fc33fc67d' ;
+
+
+explain analyze SELECT (
+  SELECT ( count(trials.id)::text || ' - ' ||  max(trials.updated_at)::text ) FROM tasks 
+  JOIN trials ON trials.task_id = tasks.id 
+  WHERE tasks.execution_id = executions.id)   FROM executions
+WHERE executions.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d' ;
+
+
+
+explain analyze SELECT executions.id, 
+(select count(*) from tasks where tasks.execution_id = executions.id) as total
+FROM executions
+WHERE executions.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
+;
+
+
+explain analyze SELECT executions.id, 
+(select count(*) from tasks where tasks.execution_id = executions.id and state = 'success') as success
+FROM executions
+WHERE executions.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
+;
+
+explain analyze SELECT tags_signature
+FROM "execution_cache_signatures"
+WHERE (execution_id IN ('2727b796-9054-4e39-a450-527e856efede',
+                        '0336a2b5-2ba7-41bb-92d3-c01b21904102',
+                        '3c0766a1-94a4-407e-a64d-7ca5458f65aa',
+                        'c11a98be-326f-4531-9f97-3b6b39a67608',
+                        '73a0aa43-3f31-431d-92c6-37f9e614a795',
+                        'e7c31583-9fb0-46e3-8ea1-9f5057d6332e',
+                        '9d7a1d04-2e43-47c4-ab40-2568c98d988e',
+                        'bc791f88-6909-4a61-a74d-9bc6c58a74ac',
+                        'bf908f9d-cf0e-45f1-87b7-1cb21b6eb55e',
+                        '9456ccb7-0514-40d0-9d41-e029ef46a74e',
+                        '11d68ad2-5c51-4ce5-ad3f-e7d0e34b8b8c',
+                        'd2fb9339-5557-47b3-8018-4b89494cbe7a'))
+;
+
 -- SCRIPTS to be cleaned
 
 SELECT * FROM trials

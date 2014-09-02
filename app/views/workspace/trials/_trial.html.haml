@@ -3,7 +3,7 @@
 -#  See the LICENSE.txt file provided with this software.
 
 -# we probably don't need this view anymore
-- cache trial do
+- cache trial.cache_signature do
   - state = trial.state
   %li.trial
     = link_to workspace_trial_path(trial), class: "label #{label_class_for_state(state)}" do

@@ -32,25 +32,23 @@
                   value: commit_text_search_filter, 
                   class: "search-query form-control input-sm"
 
-          .help-block{style: "margin-left: 14px"}
-            %small
-              :markdown
-                Values within one field are combined with logical _or_.
-                Multiple fields are combined with logical  _and_.
 
       %fieldset 
         .pull-right
           %ul.list-inline
+
             %li
-              .checkbox
-                %label
-                  = check_box_tag :is_branch_head, true, is_branch_head_filter, class: "inline" 
-                  Is branch head
-            %li
-              .checkbox
-                %label
-                  = check_box_tag :with_execution, true, with_execution_filter, class: "inline" 
-                With execution
+              .form-group
+                %label.sr-only{for: "commit_text"}
+                = select_tag :commited_within_last_days, 
+                  options_for_select([["commited within the last 24 hours",1],
+                    ["commited within the last 10 days",10],
+                    ["commited within the last 3 months",92],
+                    ["commited within the last 2 years",730],
+                    ["-",nil]],
+                    (commited_within_last_days_filter || 10)), 
+                  class: "form-control input-sm"
+
 
             %li
               = render 'per_page_form_group'
@@ -66,13 +64,16 @@
                 %i.icon-filter
                 Filter
 
+      .help-block{style: "margin-left: 14px"}
+        %small
+          :markdown
+            Values within one field are combined with logical _or_.
+            Multiple fields are combined with logical  _and_.
+
+
 
   %h1 
-    -case
-    -when is_branch_head_filter
-      Branch heads
-    -else
-      Commits
+    Commits
 
     -case
     -when branch_names_filter.count == 1

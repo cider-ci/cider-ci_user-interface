@@ -16,6 +16,7 @@ class WorkspaceController < ApplicationController
   helper_method \
     :branch_names_filter, 
     :commit_text_search_filter,
+    :commited_within_last_days_filter,
     :is_branch_head_filter,
     :execution_tags_filter,
     :repository_names_filter, 
@@ -37,23 +38,17 @@ class WorkspaceController < ApplicationController
       .split(",").map(&:strip).reject(&:blank?) rescue []
   end
 
-  def commit_text_search_filter
-    params.try('[]',"commit").try('[]',:text).try(:nil_or_non_blank_value)
+  def commited_within_last_days_filter
+    Integer(params[:commited_within_last_days]) rescue nil
   end
 
-  def is_branch_head_filter
-    params["is_branch_head"] or false
+  def commit_text_search_filter
+    params.try('[]',"commit").try('[]',:text).try(:nil_or_non_blank_value)
   end
 
   def with_branch_filter
     params["with_branch"] or false
   end
-
-  def with_execution_filter
-    params["with_execution"] or false
-  end
-
-
 
   def dashboard
     @executions = Execution.reorder(created_at: :desc).limit(10)

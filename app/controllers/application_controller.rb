@@ -8,6 +8,8 @@ class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
 
   include Concerns::ServiceSession
+  include Concerns::SessionHelper
+
 
   helper_method :admin_party? ,:current_user, :user?, :users?, :admin?
 

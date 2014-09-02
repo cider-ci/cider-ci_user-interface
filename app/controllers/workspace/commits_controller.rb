@@ -5,11 +5,10 @@
 class Workspace::CommitsController < WorkspaceController 
 
   def index
-    @link_params = params.slice(:branch,:commit_text,:page,:repository)
+    @link_params = params.slice(:branch,:commit,:page,:per_page,:repository,:commited_within_last_days)
 
     @commits = Commit.distinct.page(params[:page])
     @commits= @commits.per(Integer(params[:per_page])) unless params[:per_page].blank?
-
 
     @commits = @commits.joins(:branches) \
       .where(branches:{name: branch_names_filter}) unless branch_names_filter.empty?
@@ -19,19 +18,22 @@ class Workspace::CommitsController < WorkspaceController
 
     @commits = @commits.basic_search(commit_text_search_filter,false) if commit_text_search_filter
 
-    @commits = @commits.joins(:head_of_branches) if is_branch_head_filter
 
-    @commits = @commits.joins(tree: :executions) if with_execution_filter
+    if commited_within_last_days_filter
+      @commits= @commits \
+        .where(%[ "commits"."committer_date"  > ( now() - interval '? days') ], 
+               commited_within_last_days_filter) 
+    end
 
     @commits = @commits.reorder(committer_date: :desc, depth: :desc)
 
-    @commits_cache_signatures = CommitCacheSignature \
-      .where(%[ commit_id IN (#{@commits.map(&:id).map{|id| "'#{id}'"}.join(",").non_blank_or("NULL")}) ])
+    @commits= @commits.select(:committer_date,:committer_name,:depth,:id,:subject,:tree_id,:updated_at)
+
+    @commits_cache_signatures = CommitCacheSignature.where(%< commit_id IN (?) >, @commits.map(&:id) )
 
     @commits_cache_signatures_array= @commits_cache_signatures.map do |cs| 
       [cs.commit_id,cs.branches_signature,cs.repositories_signature,cs.executions_signature]
     end
-
 
   end
 
