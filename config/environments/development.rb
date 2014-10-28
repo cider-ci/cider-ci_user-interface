@@ -12,8 +12,7 @@ CiderCI::Application.configure do
   # Show full error reports and disable caching.
   config.consider_all_requests_local       = true
 
-  config.action_controller.perform_caching = false
-  #config.action_controller.perform_caching = true
+  config.action_controller.perform_caching = ENV['RAILS_CACHE'].present? ? true : false
 
   # Don't care if the mailer can't send.
   config.action_mailer.raise_delivery_errors = false
@@ -29,7 +28,7 @@ CiderCI::Application.configure do
   # number of complex assets.
   config.assets.debug = true
 
-  config.log_level = :info
+  # config.log_level = :info
 
   # config.action_controller.relative_url_root = '/cider_ci_dev'
 end

@@ -1,38 +1,45 @@
-
 class Messaging
-  def self.initialize
+  class << self 
 
-    begin 
+    def init
+      begin 
 
-      Rails.logger.info "Initializing messaging..." 
-      @conn = Bunny.new Settings.messaging.connection.to_hash
-      @conn.start
-      @ch = @conn.create_channel
+        @memoized_created_exchanges = {}
 
-      unless ENV['MESSAGING_BIND_CONSUMERS'].blank?
+        Rails.logger.info "Initializing messaging..." 
+        @conn = Bunny.new Settings.messaging.connection.to_hash
+        @conn.start
+        @ch = @conn.create_channel
 
-        Consumers::BranchEvent.initialize(@ch)
+      rescue Exception => e
 
-        Consumers::TrialEventUpdate.initialize(@ch)
+        Rails.logger.warn Formatter.exception_to_log_s e
+        puts "Messaging is not available in this process!"
 
-        Rails.logger.info "... initialized messaging." 
-
-      else
-
-        Rails.logger.warn "messaging consumers are not bound!"
-        puts "messaging consumers are not bound!"
+        unless %w(development test).include? Rails.env 
+          raise e
+        end
 
       end
 
-    rescue Bunny::TCPConnectionFailed => e
+    end
 
-      Rails.logger.warn Formatter.exception_to_log_s e
-      puts "Messaging is not available in this process!"
 
-      unless %w(development test).include? Rails.env 
-        raise e
-      end
+    def publish name, message, routing_key=name 
+      @conn || init
+      memoized_create_exchange(name).publish(message.to_json,routing_key: routing_key)
+    end
 
+    private 
+
+    def create_exchange name, options={}
+      @ch.exchange name, {type: 'topic',durable: true}.merge(options)
+    end
+
+    def memoized_create_exchange name, options={}
+      ekey = name + "_"  + @conn.hash.to_s
+      @memoized_created_exchanges[ekey]  \
+        || @memoized_created_exchanges[ekey]= create_exchange(name, options)
     end
 
   end

@@ -24,20 +24,6 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
--- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
---
-
-CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
-
-
---
--- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
---
-
-COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
-
-
---
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -282,14 +268,13 @@ CREATE TABLE commits (
 CREATE TABLE executions (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    substituted_specification_data text,
     tree_id character varying(40) NOT NULL,
-    specification_id uuid NOT NULL,
-    definition_name character varying(255) NOT NULL,
+    name character varying(255) NOT NULL,
     priority integer DEFAULT 5,
-    error text DEFAULT ''::text NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    updated_at timestamp without time zone DEFAULT now(),
+    specification_id uuid,
+    expanded_specification_id uuid
 );
 
 
@@ -298,7 +283,7 @@ CREATE TABLE executions (
 --
 
 CREATE TABLE repositories (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    id uuid NOT NULL,
     origin_uri character varying(255),
     name character varying(255),
     importance integer DEFAULT 0 NOT NULL,
@@ -332,10 +317,9 @@ CREATE VIEW commit_cache_signatures AS
 --
 
 CREATE TABLE definitions (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    name character varying(255),
-    description text,
-    specification_id uuid NOT NULL
+    name character varying(255) NOT NULL,
+    description character varying(255),
+    specification_id uuid
 );
 
 
@@ -389,6 +373,22 @@ CREATE TABLE email_addresses (
 
 
 --
+-- Name: execution_issues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE execution_issues (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    description text,
+    stacktrace text,
+    type character varying(255) DEFAULT 'error'::character varying NOT NULL,
+    execution_id uuid NOT NULL,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now(),
+    CONSTRAINT valid_type CHECK (((type)::text = ANY ((ARRAY['error'::character varying, 'warning'::character varying])::text[])))
+);
+
+
+--
 -- Name: executions_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -407,12 +407,12 @@ CREATE TABLE tasks (
     execution_id uuid NOT NULL,
     state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
     priority integer DEFAULT 5 NOT NULL,
-    data json,
     traits character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
     name character varying(255),
     error text DEFAULT ''::text NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    updated_at timestamp without time zone DEFAULT now(),
+    task_spec_id uuid
 );
 
 
@@ -424,6 +424,8 @@ CREATE VIEW execution_cache_signatures AS
  SELECT executions.id AS execution_id,
     md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
     md5(string_agg(DISTINCT (commits.updated_at)::text, ', '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
+    md5(string_agg(DISTINCT (execution_issues.updated_at)::text, ', '::text ORDER BY (execution_issues.updated_at)::text)) AS execution_issues_signature,
+    count(DISTINCT execution_issues.*) AS execution_issues_count,
     md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
     ( SELECT md5(string_agg((executions_tags.tag_id)::text, ','::text ORDER BY executions_tags.tag_id)) AS md5
            FROM executions_tags
@@ -431,7 +433,8 @@ CREATE VIEW execution_cache_signatures AS
     ( SELECT (((count(DISTINCT tasks.id))::text || ' - '::text) || (max(tasks.updated_at))::text)
            FROM tasks
           WHERE (tasks.execution_id = executions.id)) AS tasks_signature
-   FROM ((((executions
+   FROM (((((executions
+   LEFT JOIN execution_issues ON ((executions.id = execution_issues.execution_id)))
    LEFT JOIN commits ON (((executions.tree_id)::text = (commits.tree_id)::text)))
    LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
    LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
@@ -529,10 +532,8 @@ CREATE TABLE schema_migrations (
 --
 
 CREATE TABLE specifications (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    data text NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    id uuid NOT NULL,
+    data json
 );
 
 
@@ -545,6 +546,16 @@ CREATE TABLE tags (
     tag character varying(255),
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now()
+);
+
+
+--
+-- Name: task_specs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE task_specs (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    data json
 );
 
 
@@ -607,11 +618,11 @@ CREATE TABLE trials (
     executor_id uuid,
     error text,
     state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    scripts json DEFAULT '[]'::json NOT NULL,
     started_at timestamp without time zone,
     finished_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
+    scripts json,
     CONSTRAINT valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'pending'::character varying, 'success'::character varying])::text[])))
 );
 
@@ -684,7 +695,7 @@ ALTER TABLE ONLY commits
 --
 
 ALTER TABLE ONLY definitions
-    ADD CONSTRAINT definitions_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT definitions_pkey PRIMARY KEY (name);
 
 
 --
@@ -693,6 +704,14 @@ ALTER TABLE ONLY definitions
 
 ALTER TABLE ONLY email_addresses
     ADD CONSTRAINT email_addresses_pkey PRIMARY KEY (email_address);
+
+
+--
+-- Name: execution_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY execution_issues
+    ADD CONSTRAINT execution_issues_pkey PRIMARY KEY (id);
 
 
 --
@@ -736,6 +755,14 @@ ALTER TABLE ONLY tags
 
 
 --
+-- Name: task_specs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY task_specs
+    ADD CONSTRAINT task_specs_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -765,6 +792,14 @@ ALTER TABLE ONLY tree_attachments
 
 ALTER TABLE ONLY trial_attachments
     ADD CONSTRAINT trial_attachments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: trials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY trials
+    ADD CONSTRAINT trials_pkey PRIMARY KEY (id);
 
 
 --
@@ -847,6 +882,20 @@ CREATE INDEX email_addresses_to_tsvector_idx1 ON email_addresses USING gin (to_t
 
 
 --
+-- Name: exectutions_lower_name_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX exectutions_lower_name_idx ON executions USING btree (lower((name)::text));
+
+
+--
+-- Name: exectutions_tree_id_lower_name_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX exectutions_tree_id_lower_name_idx ON executions USING btree (tree_id, lower((name)::text));
+
+
+--
 -- Name: index_branch_update_triggers_on_branch_id_and_definition_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -924,13 +973,6 @@ CREATE INDEX index_commits_on_tree_id ON commits USING btree (tree_id);
 
 
 --
--- Name: index_definitions_on_specification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_definitions_on_specification_id ON definitions USING btree (specification_id);
-
-
---
 -- Name: index_email_addresses_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -938,17 +980,17 @@ CREATE INDEX index_email_addresses_on_user_id ON email_addresses USING btree (us
 
 
 --
+-- Name: index_execution_issues_on_execution_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_execution_issues_on_execution_id ON execution_issues USING btree (execution_id);
+
+
+--
 -- Name: index_executions_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_executions_on_created_at ON executions USING btree (created_at);
-
-
---
--- Name: index_executions_on_specification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_executions_on_specification_id ON executions USING btree (specification_id);
 
 
 --
@@ -962,7 +1004,7 @@ CREATE INDEX index_executions_on_tree_id ON executions USING btree (tree_id);
 -- Name: index_executions_on_tree_id_and_specification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_executions_on_tree_id_and_specification_id ON executions USING btree (tree_id, specification_id);
+CREATE INDEX index_executions_on_tree_id_and_specification_id ON executions USING btree (tree_id, specification_id);
 
 
 --
@@ -1113,13 +1155,6 @@ CREATE INDEX tags_to_tsvector_idx ON tags USING gin (to_tsvector('english'::regc
 
 
 --
--- Name: trials_scripts_count_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX trials_scripts_count_idx ON trials USING btree (json_array_length(scripts));
-
-
---
 -- Name: trigger_tag_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1186,7 +1221,7 @@ CREATE RULE "_RETURN" AS
     count(trials.executor_id) AS current_load,
     ((count(trials.executor_id))::double precision / (executors.max_load)::double precision) AS relative_load
    FROM (executors
-   LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY (ARRAY[('dispatching'::character varying)::text, ('executing'::character varying)::text])))))
+   LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY ((ARRAY['dispatching'::character varying, 'executing'::character varying])::text[])))))
   GROUP BY executors.id;
 
 
@@ -1201,49 +1236,49 @@ CREATE TRIGGER update_updated_at_column_of_branch_update_triggers BEFORE UPDATE 
 -- Name: update_updated_at_column_of_branches; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_branches BEFORE UPDATE ON branches FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_branches BEFORE UPDATE ON branches FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
 -- Name: update_updated_at_column_of_commits; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_commits BEFORE UPDATE ON commits FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_commits BEFORE UPDATE ON commits FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_execution_issues; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_execution_issues BEFORE UPDATE ON execution_issues FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
 -- Name: update_updated_at_column_of_executions; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_executions BEFORE UPDATE ON executions FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_executions BEFORE UPDATE ON executions FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
 -- Name: update_updated_at_column_of_executors; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_executors BEFORE UPDATE ON executors FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_executors BEFORE UPDATE ON executors FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
 -- Name: update_updated_at_column_of_repositories; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_repositories BEFORE UPDATE ON repositories FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-
-
---
--- Name: update_updated_at_column_of_specifications; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_specifications BEFORE UPDATE ON specifications FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_repositories BEFORE UPDATE ON repositories FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
 -- Name: update_updated_at_column_of_tags; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_tags BEFORE UPDATE ON tags FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_tags BEFORE UPDATE ON tags FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1264,28 +1299,28 @@ CREATE TRIGGER update_updated_at_column_of_timeout_settings BEFORE UPDATE ON tim
 -- Name: update_updated_at_column_of_tree_attachments; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_tree_attachments BEFORE UPDATE ON tree_attachments FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_tree_attachments BEFORE UPDATE ON tree_attachments FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
 -- Name: update_updated_at_column_of_trial_attachments; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_trial_attachments BEFORE UPDATE ON trial_attachments FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_trial_attachments BEFORE UPDATE ON trial_attachments FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
 -- Name: update_updated_at_column_of_trials; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_trials BEFORE UPDATE ON trials FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_trials BEFORE UPDATE ON trials FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
 -- Name: update_updated_at_column_of_users; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_users BEFORE UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_users BEFORE UPDATE ON users FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1301,14 +1336,6 @@ CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE O
 
 ALTER TABLE ONLY branch_update_triggers
     ADD CONSTRAINT branch_update_triggers_branch_id_fk FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE CASCADE;
-
-
---
--- Name: branch_update_triggers_definition_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY branch_update_triggers
-    ADD CONSTRAINT branch_update_triggers_definition_id_fk FOREIGN KEY (definition_id) REFERENCES definitions(id) ON DELETE CASCADE;
 
 
 --
@@ -1384,6 +1411,22 @@ ALTER TABLE ONLY email_addresses
 
 
 --
+-- Name: execution_issues_execution_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY execution_issues
+    ADD CONSTRAINT execution_issues_execution_id_fk FOREIGN KEY (execution_id) REFERENCES executions(id) ON DELETE CASCADE;
+
+
+--
+-- Name: executions_expanded_specification_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY executions
+    ADD CONSTRAINT executions_expanded_specification_id_fk FOREIGN KEY (expanded_specification_id) REFERENCES specifications(id);
+
+
+--
 -- Name: executions_specification_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1416,6 +1459,14 @@ ALTER TABLE ONLY tasks
 
 
 --
+-- Name: tasks_task_spec_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY tasks
+    ADD CONSTRAINT tasks_task_spec_id_fk FOREIGN KEY (task_spec_id) REFERENCES task_specs(id) ON DELETE SET NULL;
+
+
+--
 -- Name: trials_task_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1436,6 +1487,20 @@ INSERT INTO schema_migrations (version) VALUES ('10');
 INSERT INTO schema_migrations (version) VALUES ('100');
 
 INSERT INTO schema_migrations (version) VALUES ('102');
+
+INSERT INTO schema_migrations (version) VALUES ('103');
+
+INSERT INTO schema_migrations (version) VALUES ('104');
+
+INSERT INTO schema_migrations (version) VALUES ('105');
+
+INSERT INTO schema_migrations (version) VALUES ('106');
+
+INSERT INTO schema_migrations (version) VALUES ('107');
+
+INSERT INTO schema_migrations (version) VALUES ('108');
+
+INSERT INTO schema_migrations (version) VALUES ('109');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
 

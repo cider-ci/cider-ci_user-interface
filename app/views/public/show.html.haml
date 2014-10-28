@@ -12,6 +12,7 @@
 
   #reload-page{data: { reload_timeout: 30}}
 
+
     %section#radiator.radiator.reload.replace-without-animation
 
       - @radiator_rows.each do |row |
@@ -21,19 +22,9 @@
           %tbody
             %tr
               - row[:items].map(&:deep_symbolize_keys).each do |item|
-                - state_class= (bootstrap_color_for_state(item[:execution][:state]) rescue 'active')
-                %td.branch{class: "#{state_class}"}
-                  %h3= item[:repository_name]
-                  %h2= item[:branch_name]
-                  %h4= item[:definition_name]
-
-                  - if branch= item[:branch] and commit= branch.current_commit
-                    .commit 
-                      %p.committer-date=render 'humanized_time_from_now', at: commit.committer_date
-                      %p 
-                        %span.commit-id= commit.id[0..5]
-                        = render 'remote_links', commit: commit, repositories: commit.repositories.uniq.sort
-
+                %td 
+                  = render '/public/badges/medium.svg.haml',{view_params: item, 
+                    options: {include_stylesheet: false, xlink_show_value: 'replace'}}
 
   %hr 
 

@@ -13,14 +13,4 @@ class AdminController < ApplicationController
   def index
   end
 
-  def dispatch_trials
-    begin 
-      Executor.enabled.each{|executor| executor.ping}
-      dispatched_trials = DispatchService.new.dispatch_trials
-      redirect_to :back, flash: {success: "dipatched #{dispatched_trials}"}
-    rescue Exception => e
-      redirect_to :back, flash: {error: Formatter.exception_to_s(e)}
-    end
-  end
-
 end

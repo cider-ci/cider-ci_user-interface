@@ -1,9 +1,12 @@
 release: 
-  version_major: 1
-  version_minor: 7
-  version_patch: x
+  version_major: 2
+  version_minor: 0
+  version_patch: 0
   version_pre: null
   version_build: null
+
+cider_ci_link: https://github.com/cider-ci/cider-ci
+
 
 git:
   repositories_path: <%= Rails.root.join("..","tmp", "repositories").to_s %>
@@ -11,7 +14,43 @@ git:
 storage_http_prefix: http://127.0.0.1:8883/cider-ci/storage
 
 api_http_prefix: http://127.0.0.1:8885
-api_path: '/cider-ci/api/v1'
+api_path: '/cider-ci/api/v2'
+
+hostname: localhost
+
+basic_auth:
+  user: ui
+  secret: secret
+
+api_service: 
+  host: 127.0.0.1 
+  port: 8885
+  path: '/cider-ci/api/v2' 
+  ssl: false
+
+builder_service: 
+  host: 127.0.0.1 
+  port: 8884
+  path: '/cider-ci/builder' 
+  ssl: false
+
+dispatcher_service: 
+  host: 127.0.0.1 
+  port: 8882
+  path: '/cider-ci/dispatcher' 
+  ssl: false
+
+repository_service: 
+  host: 127.0.0.1 
+  port: 8881
+  path: '/cider-ci/repositories' 
+  ssl: false
+
+storage_service: 
+  host: 127.0.0.1 
+  port: 8883
+  path: '/cider-ci/storage' 
+  ssl: false
 
 
 http_server:
@@ -28,10 +67,4 @@ messaging:
     username: guest
     password: guest
     host: 127.0.0.1
-
-  exchanges:
-    - name: branch_event_topic
-      type: topic
-      durable: true
-
 

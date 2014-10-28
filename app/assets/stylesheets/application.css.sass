@@ -11,7 +11,21 @@ $cider-ci-success-color: $brand-success !default
 $cider-ci-failed-color: $brand-danger !default
 $cider-ci-pending-color: $gray-light !default
 $cider-ci-executing-color: $brand-warning !default
+$cider-ci-unavailable-color: $gray-light !default
 
+$cider-ci-success-color-bg: lighten($cider-ci-success-color,20%)
+$cider-ci-failed-color-bg: lighten($cider-ci-failed-color,20%)
+$cider-ci-pending-color-bg: lighten($cider-ci-pending-color,20%)
+$cider-ci-executing-color-bg: lighten($cider-ci-executing-color,20%)
+$cider-ci-unavailable-color-bg: lighten($cider-ci-unavailable-color,20%)
+
+
+@import svg
+
+.breadcrumb.with-circle-separator
+  > li
+    + li:before
+      content: "○"
 
 @mixin striped-executing() 
   //background-image: -webkit-linear-gradient($angle, $color 25%, transparent 25%, transparent 50%, $color 50%, $color 75%, transparent 75%, transparent)
@@ -241,3 +255,56 @@ pre.script
   overflow: auto
   word-wrap: normal
   white-space: pre
+
+
+svg.cider-ci
+
+  svg
+    &.repo, &.execution
+      &.failed
+        rect
+          fill: $cider-ci-failed-color-bg
+      &.success
+        rect
+          fill: $cider-ci-success-color-bg
+      &.pending
+        rect
+          fill: $cider-ci-pending-color-bg
+      &.executing
+        rect
+          fill: $cider-ci-executing-color-bg
+      &.unavailable
+        rect
+          fill: $cider-ci-unavailable-color-bg
+
+
+  &.badge-medium
+
+    svg.host-info
+      g
+        font-size: 12px
+        text  
+          text-anchor: middle
+        text, tspan
+          font-family: DejaVu Sans, Verdana, Geneva, sans-serif
+          font-weight: normal
+
+    svg.repo
+      g 
+        font-size: 14px
+        text  
+          text-anchor: middle
+        text, tspan
+          font-family: DejaVu Sans, Verdana, Geneva, sans-serif
+          font-weight: bold 
+
+    svg.execution
+      g
+        font-size: 16px
+        text  
+          text-anchor: middle
+        text, tspan
+          font-family: DejaVu Sans, Verdana, Geneva, sans-serif
+          font-weight: bold 
+
+

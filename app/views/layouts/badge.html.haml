@@ -1,0 +1,21 @@
+-#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Licensed under the terms of the GNU Affero General Public License v3.
+-#  See the LICENSE.txt file provided with this software.
+
+!!!
+%html
+  %head
+    %title Cider-CI Badge 
+    = stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true
+    = javascript_include_tag "application", "data-turbolinks-track" => true
+    - if Rails.env == 'development'
+      = javascript_include_tag "try", "data-turbolinks-track" => true
+    = csrf_meta_tags
+  %body{data: {session: session.to_hash}}
+    .container
+
+      %div#application{data: {env: Rails.env}}
+
+        = yield 
+
+

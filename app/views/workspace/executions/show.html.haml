@@ -3,10 +3,11 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - execution ||= @execution 
+- state = execution.state
 - ecs = execution.execution_cache_signature
-- cs = [execution.cache_signature,admin?,ecs.repositories_signature,ecs.commits_signature,
-    ecs.branches_signature,ecs.tasks_signature,@tasks_select_condition,@page,
-    @trials.collection_cache_tag ]
+- cs = [execution.id,execution.updated_at,admin?,ecs.repositories_signature,ecs.commits_signature,
+    ecs.branches_signature, ecs.tasks_signature,@tasks_select_condition,ecs.execution_issues_count,
+    @page,@trials.collection_cache_tag ]
 
 - cache cs  do |cache_tag|
 
@@ -14,11 +15,30 @@
   - reload_timeout= session_adjust_reload_timeout(%w(failed success).include?(execution.state) ? 30 : 3)
   #reload-page{data: { cache_tag: cache_tag, reload_timeout: reload_timeout}}
 
-    %ol.breadcrumb 
-      = render '/breadcrumbs/execution', execution: execution
-      .pull-right 
-        = link_to tree_attachments_workspace_execution_path(execution) do
-          Attachments
+    .row
+      .col-md-6
+        %ol.breadcrumb.pull-left
+          = render '/breadcrumbs/execution', execution: execution
+      .col-md-6
+        %ol.breadcrumb.with-circle-separator.pull-right
+          %li 
+            = link_to tree_attachments_workspace_execution_path(execution) do
+              Attachments
+          %li#issues-link.reload{data: {cache_tag: ecs.execution_issues_count}}
+            - if ecs.execution_issues_count <= 0
+              %span.text-muted Issues
+            - else 
+              = link_to issues_workspace_execution_path(execution) do
+                %span.text-danger #{ecs.execution_issues_count} Issues
+          %li 
+            = link_to specification_workspace_execution_path(execution) do
+              Specification
+
+    #issues-alert.reload{data: {cache_tag: ecs.execution_issues_count}}
+      - if ecs.execution_issues_count >= 1
+        .alert.alert-danger
+          %p 
+            This execution has issues! 
 
 
     #execution.execution
@@ -43,7 +63,10 @@
               Retry failed
 
 
-      %h1 Execution #{execution.definition_name}
+      %h1
+        %span#header-label.reload.label{data: {cache_tag: execution.state}, class: label_class_for_state(state)}<>
+          %i{class: icon_class_for_state(state)}<>
+        %span &nbsp; Execution "#{execution.name}"
       
       .row
         .col-md-9
@@ -60,34 +83,5 @@
           %tbody
             != render partial: "commit_tr", collection: execution.commits, as: :commit
 
-      .error
-        - unless execution.error.blank? 
-          .panel.panel-danger
-            .panel-heading
-              %h2.panel-title Error
-            .panel-body
-              %p 
-                This execution has errors. The common causes are a semantically 
-                incorrect specification or not existing objects in git during 
-                substitution.
-
-              %pre.script!= execution.error
-
       = render 'tasks', execution: execution, tasks: tasks
-
-      
--#    .definition
-        %h2 Execution Definition
-
-        .panel.panel-default
-          .panel-heading
-            %h3.panel-title Definition
-          .panel-body
-            %pre.script!= execution.specification.data.to_yaml
-
-        .panel.panel-default
-          .panel-heading
-            %h3.panel-title Substituted Definition
-          .panel-body
-            %pre.script!= execution.substituted_specification_data.to_yaml
 

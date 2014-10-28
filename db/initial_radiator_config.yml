@@ -4,10 +4,10 @@ rows:
   items:
   - repository_name: Cider-CI Bash Demo Project
     branch_name: master
-    definition_name: All tests
+    execution_name: Test
   - repository_name: Cider-CI Bash Demo Project
     branch_name: wip
-    definition_name: All tests
+    execution_name: Test
   - repository_name: No repository
     branch_name: nix
-    definition_name: No tests
+    execution_name: No tests

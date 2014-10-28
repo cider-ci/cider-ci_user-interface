@@ -6,23 +6,20 @@
 %li.script.well{data: {state: state}}  
 
   %h3{id: script["id"], name: script["name"]}
-    %i.icon-file-text-alt
-    Script: "#{script["name"]}"
+    %span.label{class: label_class_for_state(state)}<>
+      %i{class: icon_class_for_state(state)}<>
+    %span &nbsp; "#{script["name"]}"
 
   - started_at= Time.zone.parse(script["started_at"]) rescue false
   - finished_at= Time.zone.parse(script["finished_at"]) rescue false
 
   %ul.list-inline 
-    %li 
-      %span.label{class: label_class_for_state(state)}
-        %i{class: icon_class_for_state(state)}
-        = state
     -if finished_at and started_at
       %li Duration: #{distance_of_time_in_words(started_at,finished_at,include_seconds: true)} (#{(finished_at - started_at).round(2)} seconds)
 
-  %ul.list-inline 
     -if started_at
       %li Started #{render 'humanized_time_from_now', at: started_at}
+
     -if finished_at
       %li Finished #{render 'humanized_time_from_now', at: started_at}
 
@@ -31,7 +28,6 @@
     - ["body","error","stderr","stdout"].reject{|att_name| script[att_name].blank?}.each do |att_name|
       %li
         %h4
-          %i.icon-code
           =att_name.capitalize
         %pre.script{class: att_name}= script[att_name]
 

@@ -1,0 +1,10 @@
+messaging: 
+
+  connection: 
+
+    vhost: "/"
+    username: guest
+    password: guest
+    host: 127.0.0.1
+
+

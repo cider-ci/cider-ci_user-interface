@@ -45,6 +45,9 @@ CiderCI::Application.routes.draw do
       member do
         get :tasks
         get :tree_attachments
+        get :specification
+        get :issues, action: 'issues'
+        delete "issues/:issue_id", action: 'delete_issue', as: 'issue'
         post :add_tags
         post :retry_failed
       end
@@ -77,6 +80,8 @@ CiderCI::Application.routes.draw do
     resource :timeout_settings
     resource :welcome_page_settings
 
+    resource :status
+
     resources :branch_update_triggers
     resources :definitions
     resources :users do
@@ -108,6 +113,12 @@ CiderCI::Application.routes.draw do
   namespace 'public' do
     post 'sign_in'
     post 'sign_out'
+    resources :badges , only: [] do
+      collection do
+        get "medium/:repository_name/:branch_name/:execution_name", action: "medium"
+        # get ":repository/:branch_name/:execution_name"
+      end
+    end
   end
 
   namespace 'perf' do

@@ -3,14 +3,22 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - task ||= @task
+- state = task.state
+.row
+  .col-md-6
+    %ol.breadcrumb.pull-left
+      = render '/breadcrumbs/task', task: task
 
-%ol.breadcrumb 
-  = render '/breadcrumbs/task', task: task
+
+%h1 
+  %span.label{class: label_class_for_state(state)}<>
+    %i{class: icon_class_for_state(state)}<>
+  %span &nbsp; Task "#{task.name}"
 
 
-%h1 Task "#{task.name}"
 
 %h2 Trials
+
 
 %table.table.striped
   %thead
@@ -18,11 +26,12 @@
     - task.trials.reorder(created_at: :asc).each_with_index do |trial,i|
       %tr
         %td
-          = link_to workspace_trial_path(trial) do
+          = link_to workspace_trial_path(trial), class: "label #{label_class_for_state(trial.state)}" do
+            %i{class: icon_class_for_state(trial.state)} 
             =(i+1).ordinalize
         %td
           %ul.list-inline 
-            = render partial: 'script_label', collection: trial.scripts, as: :script, locals: {trial: trial}
+            = render partial: 'script_label', collection: trial.scripts.values, as: :script, locals: {trial: trial}
 
 
 
@@ -35,4 +44,9 @@
         %td=k 
         %td
           %pre.script{style: "border: none; padding: 0; margin: 0"}<>= (v.is_a? Array or v.is_a? Hash) ? v.to_yaml : v
+
+
+%h2 Specification
+
+%pre= task.task_spec.data.to_yaml
 

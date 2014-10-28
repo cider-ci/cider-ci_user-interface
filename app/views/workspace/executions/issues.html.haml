@@ -1,0 +1,16 @@
+
+.row
+  .col-md-6
+    %ol.breadcrumb.pull-left
+      = render '/breadcrumbs/execution', execution: @execution
+      %li.inactive
+        Issues
+
+%ul.list-unstyled 
+  = render partial: 'issue', collection: @issues 
+
+
+= paginate @issues, theme: 'default'
+
+
+

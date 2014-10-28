@@ -5,6 +5,8 @@
 class PublicController < ApplicationController
 
   include Concerns::ServiceSession
+  include Concerns::BadgeParamsBuilder
+
 
   def show
     @radiator_rows= 
@@ -22,21 +24,9 @@ class PublicController < ApplicationController
   end
 
   def build_items row
-    row.try(:[],"items").map do |item|
-      build_item item
+    row.try(:[],"items").map(&:deep_symbolize_keys).map do |item|
+      build_badge_params item[:repository_name], item[:branch_name], item[:execution_name]
     end
-  end
-
-  def build_item item
-    repository= Repository.find_by(name: item["repository_name"]) rescue nil
-    branch= repository.branches.find_by(name: item["branch_name"]) rescue nil
-    execution= Execution.joins(commits: :branches) \
-      .where("branches.id = ?",branch.id) \
-      .where(definition_name: item["definition_name"]).first rescue nil
-
-    item.merge( {repository: repository,
-                 branch: branch,
-                 execution:execution})
   end
 
   def find_user_by_login login
@@ -74,4 +64,3 @@ class PublicController < ApplicationController
   end
 
 end
-

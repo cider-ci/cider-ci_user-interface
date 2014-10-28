@@ -17,20 +17,20 @@ class Workspace::ExecutionsController < WorkspaceController
         @definition = Definition.find(params[:definition_id])
         create_map = \
           {specification: @definition.specification, 
-           definition_name: @definition.name,
+           name: @definition.name,
            tree_id: @commit.tree_id}.merge(params.require(:execution).permit(:priority))
         @execution = Execution.create! create_map
         @execution.add_strings_as_tags params[:execution][:tags].split(",") 
       end
+      @execution.create_tasks_and_trials
       branches = @commit.head_of_branches
       @execution.add_strings_as_tags [branches.map(&:name),
                                       branches.map(&:repository).map(&:name), 
-                                      @current_user.login].flatten
-    end
-    Execution.create_tasks_and_trials_for @execution.id
-    redirect_to workspace_execution_path(@execution), 
-      flash: {success: "The execution has been created. 
+                                      @current_user.try(:login) || ""].flatten
+      redirect_to workspace_execution_path(@execution), 
+        flash: {success: "The execution has been created. 
               Tasks and trials will be created in the background."}
+    end
   end
 
 
@@ -65,13 +65,12 @@ class Workspace::ExecutionsController < WorkspaceController
     @executions= @executions.per(Integer(params[:per_page])) unless params[:per_page].blank?
     @executions= @executions.joins(:tags).where(tags: {tag: execution_tags_filter}) if execution_tags_filter.count > 0
 
-    @executions = @executions.select(:id,:created_at,:tree_id,:state,:definition_name,:updated_at)
+    @executions = @executions.select(:id,:created_at,:tree_id,:state,:name,:updated_at)
 
     @execution_cache_signatures = ExecutionCacheSignature \
       .where(%[ execution_id IN (?)], @executions.map(&:id))
 
   end
-
 
   def new
     @execution = Execution.new
@@ -82,10 +81,24 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def show
     @link_params = params.slice(:branch,:page,:repository,:execution_tags)
-    @execution = Execution.select(:id,:state,:updated_at,:definition_name,:tree_id,:error).find(params[:id])
+    @execution = Execution.select(:id,:state,:updated_at,:name,:tree_id).find(params[:id])
     @trials= Trial.joins(task: :execution).where("executions.id = ?",@execution.id)
     set_and_filter_tasks params
     set_filter_params params
+  end
+
+  def issues
+    @execution= Execution.find(params[:id])
+    @issues = @execution.execution_issues.page(params[:page])
+  end
+
+  def delete_issue
+    ExecutionIssue.find(params[:issue_id]).destroy
+    redirect_to issues_workspace_execution_path(params[:id])
+  end
+
+  def specification
+    @execution= Execution.find(params[:id])
   end
 
   def tree_attachments 
@@ -95,7 +108,9 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def retry_failed
     @execution = Execution.find params[:id]
-    @execution.tasks.where(state: 'failed').each(&:create_trial)
+    @execution.tasks.where(state: 'failed').each do |task|
+      Messaging.publish("task.create-trial", {id: task.id})
+    end
     set_filter_params params
     redirect_to workspace_execution_path(@execution,@filter_params), flash: {success: "The failed tasks are scheduled for retry!"}
   end
@@ -121,17 +136,19 @@ class Workspace::ExecutionsController < WorkspaceController
 
 
   def set_and_filter_tasks params
-    @tasks_select_condition = (params[:tasks_select_condition] || :with_failed_trials).to_sym
+    @tasks_select_condition = (params[:tasks_select_condition] || :with_unsucessful_trials).to_sym
     @name_substring_term= (params[:name_substring_term] || '')
     @page=params[:page]
     @tasks = @execution.tasks
     @tasks = case @tasks_select_condition
-             when :with_failed_trials 
-               @tasks.with_failed_trials
+             when :with_unsucessful_trials
+               @tasks.with_unsucessful_trials
              when :failed
                @tasks.where(state: 'failed')
-             else
+             when :all
                @tasks
+             else
+               raise "unsupported select condition"
              end
     @tasks = if @name_substring_term.blank?
                @tasks

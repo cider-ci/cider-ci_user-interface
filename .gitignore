@@ -5,28 +5,20 @@
 #   git config --global core.excludesfile '~/.gitignore_global'
 
 # Ignore bundler config.
+
 /.bundle
-
+/.ruby-version
 /.sass-cache
-
-# Ignore the default SQLite database.
+/coverage
 /db/*.sqlite3
 /db/*.sqlite3-journal
-
-# Ignore all logfiles and tempfiles.
 /log/*.log
-/tmp
-
-/repositories/*
 /public/assets/*
-
+/repositories/*
+/tmp
+config/database.yml
+config/environments/*.local.yml
+config/secrets.yml
 config/settings.local.yml
 config/settings/*.local.yml
-config/environments/*.local.yml
-
-config/secrets.yml
-config/database.yml
-
 db/seeds.rb
-
-/.ruby-version

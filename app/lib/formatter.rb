@@ -17,10 +17,12 @@ module Formatter
       end
     end
 
-    def exception_to_log_s e
-      e.message.to_s + "\n" + 
-        e.backtrace.select{|l| l =~ Regexp.new(Rails.root.to_s)}
-      .reject{|l| l =~ Regexp.new(Rails.root.join("vendor").to_s)}.join("\n") 
+    def exception_to_log_s e, *more 
+      message= e.message.to_s 
+      trace= e.backtrace.select{|l| l =~ Regexp.new(Rails.root.to_s)}.reject{|l| 
+          l =~ Regexp.new(Rails.root.join("vendor").to_s)}.join(", ") 
+      rest= more.map(&:to_s).join(",")
+      [message,trace,rest].join(" ### ")
     end
 
 

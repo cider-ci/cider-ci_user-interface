@@ -21,7 +21,7 @@
           =link_to workspace_execution_path(execution), class: "label #{label_class_for_state(execution.state)}" do
             %i{class: icon_class_for_state(execution.state)}<>
         = link_to workspace_execution_path(execution)  do
-          %span{style: "margin-left: 0.5em"}=execution.definition_name.truncate(12)
+          %span{style: "margin-left: 0.5em"}=execution.name.truncate(12)
 
     %td.stats
       - if %(failed success).include? execution.state

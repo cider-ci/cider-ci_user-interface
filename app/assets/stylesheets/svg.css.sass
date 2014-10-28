@@ -1,0 +1,59 @@
+
+svg.cider-ci
+
+  a
+    text, tspan
+      fill: $link-color  
+
+  svg
+    &.state
+      a // darker link color is more readable on colored bg
+        text, tspan
+          fill: darken($link-color,20)
+      &.failed
+        rect
+          fill: $cider-ci-failed-color-bg
+      &.success
+        rect
+          fill: $cider-ci-success-color-bg
+      &.pending
+        rect
+          fill: $cider-ci-pending-color-bg
+      &.executing
+        rect
+          fill: $cider-ci-executing-color-bg
+      &.unavailable
+        rect
+          fill: $cider-ci-unavailable-color-bg
+
+
+  &.badge-medium
+
+    svg.host-info
+      g
+        font-size: 12px
+        text  
+          text-anchor: middle
+        text, tspan
+          font-family: DejaVu Sans, Verdana, Geneva, sans-serif
+          font-weight: normal
+
+    svg.repo
+      g 
+        font-size: 14px
+        text  
+          text-anchor: middle
+        text, tspan
+          font-family: DejaVu Sans, Verdana, Geneva, sans-serif
+          font-weight: bold 
+
+    svg.execution
+      g
+        font-size: 16px
+        text  
+          text-anchor: middle
+        text, tspan
+          font-family: DejaVu Sans, Verdana, Geneva, sans-serif
+          font-weight: bold 
+
+

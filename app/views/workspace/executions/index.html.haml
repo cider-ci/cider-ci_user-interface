@@ -5,8 +5,10 @@
 - executions ||= @executions
 - link_params ||= @link_params
 
-%ol.breadcrumb 
-  = render partial: "/breadcrumbs/executions" 
+.row
+  .col-md-6
+    %ol.breadcrumb.pull-left
+      = render partial: "/breadcrumbs/executions" 
 
 
 - cache @execution_cache_signatures.map{|cs| [@executions,

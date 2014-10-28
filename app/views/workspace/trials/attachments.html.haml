@@ -1,7 +1,10 @@
 - trial ||= @trial
 .attachments.trial_attachments 
-  %ol.breadcrumb 
-    = render '/breadcrumbs/trial_attachments', trial: trial
+
+  .row
+    .col-md-6
+      %ol.breadcrumb.pull-left
+        = render '/breadcrumbs/trial_attachments', trial: trial
 
   %h2 
     Attachments

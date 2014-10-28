@@ -10,6 +10,8 @@ class Task < ActiveRecord::Base
   belongs_to :execution
   has_many :trials
 
+  belongs_to :task_spec
+
   #validate :data_poperties
 
   after_save{execution.update_state! if state_changed?}
@@ -19,6 +21,12 @@ class Task < ActiveRecord::Base
   scope :with_failed_trials, lambda{
     where("EXISTS (SELECT 1 FROM trials WHERE trials.task_id = tasks.id AND trials.state = 'failed')")
   }
+
+  scope :with_unsucessful_trials, lambda{
+    where("EXISTS (SELECT 1 FROM trials WHERE trials.task_id = tasks.id AND trials.state != 'success')")
+  }
+
+
 
   #validates :state, inclusion: {in: %w(pending executing failed success)}
 

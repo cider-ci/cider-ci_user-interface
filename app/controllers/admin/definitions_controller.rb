@@ -6,7 +6,7 @@ class Admin::DefinitionsController < AdminController
 
   def permited_definition_params params
     if params[:definition]
-      params[:definition].permit(:name,:specification)
+      params[:definition].permit!
     else
       nil
     end

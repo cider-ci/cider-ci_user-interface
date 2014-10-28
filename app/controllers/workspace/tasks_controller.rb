@@ -7,8 +7,7 @@ class Workspace::TasksController < WorkspaceController
   def retry 
     begin
       @task = Task.find params[:id]
-      @trial = Trial.create! task: @task
-      @task.update_state!
+      Messaging.publish("task.create-trial", {id: @task.id})
       redirect_to workspace_execution_path(@task.execution), flash: {success: "A new trial will be executed"}
     rescue Exception => e
       if @task.execution

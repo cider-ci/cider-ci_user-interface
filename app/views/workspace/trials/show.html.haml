@@ -3,42 +3,50 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - trial ||= @trial 
-- cache [trial.cache_signature,trial.trial_attachments.collection_cache_tag] do
+- cache [trial.cache_signature,trial.trial_attachments.collection_cache_tag,admin?] do
 
-  %ol.breadcrumb 
-    =render '/breadcrumbs/trial', trial: trial
-    %li.pull-right 
-      %ul.list-inline.list-unstyled
-        %li 
-          = link_to attachments_workspace_trial_path(trial) do
-            Attachments
+  .row
+    .col-md-6
+      %ol.breadcrumb.pull-left
+        =render '/breadcrumbs/trial', trial: trial
+    .col-md-6
+      %ol.breadcrumb.with-circle-separator.pull-right
+        %li
+          %ul.list-inline.list-unstyled
+            %li 
+              - if trial.trial_attachments.count > 0
+                = link_to attachments_workspace_trial_path(trial) do
+                  Attachments
+              - else 
+                %span.text-muted Attachments
 
-  %h1 
-    Trial for the task "#{trial.task.data['name']}"
 
 
+  %ul.list-inline.actions.pull-right{style: "margin-top: 10px"}
+    - if admin?
+      %li 
+        = form_tag workspace_trial_path(trial), method: 'DELETE' do
+          = hidden_field_tag :authenticity_token, form_authenticity_token
+          = button_tag type: :submit, class: "btn btn-danger" do
+            %i.icon-trash
+            Delete
+      %li 
+        = form_tag set_failed_workspace_trial_path(trial), method: 'POST' do
+          = hidden_field_tag :authenticity_token, form_authenticity_token
+          = button_tag type: :submit, class: "btn btn-danger" do
+            %i.icon-failed
+            Mark as failed
 
-  %ul.list-inline
-    %li{class: "label #{label_class_for_state(trial.state)}"}
-      %i{class: icon_class_for_state(trial.state)}
-      =trial.state
-    %li.actions.pull-right
-      - if admin?
-        %ul.list-inline
-          %li 
-            = form_tag workspace_trial_path(trial), method: 'DELETE' do
-              = hidden_field_tag :authenticity_token, form_authenticity_token
-              = button_tag type: :submit, class: "btn btn-sm btn-danger" do
-                %i.icon-trash
-                Delete
-          %li 
-            = form_tag set_failed_workspace_trial_path(trial), method: 'POST' do
-              = hidden_field_tag :authenticity_token, form_authenticity_token
-              = button_tag type: :submit, class: "btn btn-sm btn-danger" do
-                %i.icon-failed
-                Mark as failed
+  %h1{style: "margin-top: 10px"}
+    %span{class: "label #{label_class_for_state(trial.state)}"}<>
+      %i{class: icon_class_for_state(trial.state)}<>
+    %span{style: "margin-left: .5em"} Trial for the task "#{trial.task.name}"
+
+
   %p
+
     Executed 
+
     -if trial.started_at
       %b #{render 'humanized_time_from_now', at: trial.started_at}
     - if trial.finished_at and trial.started_at
@@ -71,7 +79,7 @@
     - else
       %h2 Scripts 
       %ul.list-inline 
-        = render partial: 'script_label', collection: trial.scripts, as: :script
+        = render partial: 'script_label', collection: trial.scripts.map{|k,v| v}, as: :script
 
       %ul.list-unstyled.scripts
-        = render partial: 'script', collection: trial.scripts
+        = render partial: 'script', collection: trial.scripts.map{|k,v| v}

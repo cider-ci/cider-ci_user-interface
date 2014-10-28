@@ -1,31 +1,36 @@
 %li
   = link_to admin_branch_update_triggers_path do
-    %i.icon-trigger
+    %i.fa.fa-fw.icon-trigger
     Branch update triggers
 %li
   = link_to admin_executors_path do
-    %i.icon-executor
+    %i.fa.fa-fw.icon-executor
     Executors
 %li
   = link_to admin_definitions_path do
-    %i.icon-execution-definition
+    %i.fa.fa-fw.icon-execution-definition
     Execution definitions
 %li
   = link_to admin_repositories_path do
-    %i.icon-repository
+    %i.fa.fa-fw.icon-repository
     Repositories
-%li
+%li<>
   = link_to admin_users_path do
-    %i.icon-user
+    %i.fa.fa-fw.fa-users
     Users
+%li.divider 
+%li<>
+  = link_to admin_status_path do
+    %i.fa.fa-fw.fa-dashboard
+    Status
 %li.divider 
 %li
   = link_to edit_admin_timeout_settings_path do
-    %i.icon-timeout-settings
+    %i.fa.fa-fw.icon-timeout-settings
     Time and timeout settings
 %li
   = link_to edit_admin_welcome_page_settings_path do
-    %i.icon-welcome-page-settings
+    %i.fa.fa-fw.icon-welcome-page-settings
     Welcome page settings
 
 

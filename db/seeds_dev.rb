@@ -8,11 +8,20 @@
 #
 #
 
-all_spec= Specification.find_or_create_by_data! 'substitute_with_path: cider-ci/all_tests.yml'
-Definition.find_by(name: "All tests").try(&:destroy)
-Definition.create name: "All tests" ,
-  description: "Loads the specification from the repository path 'cider-ci/all_tests.yml'.",
-  specification: all_spec
+test_spec= Specification.find_or_create_by_data!({
+  "_cider-ci_include-path" =>  "cider-ci_v2/test_spec.yml"
+  })
+Definition.find_by(name: "Test").try(&:destroy)
+Definition.create name: "Test",
+  description: "Loads the specification from the repository path 'cider-ci_v2/test_spec.yml'.",
+  specification: test_spec
+
+show_info_spec= Specification.find_or_create_by_data!(
+  YAML.load_file Rails.root.join("spec","data","execution-spec-v2_show-info-example.yml"))
+Definition.find_by(name: "Show info").try(&:destroy)
+Definition.create name: "Show info" ,
+  description: "Information about project, machine and os",
+  specification: show_info_spec
 
 
 executor=Executor.find_or_initialize_by(name: "Localhost")
@@ -63,10 +72,5 @@ if welcome_page_settings.radiator_config.blank?
     radiator_config: radiator_config
 end
   
-
-
-
-
-
 
 

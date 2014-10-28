@@ -14,6 +14,7 @@ gem 'font-awesome-sass', ">= 4.2.0"
 gem 'foreigner'
 gem 'haml-contrib'
 gem 'haml-rails'
+gem 'http_monkey' 
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
 gem 'jquery-ui-sass-rails'
@@ -32,6 +33,7 @@ gem 'rspec-rails', group: [:development, :test]
 gem 'sass-rails', '>= 4.0.0'
 gem 'sdoc', group: [:doc], require: false
 gem 'selenium-webdriver'
+gem 'simplecov', require: false, group: :test
 gem 'textacular', git:  'https://github.com/DrTom/textacular.git', ref: 'ab1f5677539b1014f238dc2c644c2e4ef9c56c12'
 gem 'therubyrhino', platform: :jruby
 gem 'uglifier', '>= 1.3.0'
