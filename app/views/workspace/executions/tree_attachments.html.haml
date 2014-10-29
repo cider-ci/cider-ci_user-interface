@@ -22,6 +22,6 @@
   %table.table.table-striped
     %thead
     %tbody
-      =render partial: 'attachment', collection: @trial_attachments, as: :attachment
+      =render partial: 'attachment', collection: @tree_attachments, as: :attachment
 
   = paginate @tree_attachments, theme: 'default'
