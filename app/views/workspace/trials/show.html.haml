@@ -79,7 +79,7 @@
     - else
       %h2 Scripts 
       %ul.list-inline 
-        = render partial: 'script_label', collection: trial.scripts.map{|k,v| v}, as: :script
+        = render partial: 'script_label', collection: trial.scripts.map{|k,v| v.merge({"id" => k})}, as: :script
 
       %ul.list-unstyled.scripts
         = render partial: 'script', collection: trial.scripts.map{|k,v| v}
