@@ -987,6 +987,13 @@ CREATE INDEX index_execution_issues_on_execution_id ON execution_issues USING bt
 
 
 --
+-- Name: index_executions_on_column_and_tree_id_and_specification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_executions_on_column_and_tree_id_and_specification_id ON executions USING btree (tree_id, specification_id);
+
+
+--
 -- Name: index_executions_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -998,13 +1005,6 @@ CREATE INDEX index_executions_on_created_at ON executions USING btree (created_a
 --
 
 CREATE INDEX index_executions_on_tree_id ON executions USING btree (tree_id);
-
-
---
--- Name: index_executions_on_tree_id_and_specification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_executions_on_tree_id_and_specification_id ON executions USING btree (tree_id, specification_id);
 
 
 --
@@ -1501,6 +1501,8 @@ INSERT INTO schema_migrations (version) VALUES ('107');
 INSERT INTO schema_migrations (version) VALUES ('108');
 
 INSERT INTO schema_migrations (version) VALUES ('109');
+
+INSERT INTO schema_migrations (version) VALUES ('110');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
 
