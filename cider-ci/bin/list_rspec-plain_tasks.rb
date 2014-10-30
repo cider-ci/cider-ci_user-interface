@@ -11,6 +11,7 @@ def task_for_rspec_file file_path
     "body" => exec } } }
 end
 
-STDOUT.write \
-  Dir.glob("spec/**/*_spec.rb") \
-  .map{|f| task_for_rspec_file(f)}.to_yaml
+STDOUT.write(
+  {"tasks" => 
+   Dir.glob("spec/**/*_spec.rb").reject{|name| name =~ /spec\/feature/ } \
+     .map{|f| task_for_rspec_file(f)}}.to_yaml)

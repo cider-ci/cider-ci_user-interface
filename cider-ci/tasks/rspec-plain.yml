@@ -1,0 +1,10 @@
+---
+tasks:
+- name: db branches_commits_functions
+  scripts:
+    rspec:
+      body: bundle exec rspec "spec/db/branches_commits_functions_spec.rb"
+- name: messaging messaging
+  scripts:
+    rspec:
+      body: bundle exec rspec "spec/messaging/messaging_spec.rb"
