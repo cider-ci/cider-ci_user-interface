@@ -3,8 +3,6 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Repository < ActiveRecord::Base
-
-  self.primary_key = 'id'
   has_many :branches, dependent: :destroy
 
   before_validation on: :create do
@@ -13,15 +11,9 @@ class Repository < ActiveRecord::Base
     self.name ||= self.id
   end
 
-  after_destroy do
-    `rm -rf #{dir}`
-  end
-
   ######################## Scopes and methods returning AR ####################
   
   default_scope { order(name: :asc).reorder(importance: :desc) }
-
-  scope :ready, lambda { where("1=1")}
 
   ######################## Other stuff ########################################
   
@@ -30,4 +22,3 @@ class Repository < ActiveRecord::Base
   end
 
 end
-

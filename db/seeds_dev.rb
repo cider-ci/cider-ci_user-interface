@@ -9,11 +9,11 @@
 #
 
 test_spec= Specification.find_or_create_by_data!({
-  "_cider-ci_include-path" =>  "cider-ci_v2/test_spec.yml"
+  "_cider-ci_include" =>  "cider-ci/test_spec.yml"
   })
 Definition.find_by(name: "Test").try(&:destroy)
 Definition.create name: "Test",
-  description: "Loads the specification from the repository path 'cider-ci_v2/test_spec.yml'.",
+  description: "Loads the specification from the repository path 'cider-ci/test_spec.yml'.",
   specification: test_spec
 
 show_info_spec= Specification.find_or_create_by_data!(
@@ -35,6 +35,7 @@ executor.update_attributes!(
 executor.reload
 
 traits= (executor.traits || []).concat([
+          'chrome',
           'firefox',
           'imagemagick',
           'jdk',
@@ -47,7 +48,6 @@ traits= (executor.traits || []).concat([
           'phantomjs',
           'rbenv',
           'ruby',
-          'tightvnc',
         ]).sort.uniq
 
 executor.reload.update_attributes! traits: traits
