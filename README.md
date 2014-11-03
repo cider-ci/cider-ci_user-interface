@@ -1,5 +1,5 @@
-Cider-CI User-Interface (and Background-Processor)
-==================================================
+Cider-CI User-Interface 
+=======================
 
 Part of [Cider-CI](https://github.com/cider-ci/cider-ci). This in ruby on rails
 implemented component serves all of the user interface. This component also
@@ -20,15 +20,6 @@ ruby (instead of JRuby) in development mode.
 The application will try to open a connection to the configured message broker.
 It will continue when in `development` or `test` environment with a warning (to
 the console and log) if the connection could not be established. 
-
-Message producers are always used if the connection to the broker could
-be established.
-
-Message consumers are bound if and only if `MESSAGING_BIND_CONSUMERS` is set
-and not blank! It is advisable to bind the consumers in a second process during
-development, e.g.
-
-    MESSAGING_BIND_CONSUMERS=true rails c
 
 
 ## License
