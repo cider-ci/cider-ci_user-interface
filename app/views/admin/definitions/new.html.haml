@@ -4,20 +4,11 @@
 
 - definition ||= @definition 
 
-= form_tag admin_definitions_path, method: 'POST', class: "form-horizontal" do
+= form_for definition, url: admin_definitions_path, method: 'POST', class: "form-horizontal" do |form|
 
-  = render 'form_elements', definition: definition
+  = render 'form_elements', definition: definition, form: form
       
   =form_group "", cols_control: 8 do
     = button_tag type: 'submit', class: "btn btn-primary pull-right" do
       Create
 
-
-= form_tag new_admin_definition_path(@definition), method: 'GET', class: "form-horizontal" do
-
-  = form_group "Copy specification from" do
-    = select_tag :definition_id, options_for_select(@other_definitions.map{|d| [d.name, d.id]}), class: "form-control"
-
-  = form_group "" do
-    = button_tag type: 'submit', data: {reset_specification: true}, value: "reset", class: 'btn btn-warning pull-right' do
-      Reset form

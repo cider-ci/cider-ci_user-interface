@@ -319,7 +319,8 @@ CREATE VIEW commit_cache_signatures AS
 CREATE TABLE definitions (
     name character varying(255) NOT NULL,
     description character varying(255),
-    specification_id uuid
+    specification_id uuid,
+    is_default boolean DEFAULT false NOT NULL
 );
 
 
@@ -1503,6 +1504,8 @@ INSERT INTO schema_migrations (version) VALUES ('108');
 INSERT INTO schema_migrations (version) VALUES ('109');
 
 INSERT INTO schema_migrations (version) VALUES ('110');
+
+INSERT INTO schema_migrations (version) VALUES ('111');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
 

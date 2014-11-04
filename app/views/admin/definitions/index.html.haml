@@ -15,6 +15,10 @@
 
 %table.table.table-striped.definitions
   %thead
+    %tr
+      %th Name / Id
+      %th Is default
+      %th Description
   %tbody
     = render partial: 'definition', collection: @definitions, as: :definition
 

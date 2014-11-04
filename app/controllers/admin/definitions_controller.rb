@@ -67,7 +67,7 @@ class Admin::DefinitionsController < AdminController
       ActiveRecord::Base.transaction do
         @definition = Definition.find params[:id]
         @specification = Specification.find_or_create_by_data! YAML.load(params[:specification][:data])
-        @definition.update_attributes! permited_definition_params(params).merge({specification: @specification})
+        @definition.update_attributes! params[:definition].permit!.merge({specification: @specification})
         redirect_to admin_definitions_path, flash: {success: %Q<The definition has been updated.>}
       end
     end

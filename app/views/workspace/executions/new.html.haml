@@ -13,7 +13,10 @@
   = hidden_field_tag :commit_id, params[:commit_id]
 
   =form_group "Execution Definition", control_id: "definition_id" do
-    = select_tag :definition_id, options_for_select(@definitions.reorder(:name).map{|d| [d.name, d.id]}), autofocus: true, class: "form-control"
+    = select_tag :definition_id, 
+      options_for_select(@definitions.reorder(:name).map{|d| [d.name, d.id]},
+          @definitions.find_by(is_default: true).try(:name)), 
+      autofocus: true, class: "form-control"
 
   =form_group "Tags", control_id: "execution_tags" do
     =text_field :execution, :tags, 

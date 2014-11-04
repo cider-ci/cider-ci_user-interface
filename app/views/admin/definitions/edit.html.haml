@@ -4,9 +4,9 @@
 
 - definition ||= @definition 
 
-= form_tag admin_definition_path(definition), method: 'PUT', class: "form-horizontal" do
+= form_for definition, url: admin_definition_path(definition), method: 'PATCH', class: "form-horizontal" do |form|
 
-  = render 'form_elements', definition: definition
+  = render 'form_elements', definition: definition, form: form
 
   =form_group "", cols_control: 8 do
     = button_tag type: 'submit', class: "btn btn-primary pull-right" do
