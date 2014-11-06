@@ -8,46 +8,52 @@ release:
 cider_ci_link: https://github.com/cider-ci/cider-ci
 
 
-git:
-  repositories_path: <%= Rails.root.join("..","tmp", "repositories").to_s %>
-
-storage_http_prefix: http://127.0.0.1:8883/cider-ci/storage
-
-api_http_prefix: http://127.0.0.1:8885
-api_path: '/cider-ci/api/v2'
-
 hostname: localhost
 
 basic_auth:
   user: ui
   secret: secret
 
+
 api_service: 
-  host: 127.0.0.1 
+  host: localhost
+  port: 8885
+  path: '/cider-ci/api/v2' 
+  ssl: NULL
+
+storage_service: 
+  host: localhost
+  port: 8883
+  path: '/cider-ci/storage' 
+  ssl: NULL
+
+
+internal_api_service: 
+  host: localhost
   port: 8885
   path: '/cider-ci/api/v2' 
   ssl: false
 
-builder_service: 
+internal_builder_service: 
   host: 127.0.0.1 
   port: 8884
   path: '/cider-ci/builder' 
   ssl: false
 
-dispatcher_service: 
+internal_dispatcher_service: 
   host: 127.0.0.1 
   port: 8882
   path: '/cider-ci/dispatcher' 
   ssl: false
 
-repository_service: 
+internal_repository_service: 
   host: 127.0.0.1 
   port: 8881
   path: '/cider-ci/repositories' 
   ssl: false
 
-storage_service: 
-  host: 127.0.0.1 
+internal_storage_service: 
+  host: localhost
   port: 8883
   path: '/cider-ci/storage' 
   ssl: false

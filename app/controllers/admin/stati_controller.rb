@@ -6,7 +6,6 @@ class Admin::StatiController < AdminController
 
 
   def show
-    @service_status = {rabbitmq: ServiceCheck.check_rabbitmq}
   end
 
 

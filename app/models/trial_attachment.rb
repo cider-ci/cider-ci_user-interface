@@ -1,5 +1,6 @@
 class TrialAttachment < ActiveRecord::Base
+  include Concerns::UrlBuilder
   def url
-    Settings.storage_http_prefix + "/trial-attachments" + path
+    service_base_url(::Settings.storage_service) + "/trial-attachments" + path
   end
 end

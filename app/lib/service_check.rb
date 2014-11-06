@@ -6,6 +6,8 @@ module ServiceCheck
 
   class << self
 
+    include Concerns::UrlBuilder
+
     def check_rabbitmq
       connection = Settings.messaging.connection
       url = "http://localhost:15672/api/vhosts/"
@@ -22,29 +24,29 @@ module ServiceCheck
     end
 
     def check_api
-      check_service Settings.api_service,  Settings.basic_auth
+      check_service Settings.internal_api_service,  Settings.basic_auth
     end
 
     def check_builder
-      check_service Settings.builder_service,  Settings.basic_auth
+      check_service Settings.internal_builder_service,  Settings.basic_auth
     end
      
     def check_dispatcher
-      check_service Settings.dispatcher_service,  Settings.basic_auth
+      check_service Settings.internal_dispatcher_service,  Settings.basic_auth
     end
 
     def check_repository
-      check_service Settings.repository_service,  Settings.basic_auth
+      check_service Settings.internal_repository_service,  Settings.basic_auth
     end
 
     def check_storage
-      check_service Settings.storage_service,  Settings.basic_auth
+      check_service Settings.internal_storage_service,  Settings.basic_auth
     end
 
 
     def check_service http_opts, basic_auth
       protocol= "http#{http_opts.ssl ? 's' : ''}"
-      url = "#{protocol}://#{http_opts.host}:#{http_opts.port}#{http_opts.path}/status"
+      url = service_base_url(http_opts) + "/status"
 
       begin 
         response= HttpMonkey.at(url).basic_auth(basic_auth.user,basic_auth.secret).get
