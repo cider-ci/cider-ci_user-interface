@@ -37,6 +37,14 @@ $cider-ci-unavailable-color-bg: lighten($cider-ci-unavailable-color,20%)
 .failed 
   color: $cider-ci-failed-color !important
 
+.badge
+  &.success
+    color: lighten($cider-ci-success-color,15%) !important
+  &.failed
+    color: lighten($cider-ci-failed-color,15%) !important
+
+
+
 .dropdown-menu > li > a, 
 .dropdown-menu > li > form > .btn
   // sass can't extend nested selectors :/
