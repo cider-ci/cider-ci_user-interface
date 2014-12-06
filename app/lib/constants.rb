@@ -3,11 +3,16 @@
 #  See the LICENSE.txt file provided with this software.
 
 module Constants 
-  EXECUTION_STATES = %w(failed success executing pending)
+  STATES= %w(
+    aborted
+    executing 
+    failed 
+    passed 
+    pending
+    ).sort
+  EXECUTION_STATES= STATES
+  TASK_STATES= STATES
+  TRIAL_STATES= (Array.new(STATES) << "dispatching").sort
+
   UPDATE_BRANCH_TOPIC_NAME = '/topics/branch_updates'
-  class << self
-    def TRIAL_STATES 
-      @trial_states ||= %w(aborted pending dispatching executing failed success).sort
-    end
-  end
 end

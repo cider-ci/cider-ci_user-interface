@@ -8,11 +8,11 @@
   - _stat = execution.execution_stat
 
   #summary-stats.stats.summary-stats.reload.replace-without-animation{data: {state: execution.state, cache_tag: _stat}}
-    %table.table.new-execution-stats
+    %table.new-execution-stats
       %thead 
       %tbody
         %tr
-          - %w(failed success executing pending).each do |state|
+          - Constants::EXECUTION_STATES.each do |state|
             - if _stat[state] > 0
               - fraction= _stat[state]/_stat[:total].to_f
               %td{class: state,data:{ fraction: fraction },style: "width: #{fraction*100}%"}

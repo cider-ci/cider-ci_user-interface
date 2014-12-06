@@ -17,8 +17,8 @@
               .form-group
                 %label.sr-only{for: "tasks_select_condition"}
                 = select_tag :tasks_select_condition, 
-                  options_for_select([["All",:all],["With unsuccessful trials",:with_unsucessful_trials],
-                    ["Only failed",:failed]],@tasks_select_condition), 
+                  options_for_select([["All",:all],["Failed",:failed],["Unpassed",:unpassed],
+                  ["With failed trials",:with_failed_trials]],@tasks_select_condition), 
                   class: "form-control input-sm"
 
             %li

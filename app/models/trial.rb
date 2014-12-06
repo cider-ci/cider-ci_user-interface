@@ -12,7 +12,7 @@ class Trial < ActiveRecord::Base
     TrialAttachment.where("path like '/#{id}/%'")
   end
 
-  validates :state, inclusion: {in: Constants.TRIAL_STATES}
+  validates :state, inclusion: {in: Constants::TRIAL_STATES}
 
   after_create do
     task.reload.update_state! 
@@ -35,11 +35,11 @@ class Trial < ActiveRecord::Base
   default_scope{ reorder(created_at: :desc, id: :asc)}
 
   scope(:finished, lambda do
-    where(state: ['success','failed']).reorder(updated_at: :desc)
+    where(state: ['passed','failed']).reorder(updated_at: :desc)
   end)
 
   scope :not_finished, lambda{
-    where("state NOT IN ('success','failed')").reorder(updated_at: :desc)} 
+    where("state NOT IN ('passed','failed')").reorder(updated_at: :desc)} 
   
   scope :to_be_dispatched, lambda{
     where(state: 'pending').joins(task: :execution) \
@@ -74,8 +74,8 @@ class Trial < ActiveRecord::Base
     case
     when script_states.any?{|state| state == 'failed'}
       'failed'
-    when script_states.all?{|state| state == 'success'}
-      'success'
+    when script_states.all?{|state| state == 'passed'}
+      'passed'
     when script_states.any?{|state| ['dispatched','executing'].include? state }
       'executing'
     else # leave it

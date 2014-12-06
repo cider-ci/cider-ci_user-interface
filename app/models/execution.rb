@@ -21,6 +21,8 @@ class Execution < ActiveRecord::Base
 
   has_many :tasks #, foreign_key: [:specification_id,:tree_id]
 
+  validates :state, inclusion: {in: Constants::EXECUTION_STATES}
+
   default_scope { order(created_at: :desc,tree_id: :asc,specification_id: :asc) }
 
   serialize :substituted_specification_data

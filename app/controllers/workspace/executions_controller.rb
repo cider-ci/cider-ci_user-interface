@@ -136,17 +136,19 @@ class Workspace::ExecutionsController < WorkspaceController
 
 
   def set_and_filter_tasks params
-    @tasks_select_condition = (params[:tasks_select_condition] || :with_unsucessful_trials).to_sym
+    @tasks_select_condition = (params[:tasks_select_condition] || :with_failed_trials).to_sym
     @name_substring_term= (params[:name_substring_term] || '')
     @page=params[:page]
     @tasks = @execution.tasks
     @tasks = case @tasks_select_condition
-             when :with_unsucessful_trials
-               @tasks.with_unsucessful_trials
-             when :failed
-               @tasks.where(state: 'failed')
              when :all
                @tasks
+             when :failed
+               @tasks.where(state: 'failed')
+             when :unpassed 
+               @tasks.where("state <> 'passed'")
+             when :with_failed_trials
+               @tasks.with_failed_trials
              else
                raise "unsupported select condition"
              end

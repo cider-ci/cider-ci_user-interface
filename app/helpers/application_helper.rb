@@ -20,7 +20,7 @@ module ApplicationHelper
 
   def bootstrap_color_for_state state
     case state
-    when 'success'
+    when 'passed'
       'success'
     when 'failed'
       'danger'
@@ -48,7 +48,7 @@ module ApplicationHelper
       "icon-failed"
     when 'pending'
       "icon-pending"
-    when 'success'
+    when 'passed'
       "icon-success"
     else
       Rails.logger.warn "no icon defined for #{state}"
@@ -108,7 +108,7 @@ module ApplicationHelper
     case state
     when 'failed'
       'label-failed'
-    when 'success'
+    when 'passed'
       'label-success'
     when 'pending'
       'label-pending'

@@ -12,7 +12,7 @@ class Task < ActiveRecord::Base
 
   belongs_to :task_spec
 
-  #validate :data_poperties
+  validates :state, inclusion: {in: Constants::TASK_STATES}
 
   after_save{execution.update_state! if state_changed?}
 
@@ -22,23 +22,10 @@ class Task < ActiveRecord::Base
     where("EXISTS (SELECT 1 FROM trials WHERE trials.task_id = tasks.id AND trials.state = 'failed')")
   }
 
-  scope :with_unsucessful_trials, lambda{
-    where("EXISTS (SELECT 1 FROM trials WHERE trials.task_id = tasks.id AND trials.state != 'success')")
-  }
-
-
-
-  #validates :state, inclusion: {in: %w(pending executing failed success)}
 
   def suitable_executors
     ExecutorWithLoad.from('executors_with_load, tasks').where("tasks.id = ?", id) \
       .where('tasks.traits <@ executors_with_load.traits')
-  end
-
-  def data_poperties 
-    unless data.deep_symbolize_keys[:name]
-      errors.add :data, "must have a name attribute" 
-    end
   end
 
   def auto_trials
@@ -51,7 +38,7 @@ class Task < ActiveRecord::Base
 
 
   def check_and_retry!
-    while trials.where(state: 'success').count == 0 \
+    while trials.where(state: 'passed').count == 0 \
       and trials.count < auto_trials \
       and trials.count - trials.where(state: 'failed').count < eager_trials
       create_trial
@@ -65,8 +52,8 @@ class Task < ActiveRecord::Base
   def evaluate_state 
     trial_states = trials.pluck(:state)
     case
-    when trial_states.any?{|state| state == 'success'}
-      'success'
+    when trial_states.any?{|state| state == 'passed'}
+      'passed'
     when trial_states.any?{|state| state == 'dispatching' || state == 'executing'}
       'executing'
     when trial_states.all?{|state| state == 'failed'}

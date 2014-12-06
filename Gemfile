@@ -26,7 +26,7 @@ gem 'pry', group: [:development, :test]
 gem 'psych', platform: :mri # (j)psych is yet directly included in jruby, change when gemified
 gem 'puma'
 gem 'rack-mini-profiler'
-gem 'rails', '4.1.4'
+gem 'rails', '4.1.8'
 gem 'rails_config'
 gem 'rest-client'
 gem 'rspec-rails', group: [:development, :test]

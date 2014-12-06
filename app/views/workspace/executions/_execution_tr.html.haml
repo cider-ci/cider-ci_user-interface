@@ -28,11 +28,11 @@
       %span.nowrap
         - if execution.execution_stat.failed > 0
           %span.badge.failed= execution.execution_stat.failed
-        - if execution.execution_stat.failed > 0 and execution.execution_stat.success > 0
+        - if execution.execution_stat.failed > 0 and execution.execution_stat.passed > 0
           %span : 
-        - if execution.execution_stat.success > 0
-          %span.badge.success=  execution.execution_stat.success
-        - if execution.execution_stat.failed > 0 and execution.execution_stat.success > 0
+        - if execution.execution_stat.passed> 0
+          %span.badge.success=  execution.execution_stat.passed
+        - if execution.execution_stat.failed > 0 and execution.execution_stat.passed > 0
           %span / 
           %span.badge #{execution.execution_stat.total}
 

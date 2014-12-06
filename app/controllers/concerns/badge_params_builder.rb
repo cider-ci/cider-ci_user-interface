@@ -30,7 +30,7 @@ module Concerns
         case state
         when "failed"
           " #{stat.failed}/#{stat.total} #{execution[:state]}"
-        when "success"
+        when "passed"
           " #{stat.total} #{execution[:state]}"
         end
       else

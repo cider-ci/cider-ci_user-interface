@@ -41,7 +41,7 @@ $cider-ci-unavailable-color-bg: lighten($cider-ci-unavailable-color,20%)
   color: $cider-ci-failed-color !important
 
 .badge
-  &.success
+  &.passed
     color: lighten($cider-ci-success-color,15%) !important
   &.failed
     color: lighten($cider-ci-failed-color,15%) !important
@@ -118,14 +118,17 @@ table.summary
 
 
 .stats
-  table.table.new-execution-stats
+  table.new-execution-stats
+    width: 100%
+    max-width: 100%
     td
+      padding: 8pt 
       text-align: center
       vertical-align: middle
       color: $progress-bar-color !important
       &.failed
         background-color: $cider-ci-failed-color
-      &.success
+      &.passed
         background-color: $cider-ci-success-color
       &.executing
         @include striped-executing
@@ -275,7 +278,7 @@ svg.cider-ci
       &.failed
         rect
           fill: $cider-ci-failed-color-bg
-      &.success
+      &.passed
         rect
           fill: $cider-ci-success-color-bg
       &.pending

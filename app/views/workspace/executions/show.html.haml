@@ -12,7 +12,7 @@
 - cache cs  do |cache_tag|
 
   - tasks ||= @tasks
-  - reload_timeout= session_adjust_reload_timeout(%w(failed success).include?(execution.state) ? 30 : 3)
+  - reload_timeout= session_adjust_reload_timeout(%w(failed passed).include?(execution.state) ? 30 : 3)
   #reload-page{data: { cache_tag: cache_tag, reload_timeout: reload_timeout}}
 
     .row

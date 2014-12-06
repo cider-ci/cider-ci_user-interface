@@ -1,7 +1,7 @@
 class AddStateIndexes < ActiveRecord::Migration
   def up
     execute %[ALTER TABLE trials ADD CONSTRAINT valid_state CHECK 
-      ( state IN (#{Constants.TRIAL_STATES.map{|s|"'#{s}'"}.join(', ')}));]
+      ( state IN (#{Constants::TRIAL_STATES.map{|s|"'#{s}'"}.join(', ')}));]
     add_index :trials, :state
   end
 

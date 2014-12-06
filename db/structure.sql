@@ -274,7 +274,8 @@ CREATE TABLE executions (
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     specification_id uuid,
-    expanded_specification_id uuid
+    expanded_specification_id uuid,
+    CONSTRAINT check_executions_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying, 'dispatching'::character varying])::text[])))
 );
 
 
@@ -374,32 +375,6 @@ CREATE TABLE email_addresses (
 
 
 --
--- Name: execution_issues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE execution_issues (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    description text,
-    stacktrace text,
-    type character varying(255) DEFAULT 'error'::character varying NOT NULL,
-    execution_id uuid NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
-    CONSTRAINT valid_type CHECK (((type)::text = ANY ((ARRAY['error'::character varying, 'warning'::character varying])::text[])))
-);
-
-
---
--- Name: executions_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE executions_tags (
-    execution_id uuid,
-    tag_id uuid
-);
-
-
---
 -- Name: tasks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -413,34 +388,9 @@ CREATE TABLE tasks (
     error text DEFAULT ''::text NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
-    task_spec_id uuid
+    task_spec_id uuid,
+    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying, 'dispatching'::character varying])::text[])))
 );
-
-
---
--- Name: execution_cache_signatures; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW execution_cache_signatures AS
- SELECT executions.id AS execution_id,
-    md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
-    md5(string_agg(DISTINCT (commits.updated_at)::text, ', '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
-    md5(string_agg(DISTINCT (execution_issues.updated_at)::text, ', '::text ORDER BY (execution_issues.updated_at)::text)) AS execution_issues_signature,
-    count(DISTINCT execution_issues.*) AS execution_issues_count,
-    md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
-    ( SELECT md5(string_agg((executions_tags.tag_id)::text, ','::text ORDER BY executions_tags.tag_id)) AS md5
-           FROM executions_tags
-          WHERE (executions_tags.execution_id = executions.id)) AS tags_signature,
-    ( SELECT (((count(DISTINCT tasks.id))::text || ' - '::text) || (max(tasks.updated_at))::text)
-           FROM tasks
-          WHERE (tasks.execution_id = executions.id)) AS tasks_signature
-   FROM (((((executions
-   LEFT JOIN execution_issues ON ((executions.id = execution_issues.execution_id)))
-   LEFT JOIN commits ON (((executions.tree_id)::text = (commits.tree_id)::text)))
-   LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
-   LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
-   LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
-  GROUP BY executions.id;
 
 
 --
@@ -454,7 +404,7 @@ CREATE VIEW execution_stats AS
           WHERE (tasks.execution_id = executions.id)) AS total,
     ( SELECT count(*) AS count
            FROM tasks
-          WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'pending'::text))) AS pending,
+          WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'aborted'::text))) AS aborted,
     ( SELECT count(*) AS count
            FROM tasks
           WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'executing'::text))) AS executing,
@@ -463,8 +413,94 @@ CREATE VIEW execution_stats AS
           WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'failed'::text))) AS failed,
     ( SELECT count(*) AS count
            FROM tasks
-          WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'success'::text))) AS success
+          WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'passed'::text))) AS passed,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'pending'::text))) AS pending
    FROM executions;
+
+
+--
+-- Name: executions_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE executions_tags (
+    execution_id uuid,
+    tag_id uuid
+);
+
+
+--
+-- Name: tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE tags (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    tag character varying(255),
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now()
+);
+
+
+--
+-- Name: trials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE trials (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    task_id uuid NOT NULL,
+    executor_id uuid,
+    error text,
+    state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
+    started_at timestamp without time zone,
+    finished_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now(),
+    scripts json,
+    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
+);
+
+
+--
+-- Name: execution_cache_signatures; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW execution_cache_signatures AS
+ SELECT executions.id AS execution_id,
+    ((((((((((string_agg(DISTINCT (execution_stats.total)::text, ', '::text) || '-'::text) || string_agg(DISTINCT (execution_stats.aborted)::text, ', '::text)) || '-'::text) || string_agg(DISTINCT (execution_stats.executing)::text, ', '::text)) || '-'::text) || string_agg(DISTINCT (execution_stats.failed)::text, ', '::text)) || '-'::text) || string_agg(DISTINCT (execution_stats.passed)::text, ', '::text)) || '-'::text) || string_agg(DISTINCT (execution_stats.pending)::text, ', '::text)) AS stats_signature,
+    md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
+    md5(string_agg(DISTINCT (commits.updated_at)::text, ', '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
+    md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
+    md5(string_agg(DISTINCT (tags.updated_at)::text, ', '::text ORDER BY (tags.updated_at)::text)) AS tags_signature,
+    md5(string_agg(DISTINCT (tasks.updated_at)::text, ', '::text ORDER BY (tasks.updated_at)::text)) AS tasks_signature,
+    md5(string_agg(DISTINCT (trials.updated_at)::text, ', '::text ORDER BY (trials.updated_at)::text)) AS trials_signature
+   FROM (((((((((executions
+   JOIN execution_stats ON ((execution_stats.execution_id = executions.id)))
+   LEFT JOIN commits ON (((executions.tree_id)::text = (commits.tree_id)::text)))
+   LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
+   LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
+   LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
+   LEFT JOIN tasks ON ((tasks.execution_id = executions.id)))
+   LEFT JOIN trials ON ((trials.task_id = tasks.id)))
+   LEFT JOIN executions_tags ON ((executions_tags.execution_id = executions.id)))
+   LEFT JOIN tags ON ((executions_tags.tag_id = tags.id)))
+  GROUP BY executions.id;
+
+
+--
+-- Name: execution_issues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE execution_issues (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    description text,
+    stacktrace text,
+    type character varying(255) DEFAULT 'error'::character varying NOT NULL,
+    execution_id uuid NOT NULL,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now(),
+    CONSTRAINT valid_type CHECK (((type)::text = ANY ((ARRAY['error'::character varying, 'warning'::character varying])::text[])))
+);
 
 
 --
@@ -539,18 +575,6 @@ CREATE TABLE specifications (
 
 
 --
--- Name: tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE tags (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    tag character varying(255),
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-
---
 -- Name: task_specs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -606,25 +630,6 @@ CREATE TABLE trial_attachments (
     to_be_retained_before timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
---
--- Name: trials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE trials (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    task_id uuid NOT NULL,
-    executor_id uuid,
-    error text,
-    state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    started_at timestamp without time zone,
-    finished_at timestamp without time zone,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
-    scripts json,
-    CONSTRAINT valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'pending'::character varying, 'success'::character varying])::text[])))
 );
 
 
@@ -1506,6 +1511,8 @@ INSERT INTO schema_migrations (version) VALUES ('109');
 INSERT INTO schema_migrations (version) VALUES ('110');
 
 INSERT INTO schema_migrations (version) VALUES ('111');
+
+INSERT INTO schema_migrations (version) VALUES ('112');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
 
