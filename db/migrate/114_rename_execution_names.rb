@@ -4,9 +4,9 @@ class RenameExecutionNames < ActiveRecord::Migration
       dir.up do
         execute "CREATE INDEX branches_lower_name_idx ON branches(lower(name))"
         execute "CREATE INDEX repositories_lower_name_idx ON repositories(lower(name))"
-        execute " SET session_replication_role = REPLICA; 
+        execute "ALTER TABLE executions DISABLE TRIGGER update_updated_at_column_of_executions;
           UPDATE executions SET name = 'Tests' WHERE name ilike 'test';
-          SET session_replication_role = DEFAULT;"
+          ALTER TABLE executions ENABLE TRIGGER update_updated_at_column_of_executions;"
       end
       dir.down do
         execute "DROP INDEX  branches_lower_name_idx;"
