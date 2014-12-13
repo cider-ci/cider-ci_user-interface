@@ -6,6 +6,7 @@ class PublicController < ApplicationController
 
   include Concerns::ServiceSession
   include Concerns::BadgeParamsBuilder
+  include ActionView::Helpers::TextHelper
 
 
   def show
@@ -41,18 +42,20 @@ class PublicController < ApplicationController
   def sign_in
     begin
       user = find_user_by_login params.require(:sign_in)[:login].downcase
+      target_path= (params[:current_fullpath] || public_path)
       if user.authenticate(params.require(:sign_in)[:password])
         create_services_session_cookie user
+        redirect_to target_path, 
+          flash: {success: "You have been signed in!"}
       else
         reset_session
         cookies.delete "cider-ci_services-session"
         raise "Password authentication failed!"
       end
-      redirect_to public_path, flash: {success: "You have been signed in!"}
     rescue Exception => e
       reset_session
       cookies.delete "cider-ci_services-session"
-      redirect_to public_path, flash: {error: e.to_s}
+      redirect_to (target_path || public_path), flash: {error: e.to_s}
     end
   end
 
@@ -60,7 +63,44 @@ class PublicController < ApplicationController
   def sign_out
     reset_session
     cookies.delete "cider-ci_services-session"
-    redirect_to public_path, flash: {success: "You have been signed out!"}
+    redirect_to (params[:current_fullpath] || public_path), 
+      flash: {success: "You have been signed out!"}
   end
+
+
+  def redirect_to_execution
+    if @execution = Execution.find_by_repo_branch_name( \
+      params[:repository_name],  params[:branch_name], params[:execution_name])
+      redirect_to workspace_execution_path(@execution)
+    else
+      flash[:warning]= [%<You are looking for the execution "#{params[:execution_name]}">,
+        %<of the branch "#{params[:branch_name]}" >, %<and the repository "#{params[:repository_name]}". >,
+        "It doesn't exist at this time. You can try again later."].join("")
+      render "public/404", status: 404
+    end
+  end
+
+# http://localhost:8880/cider-ci/ui/public/attachments/Cider-CI%20Bash%20Demo%20Project/master/tests/log/hello.log
+   
+  def redirect_to_tree_attachment_content
+    if @execution = Execution.find_by_repo_branch_name(params[:repository_name], 
+                     params[:branch_name], params[:execution_name])
+      if  tree_attachment = TreeAttachment.find_by(path: "/#{@execution.tree_id}/#{params[:path]}") 
+        redirect_to workspace_attachment_path('tree_attachment',tree_attachment.path) 
+      else
+        flash[:warning]= [%<You are looking for the attchment `#{params[:path]}` >,
+                          %<with the tree-id `#{truncate(@execution.tree_id, length: 10)}`. >,
+                          "It doesn't exist at this time. You can try again later."].join("")
+        render "public/404", status: 404
+      end
+    else
+      flash[:warning]= [%<You are looking for the execution "#{params[:execution_name]}">,
+        %<of the branch "#{params[:branch_name]}" >, %<and the repository "#{params[:repository_name]}". >,
+        "It doesn't exist at this time. You can try again later."].join("")
+      render "public/404", status: 404
+    end
+  end
+
+
 
 end

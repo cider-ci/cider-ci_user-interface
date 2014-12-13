@@ -4,11 +4,13 @@ gem 'activerecord-jdbc-adapter', platform: :jruby
 gem 'activerecord-jdbcpostgresql-adapter',  platform: :jruby
 gem 'bcrypt-ruby'
 gem 'bootstrap-sass'
+# gem 'bootswatch-sprockets', "= 0.2.0.pre.beta.10" 
+gem 'bootswatch-rails'
 gem 'bunny', ">= 1.3"
 gem 'capybara', group: [:test]
 gem 'coffee-rails'
 gem 'factory_girl', group: [:development, :test]
-gem 'factory_girl_rails', group: [:development, :staging, :test]
+gem 'factory_girl_rails', group: [:development, :test]
 gem 'faker', group: [:development, :test]
 gem 'font-awesome-sass', ">= 4.2.0"
 gem 'foreigner'
@@ -30,7 +32,9 @@ gem 'rails', '4.1.8'
 gem 'rails_config'
 gem 'rest-client'
 gem 'rspec-rails', group: [:development, :test]
-gem 'sass-rails', '>= 4.0.0'
+gem 'sass-rails'
+# gem 'sass-rails', git: 'https://github.com/DrTom/sass-rails.git', ref: '849e40e69b6017486b757811b807b3810705682a'
+gem 'sass'
 gem 'sdoc', group: [:doc], require: false
 gem 'selenium-webdriver'
 gem 'simplecov', require: false, group: :test

@@ -7,8 +7,8 @@
 - cache [cs.tasks_signature || execution.cache_signature] do |cache_tag|
   - _stat = execution.execution_stat
 
-  #summary-stats.stats.summary-stats.reload.replace-without-animation{data: {state: execution.state, cache_tag: _stat}}
-    %table.new-execution-stats
+  #stats-and-progress.reload.replace-without-animation{data: {state: execution.state, cache_tag: _stat}}
+    %table.stats-and-progress
       %thead 
       %tbody
         %tr

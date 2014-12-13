@@ -3,8 +3,6 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Task < ActiveRecord::Base
-  AUTO_TRIALS= 3
-  EAGER_TRIALS= 1
   self.primary_key= 'id'
   before_create{self.id ||= SecureRandom.uuid}
   belongs_to :execution
@@ -14,58 +12,12 @@ class Task < ActiveRecord::Base
 
   validates :state, inclusion: {in: Constants::TASK_STATES}
 
-  after_save{execution.update_state! if state_changed?}
-
   default_scope{order(created_at: :desc,id: :asc)}
 
   scope :with_failed_trials, lambda{
     where("EXISTS (SELECT 1 FROM trials WHERE trials.task_id = tasks.id AND trials.state = 'failed')")
   }
 
-
-  def suitable_executors
-    ExecutorWithLoad.from('executors_with_load, tasks').where("tasks.id = ?", id) \
-      .where('tasks.traits <@ executors_with_load.traits')
-  end
-
-  def auto_trials
-     Integer(data['auto_trials']) rescue AUTO_TRIALS 
-  end
-
-  def eager_trials
-     Integer(data['eager_trials']) rescue EAGER_TRIALS 
-  end
-
-
-  def check_and_retry!
-    while trials.where(state: 'passed').count == 0 \
-      and trials.count < auto_trials \
-      and trials.count - trials.where(state: 'failed').count < eager_trials
-      create_trial
-    end
-  end
-
-  def update_state!
-    update_attributes! state: evaluate_state
-  end
-
-  def evaluate_state 
-    trial_states = trials.pluck(:state)
-    case
-    when trial_states.any?{|state| state == 'passed'}
-      'passed'
-    when trial_states.any?{|state| state == 'dispatching' || state == 'executing'}
-      'executing'
-    when trial_states.all?{|state| state == 'failed'}
-      'failed'
-    else
-      'pending'
-    end
-  end
-
-  def create_trial
-    trials.create! 
-  end
 
   def to_s
     name

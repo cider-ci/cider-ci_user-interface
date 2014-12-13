@@ -3,7 +3,8 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - trial ||= @trial 
-- cache [trial.cache_signature,trial.trial_attachments.collection_cache_tag,admin?] do
+- cache [trial.cache_signature,
+          trial.trial_attachments.collection_cache_tag,admin?] do
 
   .row
     .col-md-6
@@ -51,7 +52,8 @@
       %b #{render 'humanized_time_from_now', at: trial.started_at}
     - if trial.finished_at and trial.started_at
       in 
-      %b #{distance_of_time_in_words(trial.started_at,trial.finished_at,include_seconds: true)} 
+      %b= distance_of_time_in_words(trial.started_at,trial.finished_at, 
+        include_seconds: true)
       (#{(trial.finished_at - trial.started_at).round(2)} seconds)
     - if executor_name = trial.executor.try(:name)
       on 
@@ -73,13 +75,16 @@
           %p This trial does not have any scripts associated with it.
 
           %p 
-            They might have been erased afer some period of time in order to save space. 
-            Administrators can adjust the retention time.
+            They might have been erased afer some period of time in order to 
+            save space.  Administrators can adjust the retention time.
 
     - else
       %h2 Scripts 
       %ul.list-inline 
-        = render partial: 'script_label', collection: trial.scripts.map{|k,v| v.merge({"id" => k})}, as: :script
+        = render partial: 'script_label', 
+          collection: trial.scripts.map{|k,v| v.merge({"id" => k})}, 
+          as: :script
 
       %ul.list-unstyled.scripts
-        = render partial: 'script', collection: trial.scripts.map{|k,v| v.merge({"id" => k})}
+        = render partial: 'script', 
+          collection: trial.scripts.map{|k,v| v.merge({"id" => k})}

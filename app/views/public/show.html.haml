@@ -4,6 +4,9 @@
 
 #welcome-page.cider-ci.text-center
 
+  -# %a{href: "http://localhost:8880/cider-ci/ui/public/executions/Cider-CI%20Bash%20Demo%20Project/master/test"}
+  -#  %img{src: "http://localhost:8880/cider-ci/ui/public/badges/medium/Cider-CI%20Bash%20Demo%20Project/master/test.svg"}
+
   - cache WelcomePageSettings.find.cache_signature do 
     #welcome_message
       =markdown(WelcomePageSettings.find.welcome_message)
@@ -18,7 +21,6 @@
       - @radiator_rows.each do |row |
 
         %table.table.radiator-table
-          %thead
           %tbody
             %tr
               - row[:items].map(&:deep_symbolize_keys).each do |item|

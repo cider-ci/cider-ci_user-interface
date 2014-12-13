@@ -1,0 +1,11 @@
+table.table.executions-table
+  tr
+    td.execution
+      font-size: 125%
+    &.spacer
+      height: 0.25em
+    &.execution
+      @each $state in $ci-states
+        $i: index($ci-states,$state)
+        &.#{$state}
+          background-color: nth($ci-colors-bg,$i)

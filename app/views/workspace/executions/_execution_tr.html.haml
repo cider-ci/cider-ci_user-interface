@@ -12,7 +12,7 @@
  
   - commits = execution.commits
 
-  %tr.execution.reload{id: "execution-tr-#{execution.id}",class: bootstrap_color_for_state(execution.state),data: {cache_tag: cache_tag}}
+  %tr.execution.reload{id: "execution-tr-#{execution.id}",class: execution.state,data: {cache_tag: cache_tag}}
 
     %td.execution
 
@@ -27,14 +27,14 @@
 
       %span.nowrap
         - if execution.execution_stat.failed > 0
-          %span.badge.failed= execution.execution_stat.failed
+          %span.execution-stats-badge.badge.failed= execution.execution_stat.failed
         - if execution.execution_stat.failed > 0 and execution.execution_stat.passed > 0
           %span : 
         - if execution.execution_stat.passed> 0
-          %span.badge.success=  execution.execution_stat.passed
+          %span.execution-stats-badge.badge.passed=  execution.execution_stat.passed
         - if execution.execution_stat.failed > 0 and execution.execution_stat.passed > 0
           %span / 
-          %span.badge #{execution.execution_stat.total}
+          %span.execution-stats-badge.badge #{execution.execution_stat.total}
 
  
     %td.created-at= render 'humanized_time_from_now', at: execution.created_at

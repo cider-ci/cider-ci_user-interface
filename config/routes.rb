@@ -71,6 +71,11 @@ CiderCI::Application.routes.draw do
       end
     end
 
+
+    get '/attachments/:kind/*path', controller: :attachments, 
+      action: :show, constraints: { path: /.*/ },
+      as: :attachment
+
   end
 
   namespace 'admin' do
@@ -113,6 +118,16 @@ CiderCI::Application.routes.draw do
   namespace 'public' do
     post 'sign_in'
     post 'sign_out'
+
+    # ħttp://localhost:8880/cider-ci/ui/public/attachments/Cider-CI%20Bash%20Demo%20Project/master/Tests/log/hello.txt
+    #
+    get 'attachments/:repository_name/:branch_name/:execution_name/*path', 
+      action: :redirect_to_tree_attachment_content , 
+      constraints: { path: /.*/ }
+
+    get 'executions/:repository_name/:branch_name/:execution_name', 
+      action: :redirect_to_execution
+
     resources :badges , only: [] do
       collection do
         get "medium/:repository_name/:branch_name/:execution_name", action: "medium"

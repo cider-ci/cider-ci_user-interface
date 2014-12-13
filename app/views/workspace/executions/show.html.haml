@@ -5,9 +5,9 @@
 - execution ||= @execution 
 - state = execution.state
 - ecs = execution.execution_cache_signature
-- cs = [execution.id,execution.updated_at,admin?,ecs.repositories_signature,ecs.commits_signature,
+- cs = [execution.id,execution.updated_at,ecs.repositories_signature,ecs.commits_signature,
     ecs.branches_signature, ecs.tasks_signature,@tasks_select_condition,ecs.execution_issues_count,
-    @page,@trials.collection_cache_tag ]
+    @page,@trials.collection_cache_tag]
 
 - cache cs  do |cache_tag|
 
@@ -44,18 +44,17 @@
     #execution.execution
 
       %ul.list-inline.actions.pull-right
-        - if admin?
-          %li
-            = form_tag workspace_execution_path(execution), method: 'DELETE' do
-              = hidden_field_tag :authenticity_token, form_authenticity_token
-              = button_tag type: :submit, class: "btn btn-danger" do
-                %i.icon-trash
-                Delete
-        %li
+        %li.for-admin
+          = form_tag workspace_execution_path(execution), method: 'DELETE' do
+            = hidden_field_tag :authenticity_token, form_authenticity_token
+            = button_tag type: :submit, class: "btn btn-danger" do
+              %i.icon-trash
+              Delete
+        %li.for-signed-in-user
           =link_to edit_workspace_execution_path(execution), class: "btn btn-warning" do
             %i.icon-edit
             Edit
-        %li
+        %li.for-signed-in-user
           = form_tag retry_failed_workspace_execution_path(execution,@filter_params), method: 'POST', remote: false do
             = hidden_field_tag :authenticity_token, form_authenticity_token
             = button_tag type: :submit, class: "btn btn-primary" do

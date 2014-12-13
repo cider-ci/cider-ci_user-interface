@@ -1,0 +1,46 @@
+
+// simplified variant, more general, less obtrusive, 
+.dropdown-menu > li > a,  .dropdown-menu > li > form > .btn
+  display: block
+  padding: 3px 20px
+  clear: both
+  font-weight: normal
+  line-height: $line-height-base
+  color: $dropdown-link-color
+  white-space: nowrap // prevent links from randomly breaking onto new lines
+  width: 100%
+  text-align: left
+//  background-color: $dropdown-bg
+
+
+
+//.dropdown-menu > li > a, .dropdown-menu > li > form > .btn
+//  // sass can't extend nested selectors :/
+//  // @extend .dropdown-menu > li > a
+//  display: block
+//  padding: 3px 20px 3px 15px
+//  clear: both
+//  font-weight: normal
+//  line-height: 1.42857
+//  white-space: nowrap
+//
+//  width: 100%
+//  text-align: left
+//
+//  .navbar-default &, &
+//    &.btn
+//      @extend .btn-link
+//      color: #333
+//      &:hover, &:focus
+//        text-decoration: none
+//        color: #262626
+//        background-color: #F5F5F5
+//    
+//    // support button variations as needed
+//    &.btn-warning
+//      [class^="icon-"]
+//        color: $brand-warning
+//      &:hover, &:focus
+//        text-decoration: none
+//        color: $gray-darker
+//        background-color: hsl(hue($brand-warning), saturation($brand-warning), lightness(#F5F5F5))

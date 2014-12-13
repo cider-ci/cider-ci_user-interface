@@ -5,4 +5,8 @@ class TreeAttachment < ActiveRecord::Base
     service_base_url(::Settings.storage_service) + "/tree-attachments" + path
   end
 
+  def tree_id
+    path.split("/").second
+  end
+
 end

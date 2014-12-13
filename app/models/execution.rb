@@ -27,6 +27,18 @@ class Execution < ActiveRecord::Base
 
   serialize :substituted_specification_data
 
+  def self.find_by_repo_branch_name repo_name, branch_name, execution_name
+    Execution.joins(commits: {head_of_branches: :repository}) \
+      .where("lower(executions.name) = ?", execution_name.downcase)
+      .where("lower(branches.name) = ?", branch_name.downcase)
+      .where("lower(repositories.name) =? ", repo_name.downcase)
+      .first
+  end
+
+  def public_view_permission?
+    repositories.where(public_view_permission: true).count > 0
+  end
+
   def tree_attachments
     TreeAttachment.where("path like '/#{tree_id}/%'")
   end

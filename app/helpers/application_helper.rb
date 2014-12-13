@@ -49,7 +49,7 @@ module ApplicationHelper
     when 'pending'
       "icon-pending"
     when 'passed'
-      "icon-success"
+      "icon-passed"
     else
       Rails.logger.warn "no icon defined for #{state}"
     end
@@ -109,7 +109,7 @@ module ApplicationHelper
     when 'failed'
       'label-failed'
     when 'passed'
-      'label-success'
+      'label-passed'
     when 'pending'
       'label-pending'
     when 'executing','dispatched'

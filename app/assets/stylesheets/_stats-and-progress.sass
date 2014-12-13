@@ -1,0 +1,16 @@
+#stats-and-progress
+  table.stats-and-progress
+    width: 100%
+    max-width: 100%
+    td
+      padding: 8pt 
+      text-align: center
+      vertical-align: middle
+      color: $progress-bar-color !important
+      @each $state in $ci-states
+        $i: index($ci-states,$state)
+        &.#{$state}
+          background-color: nth($ci-colors,$i)
+      //&.executing
+      //  @include striped-executing
+

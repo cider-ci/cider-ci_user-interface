@@ -11,7 +11,15 @@
     - if Rails.env == 'development'
       = javascript_include_tag "try", "data-turbolinks-track" => true
     = csrf_meta_tags
-  %body{data: {session: session.to_hash}}
+    - unless user?
+      :sass
+        .for-signed-in-user
+          display: none !important
+    - unless admin?
+      :sass
+        .for-admin
+          display: none !important
+  %body{data: {user: user?, admin: admin?}}
     .container
 
       = cache [admin_party?,current_user,admin?] do 
@@ -23,7 +31,7 @@
             %button.close{type:"button", 'data-dismiss'=>'alert'} &#215
             = flash[:success]
         - if flash[:notice]
-          .alert.alert-notice.alert-dismissable
+          .alert.alert-info.alert-dismissable
             %button.close{type:"button", 'data-dismiss'=>"alert"} &#215
             = flash[:notice]
         - if flash[:error] and (flash[:error].is_a? Array) or flash[:error] = [flash[:error]]
@@ -32,6 +40,14 @@
               .alert.alert-danger.alert-dismissable
                 %button.close{type:"button", 'data-dismiss'=>"alert"} &#215
                 = error
+        - if flash[:warning] and (flash[:warning].is_a? Array) or flash[:warning] = [flash[:warning]]
+          - flash[:warning].each do |error|
+            - if error
+              .alert.alert-warning.alert-dismissable
+                %button.close{type:"button", 'data-dismiss'=>"alert"} &#215
+                = error
+
+
 
       %div#application{data: {env: Rails.env}}
 

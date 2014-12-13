@@ -22,6 +22,11 @@ It will continue when in `development` or `test` environment with a warning (to
 the console and log) if the connection could not be established. 
 
 
+### Code Status
+
+[![Code Climate](https://codeclimate.com/github/cider-ci/cider-ci_user-interface/badges/gpa.svg)](https://codeclimate.com/github/cider-ci/cider-ci_user-interface)
+
+
 ## License
 
 Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)

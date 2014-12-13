@@ -14,22 +14,6 @@ class Trial < ActiveRecord::Base
 
   validates :state, inclusion: {in: Constants::TRIAL_STATES}
 
-  after_create do
-    task.reload.update_state! 
-    create_scripts
-  end
-
-  after_commit do
-    if destroyed? \
-      or previous_changes.keys.include?('state')  \
-      or previous_changes.keys.include?('created_at') # resource is newly created
-
-      # TODO use messaging for the following:
-      task.check_and_retry!
-      task.update_state!
-    end
-  end
-
   delegate :script, to: :task
 
   default_scope{ reorder(created_at: :desc, id: :asc)}
@@ -64,30 +48,5 @@ class Trial < ActiveRecord::Base
     where("json_array_length(scripts) > 0")
     .where(%[ trials.created_at <
       (now() - interval '#{TimeoutSettings.find.trial_scripts_retention_time_days} Days')])}
-
-  def update_state!
-    update_attributes! state: evaluate_state
-  end
-
-  def evaluate_state
-    script_states= scripts.pluck(:state)
-    case
-    when script_states.any?{|state| state == 'failed'}
-      'failed'
-    when script_states.all?{|state| state == 'passed'}
-      'passed'
-    when script_states.any?{|state| ['dispatched','executing'].include? state }
-      'executing'
-    else # leave it
-      state
-    end
-  end
-
-  def create_scripts
-    self.scripts= task.data.deep_symbolize_keys.try(:[],:scripts).map { |name,script|
-      script.merge({name: name, id: SecureRandom.uuid})
-    }.sort { |s1,s2| s1[:order] <=> s2[:order] }
-    self.save
-  end
 
 end

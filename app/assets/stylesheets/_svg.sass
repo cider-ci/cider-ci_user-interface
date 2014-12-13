@@ -1,0 +1,54 @@
+
+@mixin badge_box()
+  g
+    font-size: 12px
+    text  
+      text-anchor: middle
+    text, tspan
+      font-family: DejaVu Sans, Verdana, Geneva, sans-serif
+      font-weight: normal
+
+
+svg.cider-ci
+
+  line
+    stroke: $ci-border-color
+  
+  rect
+    fill: $body-bg
+    stroke: $ci-border-color
+  text
+    fill: $text-color
+
+  a
+    text, tspan
+      fill: $link-color  
+
+  svg
+    &.state
+      @each $state in $ci-states
+        $i: index($ci-states,$state)
+        &.#{$state}
+          rect
+            fill: nth($ci-colors-bg,$i)
+
+  &.badge-medium
+
+    svg.host-info
+      @include badge_box
+
+    svg.repo
+      @include badge_box
+      g 
+        font-size: 14px
+        text, tspan
+          font-weight: bold 
+
+    svg.execution
+      @include badge_box
+      g
+        font-size: 16px
+        text, tspan
+          font-weight: bold 
+
+

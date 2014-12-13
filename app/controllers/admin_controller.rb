@@ -6,7 +6,7 @@ class AdminController < ApplicationController
 
   before_action do
     unless admin? 
-      redirect_to public_path, flash: {error: "This resource requires adminstrator privileges!"}
+      render "public/403", status: :forbidden
     end
   end
 

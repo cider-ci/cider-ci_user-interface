@@ -3,16 +3,17 @@
 #  See the LICENSE.txt file provided with this software.
 
 module Constants 
+  # keep order (because of execution stats/progress)
   STATES= %w(
-    aborted
-    executing 
     failed 
-    passed 
+    aborted
     pending
-    ).sort
+    executing 
+    passed 
+    )
   EXECUTION_STATES= STATES
   TASK_STATES= STATES
-  TRIAL_STATES= (Array.new(STATES) << "dispatching").sort
+  TRIAL_STATES= (Array.new(STATES).insert 3, "dispatching")
 
   UPDATE_BRANCH_TOPIC_NAME = '/topics/branch_updates'
 end

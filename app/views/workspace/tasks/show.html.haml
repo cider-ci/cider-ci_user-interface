@@ -26,13 +26,16 @@
     - task.trials.reorder(created_at: :asc).each_with_index do |trial,i|
       %tr
         %td
-          = link_to workspace_trial_path(trial), class: "label #{label_class_for_state(trial.state)}" do
+          = link_to workspace_trial_path(trial), 
+            class: "label #{label_class_for_state(trial.state)}" do
             %i{class: icon_class_for_state(trial.state)} 
             =(i+1).ordinalize
         %td
           %ul.list-inline 
-            = render partial: 'script_label', collection: trial.scripts.values, as: :script, locals: {trial: trial}
-
+            = render partial: 'script_label', 
+              collection: trial.scripts.map{|k,v| v.merge({"id" => k})}, 
+              as: :script,
+              locals: {trial: trial}
 
 
 %h2 Properties
@@ -43,7 +46,8 @@
       %tr 
         %td=k 
         %td
-          %pre.script{style: "border: none; padding: 0; margin: 0"}<>= (v.is_a? Array or v.is_a? Hash) ? v.to_yaml : v
+          %pre.script{style: "border: none; padding: 0; margin: 0"}<>
+            = (v.is_a? Array or v.is_a? Hash) ? v.to_yaml : v
 
 
 %h2 Specification

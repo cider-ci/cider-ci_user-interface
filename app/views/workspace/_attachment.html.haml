@@ -4,8 +4,9 @@
 
 %tr
   %td
-    = link_to attachment.url do
-      = attachment.path.split('/').drop(2).join("/")
+    = link_to workspace_attachment_path(attachment.class.name.underscore, 
+        attachment.path.slice(1..-1)) do
+      = "/" + attachment.path.split('/').drop(2).join("/")
   %td
     - if attachment.content_length
       = (number_to_human_size(attachment.content_length) rescue 'unknown')

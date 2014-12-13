@@ -1,15 +1,17 @@
 %li
   = form_tag public_sign_out_path, method: 'POST' do
     = hidden_field_tag :authenticity_token, form_authenticity_token
+    = hidden_field_tag :current_fullpath, request.original_fullpath
     = button_tag type: :submit, class: "btn btn-warning" do
-      %i.icon-sign-out
-      Sign out!
+      %span Sign out! &nbsp; 
+      %i.fa.fa-sign-out.fw
+
 %li
   =link_to edit_workspace_account_path do
-    %i.icon-edit
+    %i.fw.fa.fa-pencil
     Account
 %li 
   = link_to edit_workspace_session_path do
-    %i.fa.fa-wrench
+    %i.fw.fa.fa-wrench
     Session
 

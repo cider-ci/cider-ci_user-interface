@@ -4,14 +4,7 @@
 
 class WorkspaceController < ApplicationController
 
-
-  before_action do
-    unless user?
-      reset_session
-      redirect_to public_path, flash: {error: "You must be signed in to access this resource!"}
-    end
-  end
-
+  before_action :require_sign_in
 
   helper_method \
     :branch_names_filter, 
@@ -64,6 +57,15 @@ class WorkspaceController < ApplicationController
 
   def branch_heads
     @branches = Branch.reorder(updated_at: :desc).page(params[:page])
+  end
+
+
+  def require_sign_in
+    unless user?
+      reset_session
+      # redirect_to public_path, flash: {error: "You must be signed in to access this resource!"}
+      render "public/401", status: :unauthorized
+    end
   end
 
 end

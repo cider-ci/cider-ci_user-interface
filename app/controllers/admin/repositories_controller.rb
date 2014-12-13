@@ -6,7 +6,7 @@ class Admin::RepositoriesController < AdminController
 
   def permited_repository_params params
     if params[:repository]
-      params[:repository].permit(:name,:origin_uri,:importance,:git_fetch_and_update_interval,:git_update_interval)
+      params[:repository].permit(:name,:origin_uri,:importance,:git_fetch_and_update_interval,:git_update_interval,:public_view_permission)
     else
       nil
     end
