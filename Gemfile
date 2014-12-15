@@ -3,7 +3,7 @@ source 'https://rubygems.org'
 gem 'activerecord-jdbc-adapter', platform: :jruby
 gem 'activerecord-jdbcpostgresql-adapter',  platform: :jruby
 gem 'bcrypt-ruby'
-gem 'bootstrap-sass'
+gem 'bootstrap-sass', '~> 3.3.1'
 # gem 'bootswatch-sprockets', "= 0.2.0.pre.beta.10" 
 gem 'bootswatch-rails'
 gem 'bunny', ">= 1.3"

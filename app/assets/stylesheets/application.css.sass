@@ -1,33 +1,34 @@
 @import jquery.ui.all
 @import codemirror
 
-//@import bootswatch/slate/variables
-//@import bootswatch/cyborg/variables
-//@import bootswatch/superhero/variables
-
+// asset path helpers (sprockets) - must be loaded first!
 @import bootstrap-sprockets
-@import bootstrap
-
-//@import bootswatch/slate/bootswatch
-//@import bootswatch/cyborg/bootswatch
-//@import bootswatch/superhero/bootswatch
-
 @import font-awesome-sprockets
+
+// icons (not themeable atm)
 @import font-awesome
 
-@import icons
+// select 1 bootstrap theme
+// - uses vars, needs to go before bootstrap
+// - theme needs to `@import bootstrap` to make overrides!
+@import themes/bootstrap-plain
+// @import themes/bootstrap-theme
+// @import themes/darkly
 
-@import variables
-@import colors_and_states
+// partials and stuff (app specific, using variables from theme where sensible):
+@import lib/variables
 
-@import svg
+@import lib/icons
 
-@import executions_table
+@import lib/colors_and_states
 
-@import dropdown_form_with_button 
+@import lib/svg
 
-@import stats-and-progress
+@import lib/executions_table
 
+@import lib/dropdown_form_with_button 
+
+@import lib/stats-and-progress
 
 i
   &.success
