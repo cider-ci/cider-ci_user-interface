@@ -34,12 +34,7 @@
 
   %p#release-info
     Version&nbsp;
-    =Settings.release.version_major
-    %span<>.
-    =Settings.release.version_minor
-    %span<>.#{Settings.release.version_patch}
-    %span<>#{Settings.release.version_pre.to_s}
-    %span<>#{Settings.release.version_build.to_s}
+    = render partial: 'application/semantic_version', locals:{semver: Settings.release}
 
 
 
@@ -50,4 +45,3 @@
   %p 
     Read more about Cider-CI on the 
     %a{href: "https://github.com/cider-ci/cider-ci"} Cider-CI github project page.
-

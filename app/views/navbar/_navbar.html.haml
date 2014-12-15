@@ -6,7 +6,11 @@
 
   .navbar-header 
     = link_to public_path, class: "navbar-brand" do
-      %b Cider-CI
+      %b<
+        Cider-CI
+        - unless Settings.release.version_pre.nil?
+          %small.text-warning<
+            = render partial: 'application/semantic_version'
 
   .collaps.navbar-collapse
 
@@ -17,4 +21,3 @@
     = render partial: "navbar/user"
     
   
-

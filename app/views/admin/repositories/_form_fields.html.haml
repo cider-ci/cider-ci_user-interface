@@ -11,7 +11,7 @@
 
 =form_group "Public view permission", control_id: "repository_public_view_permission" do
   .checkbox 
-    %label 
+    %label<
       = f.check_box :public_view_permission, class: ""
 
 =form_group "Importance", control_id: "repository_importance", cols_control: 2 do

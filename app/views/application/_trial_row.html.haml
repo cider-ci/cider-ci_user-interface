@@ -9,11 +9,11 @@
   - state ||= trial.state
   %tr
     %td
-      .label{class: label_class_for_state(state)}
+      .label{class: label_class_for_state(state)}<
         %i{class: icon_class_for_state(state)} 
 
     %td
-      .label
+      .label<
         %i{class: icon_class_for_priority(trial.priority)}
         =trial.priority
     %td
@@ -35,4 +35,3 @@
       = link_to workspace_trial_path(trial) do
         %i.icon-eye-open 
         details ...
-

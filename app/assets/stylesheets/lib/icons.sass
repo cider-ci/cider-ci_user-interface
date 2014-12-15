@@ -4,11 +4,8 @@
 [class^="icon-"]
   @extend .fa
   
-  .navbar &
+  .nav &, .navbar &
     @extend .fa-fw // fixed-width icons
-    
-  .dropdown-menu &
-    margin-left: -10px
 
 .icon-add
   @extend .fa-plus-circle
@@ -27,8 +24,6 @@
 
 .icon-checked
   @extend .fa-check
-  before 
-    content: $fa-var-check 
 
 .icon-commit, .icon-commits
   @extend .fa-code-fork
@@ -77,6 +72,9 @@
 
 .icon-repository
   @extend .fa-archive
+
+.icon-reset
+  @extend .fa-times-circle
 
 .icon-retry
   @extend .fa-repeat
