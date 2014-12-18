@@ -7,20 +7,10 @@ class Workspace::TasksController < WorkspaceController
   skip_before_action :require_sign_in, only: [:show]
 
   def retry 
-    begin
-      @task = Task.find params[:id]
-      Messaging.publish("task.create-trial", {id: @task.id})
-      redirect_to workspace_execution_path(@task.execution), 
-        flash: {success: "A new trial will be executed"}
-    rescue Exception => e
-      if @task.execution
-        redirect_to workspace_execution_path(@task.execution), 
-          flash: {error: Formatter.exception_to_s(e)}
-      else
-        redirect_to workspace_dashboard_path, 
-          flash: {error: Formatter.exception_to_s(e)}
-      end
-    end
+    @task = Task.find params[:id]
+    Messaging.publish("task.create-trial", {id: @task.id})
+    redirect_to workspace_execution_path(@task.execution), 
+      flash: {success: "A new trial will be executed"}
   end
 
   def show

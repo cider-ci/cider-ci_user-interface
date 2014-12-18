@@ -2,11 +2,25 @@
 ENV["RAILS_ENV"] ||= 'test'
 
 require 'simplecov'
-SimpleCov.start
+SimpleCov.start do
+  add_filter "/spec/"
+  add_filter "app/messaging/messaging.rb"
+  add_filter "/admin/"
+end
 
 require File.expand_path("../../config/environment", __FILE__)
 require 'rspec/rails'
 require 'rspec/autorun'
+
+require 'spec_helper_mock_messaging'
+
+Dir[Rails.root.join("app/models/**/*.rb")].each{|f| require f}
+Dir[Rails.root.join("app/helpers/**/*.rb")].each{|f| require f}
+Dir[Rails.root.join("app/messaging/**/*.rb")].each{|f| require f}
+Dir[Rails.root.join("app/lib/**/*.rb")].each{|f| require f}
+Dir[Rails.root.join("app/controllers/**/*controller.rb")].each{|f| require f}
+
+
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.

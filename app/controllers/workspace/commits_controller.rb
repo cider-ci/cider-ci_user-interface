@@ -37,9 +37,5 @@ class Workspace::CommitsController < WorkspaceController
 
   end
 
-  def show
-    @commit = Commit.find params[:id]
-  end
-
 end
 

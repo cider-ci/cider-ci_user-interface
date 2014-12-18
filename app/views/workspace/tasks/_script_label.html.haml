@@ -4,6 +4,6 @@
 
 %li
   =link_to workspace_trial_path(trial) + "##{script["id"]}" do
-    %span.label{class: label_class_for_state(script["state"])}
+    %span.script-label.label{class: label_class_for_state(script["state"])}
       #{script["name"]}
      

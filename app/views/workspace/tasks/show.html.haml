@@ -15,27 +15,26 @@
     %i{class: icon_class_for_state(state)}<>
   %span &nbsp; Task "#{task.name}"
 
+%section#trials
 
+  %h2 Trials
 
-%h2 Trials
-
-
-%table.table.striped
-  %thead
-  %tbody
-    - task.trials.reorder(created_at: :asc).each_with_index do |trial,i|
-      %tr
-        %td
-          = link_to workspace_trial_path(trial), 
-            class: "label #{label_class_for_state(trial.state)}" do
-            %i{class: icon_class_for_state(trial.state)} 
-            =(i+1).ordinalize
-        %td
-          %ul.list-inline 
-            = render partial: 'script_label', 
-              collection: trial.scripts.map{|k,v| v.merge({"id" => k})}, 
-              as: :script,
-              locals: {trial: trial}
+  %table.table.striped
+    %thead
+    %tbody
+      - task.trials.reorder(created_at: :asc).each_with_index do |trial,i|
+        %tr.trial
+          %td
+            = link_to workspace_trial_path(trial), 
+              class: "label trial-label #{label_class_for_state(trial.state)}" do
+              %i{class: icon_class_for_state(trial.state)} 
+              =(i+1).ordinalize
+          %td
+            %ul.list-inline 
+              = render partial: 'script_label', 
+                collection: trial.scripts.map{|k,v| v.merge({"id" => k})}, 
+                as: :script,
+                locals: {trial: trial}
 
 
 %h2 Properties

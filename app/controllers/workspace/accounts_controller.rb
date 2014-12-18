@@ -9,7 +9,7 @@ class Workspace::AccountsController < WorkspaceController
     with_rescue_flash do
       EmailAddress.where(user_id: @user.id).update_all primary: false
       EmailAddress.find_by(user_id: @user.id,email_address: params[:email_address]).update_attributes! primary: true
-      {success: "A new primary email has been set."}
+      {success: "A new primary email address has been set."}
     end
   end
 
@@ -17,7 +17,7 @@ class Workspace::AccountsController < WorkspaceController
   def add_email_address
     with_rescue_flash do
       EmailAddress.create! user_id: @user.id, email_address: params[:email_address]
-      {success: "The new email-address has been added. "}
+      {success: "The new email address has been added. "}
     end
   end
 

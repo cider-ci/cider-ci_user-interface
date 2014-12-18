@@ -275,7 +275,7 @@ CREATE TABLE executions (
     updated_at timestamp without time zone DEFAULT now(),
     specification_id uuid,
     expanded_specification_id uuid,
-    CONSTRAINT check_executions_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying, 'dispatching'::character varying])::text[])))
+    CONSTRAINT check_executions_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 
@@ -416,7 +416,7 @@ CREATE TABLE tasks (
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     task_spec_id uuid,
-    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying, 'dispatching'::character varying])::text[])))
+    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 
@@ -630,7 +630,7 @@ CREATE TABLE trials (
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     scripts json,
-    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
+    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 

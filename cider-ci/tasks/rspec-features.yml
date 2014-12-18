@@ -1,2 +1,50 @@
 ---
-tasks: []
+tasks:
+- name: features attachments
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/attachments_spec.rb"
+- name: features badges
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/badges_spec.rb"
+- name: features public_page
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/public_page_spec.rb"
+- name: features sign_in
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/sign_in_spec.rb"
+- name: features workspace account
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/workspace/account_spec.rb"
+- name: features workspace commits
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/workspace/commits_spec.rb"
+- name: features workspace execution
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/workspace/execution_spec.rb"
+- name: features workspace executions
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/workspace/executions_spec.rb"
+- name: features workspace session
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/workspace/session_spec.rb"
+- name: features workspace task
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/workspace/task_spec.rb"
+- name: features workspace tasks
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/workspace/tasks_spec.rb"
+- name: features workspace trial
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/workspace/trial_spec.rb"

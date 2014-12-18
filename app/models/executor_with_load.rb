@@ -7,8 +7,4 @@ class ExecutorWithLoad < Executor
 
   belongs_to :executor, primary_key: 'id', foreign_key: 'id'
 
-  scope :dispatch_order, lambda{
-    where("executors_with_load.relative_load < 1") \
-    .reorder(relative_load: :asc)
-  }
 end

@@ -7,52 +7,6 @@ class Workspace::TrialsController < WorkspaceController
   skip_before_action :require_sign_in, 
     only: [:show, :attachments]
 
-
-  def destroy
-    begin
-      @trial = Trial.find(params[:id])
-      @execution= @trial.task.execution
-      @trial.destroy
-      redirect_to workspace_execution_path(@execution), 
-        flash: {success: "The trial has been destroyed"}
-    rescue Exception => e
-      redirect_to workspace_dashboard_path, 
-        flash: {error: Formatter.exception_to_s(e)}
-    end
-  end
-
-  def index
-    @trials = Trial.page(params[:page])
-
-    @selected_state = params[:state]
-    @trials = case @selected_state
-              when "all"
-                @trials
-              when "executing"
-                @trials.in_execution
-              when "finished"
-                @trials.finished
-              when "pending"
-                @trials.to_be_dispatched
-              else
-                @trials
-              end
-  end
-
-
-  def set_failed 
-    begin
-      @trial = Trial.find(params[:id])
-      @trial.update_attributes! state: "failed"
-      redirect_to workspace_execution_path(@trial.task.execution), 
-        flash: {success: "The trail has been marked as failed."}
-    rescue Exception => e
-      redirect_to (@trial ? 
-                   workspace_trial_path(@trial) : workspace_dashboard_path),
-      flash: {error: Formatter.exception_to_s(e)}
-    end
-  end
-
   def show
     @trial = Trial.find params[:id]
     require_sign_in unless @trial.task.execution.public_view_permission?

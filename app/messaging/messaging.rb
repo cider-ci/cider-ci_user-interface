@@ -1,6 +1,13 @@
 class Messaging
   class << self 
 
+    def publish name, message, routing_key=name 
+      @conn || init
+      memoized_create_exchange(name).publish(message.to_json,routing_key: routing_key)
+    end
+
+    private 
+
     def init
       begin 
 
@@ -23,14 +30,6 @@ class Messaging
       end
 
     end
-
-
-    def publish name, message, routing_key=name 
-      @conn || init
-      memoized_create_exchange(name).publish(message.to_json,routing_key: routing_key)
-    end
-
-    private 
 
     def create_exchange name, options={}
       @ch.exchange name, {type: 'topic',durable: true}.merge(options)

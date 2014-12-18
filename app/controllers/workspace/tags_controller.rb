@@ -5,20 +5,13 @@
 class Workspace::TagsController < WorkspaceController 
 
   def index
+    @tags= Tag.reorder(tag: :asc) \
+      .instance_exec(params) do |params|
+      (term= params[:term]).blank? ? self : where("tag ilike ?",term<<'%')
+    end.distinct.limit(25)
 
-    @tags= if (term= params[:term]).blank?
-        Tag.reorder(tag: :asc).page
-      else
-        Tag.reorder(tag: :asc).where("tag ilike ?",term<<'%')
-      end
-    @tags=@tags.limit(25)
-
-    if @tags.count < 25
-      render json: @tags.pluck(:tag)
-    else
-      render json: []
-    end
-
+    render json: @tags.pluck(:tag)
   end
-  
+
 end
+

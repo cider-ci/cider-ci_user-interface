@@ -16,7 +16,6 @@ FactoryGirl.define do
     end
   end
 
-
   factory :passed_task, class: "Task" do
     state "passed"
     after(:create) do |task|

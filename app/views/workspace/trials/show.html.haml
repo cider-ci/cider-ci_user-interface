@@ -22,22 +22,6 @@
                 %span.text-muted Attachments
 
 
-
-  %ul.list-inline.actions.pull-right{style: "margin-top: 10px"}
-    - if admin?
-      %li 
-        = form_tag workspace_trial_path(trial), method: 'DELETE' do
-          = hidden_field_tag :authenticity_token, form_authenticity_token
-          = button_tag type: :submit, class: "btn btn-danger" do
-            %i.icon-trash
-            Delete
-      %li 
-        = form_tag set_failed_workspace_trial_path(trial), method: 'POST' do
-          = hidden_field_tag :authenticity_token, form_authenticity_token
-          = button_tag type: :submit, class: "btn btn-danger" do
-            %i.icon-failed
-            Mark as failed
-
   %h1{style: "margin-top: 10px"}
     %span{class: "label #{label_class_for_state(trial.state)}"}<>
       %i{class: icon_class_for_state(trial.state)}<>

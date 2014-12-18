@@ -32,6 +32,8 @@ module Concerns
           " #{stat.failed}/#{stat.total} #{execution[:state]}"
         when "passed"
           " #{stat.total} #{execution[:state]}"
+        else
+          state
         end
       else
         " not available"

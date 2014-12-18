@@ -27,7 +27,7 @@
   - else
     %ul.nav.navbar-nav.navbar-right
       %li 
-        %a.dropdown-toggle{data: {toggle: :dropdown}, href: workspace_user_path } 
+        %a.dropdown-toggle#user-actions{data: {toggle: :dropdown}, href: workspace_user_path } 
           - if admin?
             %i.icon-admin
           - else

@@ -39,32 +39,10 @@ class WorkspaceController < ApplicationController
     params.try('[]',"commit").try('[]',:text).try(:nil_or_non_blank_value)
   end
 
-  def with_branch_filter
-    params["with_branch"] or false
-  end
-
-  def dashboard
-    @executions = Execution.reorder(created_at: :desc).limit(10)
-
-    @finished_trials = Trial.finished
-    @trials_in_exeuction = Trial.in_execution.limit(5)
-    @queued_trials = Trial.to_be_dispatched.limit(5)
-
-    @branches = Branch.joins(:current_commit).reorder("commits.committer_date DESC").limit(10)
-
-    @executors = ExecutorWithLoad.reorder(:name).limit(10)
-  end
-
-  def branch_heads
-    @branches = Branch.reorder(updated_at: :desc).page(params[:page])
-  end
-
-
   def require_sign_in
     unless user?
-      reset_session
-      # redirect_to public_path, flash: {error: "You must be signed in to access this resource!"}
       render "public/401", status: :unauthorized
+      return 
     end
   end
 

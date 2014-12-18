@@ -10,7 +10,7 @@
       %span.monospaced= "/" + @attachment.path.split("/").drop(2).join("/")
 
       %p 
-        %span content_type:&nbsp;
+        %span Content-type:&nbsp;
         %span.monospaced>= @attachment.content_type
         %span ,&nbsp; content_length: 
         %span.monospaced= number_to_human_size(@attachment.content_length)

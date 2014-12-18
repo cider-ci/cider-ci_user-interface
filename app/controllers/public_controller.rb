@@ -34,7 +34,7 @@ class PublicController < ApplicationController
     begin
       User.find_by(login_downcased: login) || EmailAddress.find_by!(email_address: login).user
     rescue
-      raise "Neither login nor email found!"
+      raise "Neither login nor email address found!"
     end
   end
 

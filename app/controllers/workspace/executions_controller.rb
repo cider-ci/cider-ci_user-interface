@@ -41,20 +41,11 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def destroy
     @execution = Execution.find params[:id]
-    begin
-      ActiveRecord::Base.transaction do
-        @execution.delete
-      end
-      redirect_to workspace_commits_path, 
-        flash: {success: "The execution #{@execution} has been destroyed."}
-    rescue Exception => e
-      path =  if @execution and not @execution.destroyed?
-                workspace_execution_path(@execution) 
-              else
-                workspace_dashboard_path
-              end
-      redirect_to path , flash: {error: Formatter.exception_to_s(e)}
+    ActiveRecord::Base.transaction do
+      @execution.delete
     end
+    redirect_to workspace_commits_path, 
+      flash: {success: "The execution #{@execution} has been deleted."}
   end
 
   def edit
@@ -139,17 +130,13 @@ class Workspace::ExecutionsController < WorkspaceController
   end
 
   def update
-    begin 
-      @execution = Execution.find(params[:id])
-      @execution.tags= params[:execution][:tags] \
-        .split(",").map(&:strip).reject(&:blank?) \
-        .map{|s| Tag.find_or_create_by(tag: s)}
-      @execution.update_attributes! params.require(:execution).permit(:priority)
-      redirect_to workspace_execution_path(@execution), 
-        flash: {success: "The execution has been updated."}
-    rescue Exception => e
-      redirect_to edit_workspace_execution_path(@execution), flash: {error: e}
-    end
+    @execution = Execution.find(params[:id])
+    @execution.tags= params[:execution][:tags] \
+      .split(",").map(&:strip).reject(&:blank?) \
+      .map{|s| Tag.find_or_create_by(tag: s)}
+    @execution.update_attributes! params.require(:execution).permit(:priority)
+    redirect_to workspace_execution_path(@execution), 
+      flash: {success: "The execution has been updated."}
   end
 
 
@@ -157,7 +144,6 @@ class Workspace::ExecutionsController < WorkspaceController
     @filter_params= params.slice(:tasks_select_condition, 
                                  :name_substring_term, :per_page)
   end
-
 
 
   def set_and_filter_tasks params
@@ -175,8 +161,6 @@ class Workspace::ExecutionsController < WorkspaceController
                @tasks.where("state <> 'passed'")
              when :with_failed_trials
                @tasks.with_failed_trials
-             else
-               raise "unsupported select condition"
              end
     @tasks = if @name_substring_term.blank?
                @tasks

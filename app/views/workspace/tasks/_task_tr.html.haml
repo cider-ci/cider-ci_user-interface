@@ -8,7 +8,7 @@
 
 - cache cs do |cache_tag|
 
-  %tr.task.reload{id: task.id,data: {cache_tag: cs}}
+  %tr.task.reload{id: task.id,data: {cache_tag: cs, state: task.state}}
     %td.state
       =link_to workspace_task_path(task) do
         = render "label_for_state", state: task.state

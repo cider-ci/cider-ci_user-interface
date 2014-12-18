@@ -18,7 +18,7 @@
 /tmp
 config/database.yml
 config/environments/*.local.yml
-config/secrets.yml
+#config/secrets.yml
 config/settings.local.yml
 config/settings/*.local.yml
 db/seeds.rb

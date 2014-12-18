@@ -4,24 +4,15 @@
 
 class Workspace::BranchesController < WorkspaceController 
 
-  def show
-    @branch = Branch.find(params[:id])
-    @commits = @branch.current_commit.with_ancestors.page(params[:page])
-  end
-
   def names
-    @branches= if (term= params[:term]).blank?
-        Branch.reorder(name: :asc).page
-      else
-        Branch.reorder(name: :asc).where("name ilike ?",term<<'%')
-      end
-    @branches=@branches.limit(25)
-    if @branches.count < 25
-      render json: @branches.pluck(:name)
-    else
-      render json: []
-    end
-  end
 
+    @branches= Branch.reorder(name: :asc) \
+      .instance_exec(params) do |params|
+      (term= params[:term]).blank? ? self : self.where("name ilike ?", term<<'%')
+    end.distinct.limit(25)
+
+    render json: @branches.pluck(:name)
+  end
 
 end
+

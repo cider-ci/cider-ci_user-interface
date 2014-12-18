@@ -1,5 +1,5 @@
 %li 
-  .panel{class: "panel-#{issue.bootstrap_type}"}
+  .panel{class: "panel-#{issue.bootstrap_type} issue"}
     .panel-heading
       .pull-right 
         = link_to issue_workspace_execution_path(id: @execution,issue_id: issue.id), method: 'DELETE', class: "btn btn-default btn-xs" do

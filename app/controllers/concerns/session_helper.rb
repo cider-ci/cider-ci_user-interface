@@ -2,6 +2,10 @@ module Concerns
   module SessionHelper
     extend ActiveSupport::Concern
 
+    included do
+      helper_method :session_adjust_reload_timeout
+    end
+
     def session_adjust_reload_timeout default_value
       case session[:reload_frequency]
       when "aggressive"
@@ -11,10 +15,6 @@ module Concerns
       else
         default_value
       end
-    end
-
-    included do
-      helper_method :session_adjust_reload_timeout
     end
 
   end

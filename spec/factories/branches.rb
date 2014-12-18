@@ -2,6 +2,6 @@
 
 FactoryGirl.define do
   factory :branch do
-    name {Faker::Lorem.words(1).join}
+    name {Faker::Lorem.word}
   end
 end
