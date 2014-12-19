@@ -39,4 +39,9 @@ class Executor < ActiveRecord::Base
   def url
     "#{protocol}://#{host}:#{port}"
   end
+
+  def to_s
+    "#{name} @ #{host}"
+  end
+
 end
