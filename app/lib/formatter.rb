@@ -9,11 +9,11 @@ module Formatter
 
       case Rails.env
       when "development"
-        e.message.to_s + "\n\n" + 
+        e.class.to_s + " " + e.message.to_s + "\n\n" + 
           e.backtrace.select{|l| l =~ Regexp.new(Rails.root.to_s)}.join("\n") 
         # + "\n\n" + e.backtrace.join("\n") 
       else
-        e.message.to_s
+        e.class.to_s + " " + e.message.to_s
       end
     end
 
@@ -23,12 +23,6 @@ module Formatter
           l =~ Regexp.new(Rails.root.join("vendor").to_s)}.join(", ") 
       rest= more.map(&:to_s).join(",")
       [message,trace,rest].join(" ### ")
-    end
-
-
-    def include_realative_url_root url, path
-      idx= (url =~ Regexp.new(path)) 
-      "#{url[0..(idx-1)]}#{Rails.application.config.relative_url_root}#{url[idx..url.size]}"
     end
 
   end

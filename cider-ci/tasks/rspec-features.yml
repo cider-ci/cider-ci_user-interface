@@ -1,5 +1,33 @@
 ---
 tasks:
+- name: features admin definitions
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/admin/definitions_spec.rb"
+- name: features admin executors
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/admin/executors_spec.rb"
+- name: features admin repositories
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/admin/repositories_spec.rb"
+- name: features admin timeout_settings
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/admin/timeout_settings_spec.rb"
+- name: features admin users
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/admin/users_spec.rb"
+- name: features admin view_service_stati
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/admin/view_service_stati_spec.rb"
+- name: features admin welcome_page
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/admin/welcome_page_spec.rb"
 - name: features attachments
   scripts:
     rspec:

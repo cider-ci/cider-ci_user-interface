@@ -17,7 +17,9 @@
         %i.success.icon-online.fa.fa-heart
       - else
         %i.warning.fa.fa-heart-o
-  %td.name #{executor.name}
+  %td.last-ping-at
+    =render 'humanized_time_from_now', at: executor.last_ping_at
+  %td.name #{executor.name} @ #{executor.host}
   %td
     .load.badge
       %i{class: (executor.relative_load > 0 ? "icon-executing" : "")}

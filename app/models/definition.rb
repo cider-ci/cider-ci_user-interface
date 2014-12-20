@@ -5,7 +5,6 @@
 class Definition < ActiveRecord::Base
 
   belongs_to :specification
-  has_many :branch_update_triggers
 
   default_scope{order(:name)}
 

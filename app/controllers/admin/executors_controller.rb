@@ -6,22 +6,16 @@ class Admin::ExecutorsController < AdminController
 
 
   def create 
-    begin
-      @executor = Executor.create! processed_params 
-      redirect_to admin_executors_path, flash: {success: %< The new executor "#{@executor}" has been created.>}
-    rescue Exception => e
-      redirect_to new_admin_executor_path(params), flash: {error: Formatter.exception_to_s(e)}
-    end
+    @executor = Executor.create! processed_params 
+    redirect_to admin_executors_path, 
+      flash: {success: %< The new executor "#{@executor}" has been created.>}
   end
 
   def destroy
-    begin 
-      @executor = Executor.find params[:id]
-      @executor.destroy
-      redirect_to admin_executors_path, flash: {success: %<The executor "#{@executor}" has been destroyed>}
-    rescue Exception => e
-      redirect_to admin_executors_path, flash:{error: Formatter.exception_to_s(e)}
-    end
+    @executor = Executor.find params[:id]
+    @executor.destroy
+    redirect_to admin_executors_path, 
+      flash: {success: %<The executor "#{@executor}" has been deleted>}
   end
 
   def edit
@@ -37,23 +31,19 @@ class Admin::ExecutorsController < AdminController
   end
 
   def update
-    begin
       @executor =  Executor.find params[:id]
       @executor.update_attributes! processed_params 
-      redirect_to admin_executors_path,  flash: {success: "The executor has been updated."} 
-    rescue Exception => e
-      redirect_to admin_executors_path,  flash: {error: Formatter.exception_to_s(e)} 
-    end
-  end
-
-  def ping
-    Executor.find(params[:id]).ping
-    redirect_to admin_executors_path
+      redirect_to admin_executors_path,  
+        flash: {success: "The executor has been updated."} 
   end
 
   def processed_params 
-    traits = params[:executor].try(:[],:traits).try(:split,',').try(:map){|s|s.strip}.try(:sort).try(:uniq)
-    params[:executor].try(:permit,:name,:host,:port,:ssl,:server_overwrite,:server_host,:server_port,:server_ssl,:max_load,:enabled,:traits).try(:merge,{traits: traits})
+    traits = params[:executor].try(:[],:traits).try(:split,',')
+    .try(:map){|s|s.strip}.try(:sort).try(:uniq)
+    params[:executor].try(:permit,:name,:host,:port,:ssl,:server_overwrite,
+                          :server_host,:server_port,:server_ssl,:max_load,
+                          :enabled,:traits) \
+                      .try(:merge,{traits: traits})
   end
 
 end

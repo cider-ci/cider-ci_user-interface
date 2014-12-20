@@ -13,10 +13,6 @@
         %i{class: icon_class_for_state(state)} 
 
     %td
-      .label<
-        %i{class: icon_class_for_priority(trial.priority)}
-        =trial.priority
-    %td
       %small 
         =render 'humanized_time_from_now', at: trial.created_at
 

@@ -10,13 +10,9 @@ class Admin::TimeoutSettingsController < AdminController
 
   def update
     @timeout_settings = TimeoutSettings.find
-    redirect_to edit_admin_timeout_settings_path(@timeout_settings), flash: \
-      begin
-        @timeout_settings.update_attributes! params.require(:timeout_settings).permit!
-        { success: %<The timeout settings have been updated!>}
-    rescue Exception => e
-      { error: Formatter.exception_to_s(e)}
-    end
+    @timeout_settings.update_attributes! params.require(:timeout_settings).permit!
+    redirect_to edit_admin_timeout_settings_path(@timeout_settings), 
+      flash: { success: %<The timeout settings have been updated!>}
   end
 
 end

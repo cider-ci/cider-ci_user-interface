@@ -13,8 +13,7 @@ class Admin::DefinitionsController < AdminController
   end
 
   def create 
-    rescue_path= new_admin_definition_path(definition: {name: params[:definition].try(:[],'name')}, 
-                                           specification: {data: params[:specification].try(:[],'data')})
+    rescue_path= new_admin_definition_path(rescue_params)
     Fun.wrap_exception_with_redirect self, rescue_path do
       @specification = Specification.find_or_create_by_data! YAML.load(params[:specification][:data])
       @definition = Definition.create! permited_definition_params(params).merge({specification: @specification})
@@ -27,7 +26,7 @@ class Admin::DefinitionsController < AdminController
       @definition = Definition.find params[:id]
       @definition.destroy 
       redirect_to admin_definitions_path, flash: \
-        {success: %Q<The definition "#{@definition}" has been destroyed.>}
+        {success: %Q<The definition "#{@definition}" has been deleted.>}
     end
   end
 
@@ -45,24 +44,14 @@ class Admin::DefinitionsController < AdminController
   end
 
 
-
   def new
     @previous_data = params[:specification].try(:[],'data')
     @previous_name = params[:definition].try(:[],'name')
-
-    @definition = Definition.new(specification: 
-                                 if (id = params[:definition_id])
-                                   Definition.find(id).specification
-                                 else
-                                   Specification.new  
-                                 end)
-
-    @other_definitions = Definition.reorder(:name)
+    @definition = Definition.new(specification: Specification.new) 
   end
 
   def update
-    rescue_path=edit_admin_definition_path(definition: {name: params[:definition].try(:[],'name')}, 
-                                           specification: {data: params[:specification].try(:[],'data')})
+    rescue_path=edit_admin_definition_path(rescue_params)
     Fun.wrap_exception_with_redirect self, rescue_path do
       ActiveRecord::Base.transaction do
         @definition = Definition.find params[:id]
@@ -73,4 +62,9 @@ class Admin::DefinitionsController < AdminController
     end
   end
 
+
+  def rescue_params
+    { definition: params['definition'], 
+      specification: params['specification'],}
+  end
 end

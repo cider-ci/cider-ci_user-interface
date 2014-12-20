@@ -16,31 +16,11 @@ class Executor < ActiveRecord::Base
   scope :enabled, lambda{where(enabled: true)}
   scope :online, lambda{where(ONLINE_SQL_CONDITION)}
 
-  def ping
-    begin
-      RestClient.post("#{url}/ping", {time: Time.zone.now.iso8601}.to_json, 
-                      content_type: :json, accept: :json, timeout: 3, open_timeout: 3)
-      update_attributes! last_ping_at: Time.zone.now
-    rescue  RestClient::Exception, Errno::ECONNREFUSED => e
-      Rails.logger.warn Formatter.exception_to_log_s(e)
-      nil 
-    end
-    self
-  end
-
   def online?
     !! Executor.where(id: self.id).where(ONLINE_SQL_CONDITION).take
   end
 
-  def protocol
-    ssl ? "https" : "http" 
-  end
-
-  def url
-    "#{protocol}://#{host}:#{port}"
-  end
-
-  def to_s
+    def to_s
     "#{name} @ #{host}"
   end
 

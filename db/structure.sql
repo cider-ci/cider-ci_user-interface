@@ -183,20 +183,6 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: branch_update_triggers; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE branch_update_triggers (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    definition_id uuid NOT NULL,
-    branch_id uuid NOT NULL,
-    active boolean DEFAULT true NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
-);
-
-
---
 -- Name: branch_update_triggers_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -666,14 +652,6 @@ CREATE TABLE welcome_page_settings (
 
 
 --
--- Name: branch_update_triggers_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY branch_update_triggers
-    ADD CONSTRAINT branch_update_triggers_pkey PRIMARY KEY (id);
-
-
---
 -- Name: branches_commits_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -907,13 +885,6 @@ CREATE INDEX exectutions_lower_name_idx ON executions USING btree (lower((name):
 --
 
 CREATE UNIQUE INDEX exectutions_tree_id_lower_name_idx ON executions USING btree (tree_id, lower((name)::text));
-
-
---
--- Name: index_branch_update_triggers_on_branch_id_and_definition_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_branch_update_triggers_on_branch_id_and_definition_id ON branch_update_triggers USING btree (branch_id, definition_id);
 
 
 --
@@ -1247,13 +1218,6 @@ CREATE RULE "_RETURN" AS
 
 
 --
--- Name: update_updated_at_column_of_branch_update_triggers; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_branch_update_triggers BEFORE UPDATE ON branch_update_triggers FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-
-
---
 -- Name: update_updated_at_column_of_branches; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1349,22 +1313,6 @@ CREATE TRIGGER update_updated_at_column_of_users BEFORE UPDATE ON users FOR EACH
 --
 
 CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE ON welcome_page_settings FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
-
-
---
--- Name: branch_update_triggers_branch_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY branch_update_triggers
-    ADD CONSTRAINT branch_update_triggers_branch_id_fk FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE CASCADE;
-
-
---
--- Name: branch_update_triggers_tags_branch_update_trigger_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY branch_update_triggers_tags
-    ADD CONSTRAINT branch_update_triggers_tags_branch_update_trigger_id_fk FOREIGN KEY (branch_update_trigger_id) REFERENCES branch_update_triggers(id) ON DELETE CASCADE;
 
 
 --
@@ -1532,6 +1480,8 @@ INSERT INTO schema_migrations (version) VALUES ('112');
 INSERT INTO schema_migrations (version) VALUES ('113');
 
 INSERT INTO schema_migrations (version) VALUES ('114');
+
+INSERT INTO schema_migrations (version) VALUES ('115');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
 

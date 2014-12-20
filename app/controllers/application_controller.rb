@@ -17,10 +17,6 @@ class ApplicationController < ActionController::Base
     Rack::MiniProfiler.authorize_request if session[:mini_profiler_enabled]
   end
 
-  def redirect
-    redirect_to public_path
-  end
-
   def admin_party?
     User.admin_party?
   end

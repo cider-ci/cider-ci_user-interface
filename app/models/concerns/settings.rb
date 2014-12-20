@@ -7,11 +7,17 @@ module Concerns
     extend ActiveSupport::Concern
 
     module ClassMethods
-      def find
-        @instance ||= find_or_create_by id: 0
-      end
-      def reload
-        @instance = find_or_create_by id: 0
+      def find *args
+        find_or_create_by id: 0
+        # this doesn't by us much anymore 
+        #        case RUBY_ENGINE
+        #        when "jruby" # we are running one server 
+        #          @instance ||= find_or_create_by id: 0
+        #        when "ruby"
+        #          find_or_create_by id: 0
+        #        else
+        #          raise RuntimeError, "The ruby engine #{RUBY_ENGINE} is not supported" 
+        #        end
       end
     end
   end

@@ -8,11 +8,7 @@
       %li 
         =link_to admin_executor_path(executor), method: 'DELETE', class: "btn btn-danger btn-sm" do
           %i.icon-delete
-          Destroy
-      %li 
-        = link_to ping_admin_executor_path(executor), method: 'POST', class: "btn btn-default btn-sm" do
-          %i.icon-bell-alt
-          Ping
+          Delete
       %li 
         =link_to edit_admin_executor_path(executor) , class: "btn btn-warning btn-sm" do
           %i.icon-edit
