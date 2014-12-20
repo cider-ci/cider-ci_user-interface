@@ -17,41 +17,4 @@ class Commit < ActiveRecord::Base
 
   has_many :repositories, through: :branches
 
-  #def repositories
-  #  Repository.joins(branches: :commits).where("commits.id = ?",id).select("DISTINCT repositories.*")
-  #end
-
-  def with_ancestors 
-    # we should be avoid the subquery "id IN" if we 
-    # patch AR to include a WITH statement
-    # REMARK: there seems to be with_recursive support in arel; how to use it? 
-    Commit.where(" commits.id IN (
-      WITH RECURSIVE ancestors AS
-      (
-        SELECT * FROM commits WHERE ID = ?
-        UNION 
-        SELECT commits.* 
-          FROM ancestors, commit_arcs, commits
-          WHERE TRUE
-          AND ancestors.id = commit_arcs.child_id
-          AND commit_arcs.parent_id = commits.id
-      )
-      SELECT id FROM ancestors)", id).reorder(committer_date: :desc)
-  end
-
-  def with_descendants
-    Commit.where(" commits.id IN (
-      WITH RECURSIVE descendants AS
-      (
-        SELECT * FROM commits WHERE ID = ?
-        UNION 
-        SELECT commits.* 
-          FROM descendants, commit_arcs, commits
-          WHERE TRUE
-          AND descendants.id = commit_arcs.parent_id
-          AND commit_arcs.child_id = commits.id
-      )
-      SELECT id FROM descendants)", id).reorder(committer_date: :desc)
-  end
-
 end

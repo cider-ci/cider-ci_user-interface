@@ -82,8 +82,6 @@ class Workspace::ExecutionsController < WorkspaceController
   def new
     @execution = Execution.new
     @commit = Commit.find params[:commit_id]
-    @branches = Branch.where(
-      current_commit_id: @commit.with_descendants.pluck(:id))
     @definitions = Definition.all
   end
 

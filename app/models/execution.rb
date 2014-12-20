@@ -43,32 +43,9 @@ class Execution < ActiveRecord::Base
     TreeAttachment.where("path like '/#{tree_id}/%'")
   end
 
-  def repository
-    Repository.joins(branches: :commits).where("commits.tree_id  = ?",self.tree_id) \
-      .reorder("branches.updated_at").first
-  end
-
-  ### deeper associations
-  #def branches
-  #  Branch.joins(commits: :tree).where("trees.id = ?",self.tree_id) \
-  #    .reorder(name: :desc).select("DISTINCT branches.*")
-  #end
-  #def respositories
-  #  Repository.joins(branches:  {commits: :tree}).where("trees.id = ?",self.tree_id) \
-  #   .reorder(name: :asc,created_at: :desc).select("DISTINCT repositories.*")
-  #end
   def trials
-    Trial.joins(task: :execution) \
-      .where("executions.tree_id = ?",tree_id)
+    Trial.joins(task: :execution).where("executions.tree_id = ?",tree_id)
   end
-  ######################
-
-  # a commit, rather arbitrary the most recent 
-  # but git doesn't care as long it is referenced by a head 
-  def commit 
-    commits.reorder(updated_at: :desc).first
-  end
-
 
   def accumulated_time
     trials.where.not(started_at: nil).where.not(finished_at: nil) \
@@ -82,14 +59,9 @@ class Execution < ActiveRecord::Base
       .group("executions.tree_id").first[:duration]
   end
 
-  def collect_from_specification hierarchy, keyword
-    hierarchy.map{|x| x[keyword]}.reject(&:nil?).reduce(&:merge)
-  end
-
   def create_tasks_and_trials
     Messaging.publish("execution.create-tasks-and-trials", {execution_id: id})
   end
-
 
   def add_strings_as_tags seq_of_strings 
     seq_of_strings \

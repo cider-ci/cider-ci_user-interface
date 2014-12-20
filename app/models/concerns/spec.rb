@@ -17,12 +17,10 @@ module Concerns
 
     end
 
-
     def id_matches_data
-      unless id == id_hash(self.data)
+      unless id == self.class.id_hash(self.data)
         errors.add(:data, "is immutable")
       end
-
     end
 
     module ClassMethods

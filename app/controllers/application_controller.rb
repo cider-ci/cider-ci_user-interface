@@ -11,14 +11,14 @@ class ApplicationController < ActionController::Base
   include Concerns::SessionHelper
 
 
-  helper_method :admin_party? ,:current_user, :user?, :users?, :admin?
+  helper_method :current_user, :user?, :users?, :admin?
 
   before_action do
     Rack::MiniProfiler.authorize_request if session[:mini_profiler_enabled]
   end
 
-  def admin_party?
-    User.admin_party?
+  def redirect
+    redirect_to public_path
   end
 
   def current_user
@@ -27,20 +27,11 @@ class ApplicationController < ActionController::Base
   end
 
   def user? 
-    admin_party? or current_user 
+    current_user 
   end
 
   def admin?
-    admin_party? or current_user.try(&:is_admin)
-  end
-
-  def users?
-    User.users?
-  end
-
-  # TODO restrict this; otherwise we will have a bunch of dead threads
-  def pry
-    # binding.pry
+    current_user.try(&:is_admin)
   end
 
 end

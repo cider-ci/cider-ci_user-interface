@@ -1,10 +1,22 @@
 require 'spec_helper_feature'
 require 'spec_helper_feature_shared'
 
-feature "Public start page" do
+feature "Public start page", browser: :firefox  do
 
-  scenario "contains the welcome message and the first svg badge for master", 
-    browser: :firefox do
+  scenario "automatic redirect from root to public page" do
+    visit "/" 
+    expect(current_path).to be== public_path
+  end
+
+  scenario "public page with not existing / invalid welcome page setting" do
+    WelcomePageSettings.find.destroy
+    visit public_path
+    expect(page).to have_content "Failed to build the radiator, see the logs for details."
+    expect(page).to have_content "Markdown render error!"
+  end
+
+
+  scenario "contains the welcome message and the first svg badge for master" do
 
     visit "/public"
 
@@ -15,6 +27,7 @@ feature "Public start page" do
     expect( first("svg.badge-medium") ).to have_content "passed"
 
   end
+
 
 
   scenario "redirect for non existing execution",  
@@ -60,5 +73,7 @@ feature "Public start page" do
     expect(page).to have_content 'Execution "Tests"'
 
   end
+
+
 
 end

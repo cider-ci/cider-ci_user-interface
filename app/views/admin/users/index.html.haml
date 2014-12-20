@@ -43,11 +43,13 @@
               Filter
 
 
-%table.table.table-striped
-  %thead
-  %tbody
-    = render @users
+%section#users.users
+
+  %table.table.table-striped
+    %thead
+    %tbody
+      = render @users
 
 
-= paginate @users, theme: 'default'
+  = paginate @users, theme: 'default'
 

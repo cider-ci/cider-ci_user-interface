@@ -22,7 +22,7 @@
   %body{data: {user: user?, admin: admin?}}
     .container
 
-      = cache [admin_party?,current_user,admin?] do 
+      = cache [current_user,admin?] do 
         = render partial: "navbar/navbar" 
 
       #messages

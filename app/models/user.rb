@@ -7,7 +7,7 @@ class User < ActiveRecord::Base
   has_many :email_addresses, lambda{order(email_address: :asc)}
 
   def to_s
-    login
+    "#{first_name} #{last_name} [#{login}]".squish
   end
 
   before_save{ self.login_downcased= self.login.downcase}
@@ -15,7 +15,7 @@ class User < ActiveRecord::Base
   after_save{ User.check_last_admin_not_gone! }
   after_destroy{ User.check_last_admin_not_gone! }
 
-  validates :login, :first_name, :last_name, presence: true
+  validates :login, presence: true
 
   validates :login, format: { with: /\A[\w\d]+\z/, message: "Only alphanumic characters allowed" }
 
@@ -30,10 +30,6 @@ class User < ActiveRecord::Base
 
   def self.users? 
     User.count > 0
-  end
-
-  def self.admin_party?
-    not users?
   end
 
   def self.admins? 

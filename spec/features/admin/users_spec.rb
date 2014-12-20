@@ -23,7 +23,8 @@ feature "Managing users as admin ", browser: :firefox  do
     click_on("Filter")
 
     expect(page).to have_content "Normin"
-    expect(page).not_to have_content "Adam"
+    expect(find("#users")).not_to have_content "Adam"
+
 
   end
 
