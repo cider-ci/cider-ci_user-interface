@@ -9,4 +9,6 @@ class TrialAttachment < ActiveRecord::Base
     path.split("/").second
   end
 
+  default_scope { reorder(path: :asc) }
+
 end
