@@ -45,6 +45,19 @@ the console and log) if the connection could not be established.
 
 ### Code Status
 
+
+<a href="http://ci2.zhdk.ch/cider-ci/ui/public/executions/Cider-CI%20User-Interface/master/Tests">
+  <img src="http://ci2.zhdk.ch/cider-ci/ui/public/badges/small/Cider-CI%20User-Interface/master/Tests.svg?respond_with_200">
+  </img>
+</a>
+
+<a href="http://ci2.zhdk.ch/cider-ci/ui/public/attachments/Cider-CI%20User-Interface/master/Tests/coverage/index.html">
+  <img src="http://ci2.zhdk.ch/cider-ci/ui/public/badges/small/Cider-CI%20User-Interface/master/coverage.svg?respond_with_200">
+  </img>
+</a>
+
+
+
 [![Code Climate](https://codeclimate.com/github/cider-ci/cider-ci_user-interface/badges/gpa.svg)](https://codeclimate.com/github/cider-ci/cider-ci_user-interface)
 
 

@@ -28,22 +28,26 @@ tasks:
   scripts:
     rspec:
       body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/admin/welcome_page_spec.rb"
-- name: features attachments
+- name: features public attachments
   scripts:
     rspec:
-      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/attachments_spec.rb"
-- name: features badges
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/public/attachments_spec.rb"
+- name: features public badges_small
   scripts:
     rspec:
-      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/badges_spec.rb"
-- name: features public_page
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/public/badges_small_spec.rb"
+- name: features public badges
   scripts:
     rspec:
-      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/public_page_spec.rb"
-- name: features sign_in
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/public/badges_spec.rb"
+- name: features public public_page
   scripts:
     rspec:
-      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/sign_in_spec.rb"
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/public/public_page_spec.rb"
+- name: features public sign_in
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/public/sign_in_spec.rb"
 - name: features workspace account
   scripts:
     rspec:

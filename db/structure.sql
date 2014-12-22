@@ -629,8 +629,8 @@ CREATE TABLE users (
     password_digest character varying(255),
     login character varying(255) NOT NULL,
     login_downcased character varying(255) NOT NULL,
-    last_name character varying(255) NOT NULL,
-    first_name character varying(255) NOT NULL,
+    last_name character varying(255) DEFAULT ''::character varying NOT NULL,
+    first_name character varying(255) DEFAULT ''::character varying NOT NULL,
     is_admin boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now()
@@ -1482,6 +1482,8 @@ INSERT INTO schema_migrations (version) VALUES ('113');
 INSERT INTO schema_migrations (version) VALUES ('114');
 
 INSERT INTO schema_migrations (version) VALUES ('115');
+
+INSERT INTO schema_migrations (version) VALUES ('116');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
 

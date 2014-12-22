@@ -131,6 +131,7 @@ CiderCI::Application.routes.draw do
     resources :badges , only: [] do
       collection do
         get "medium/:repository_name/:branch_name/:execution_name", action: "medium"
+        get "small/:repository_name/:branch_name/:execution_name", action: "small"
         # get ":repository/:branch_name/:execution_name"
       end
     end

@@ -12,10 +12,7 @@
       = javascript_include_tag "try", "data-turbolinks-track" => true
     = csrf_meta_tags
   %body{data: {session: session.to_hash}}
-    .container
-
-      %div#application{data: {env: Rails.env}}
-
-        = yield 
+    %div#application{data: {env: Rails.env}}
+      = yield 
 
 

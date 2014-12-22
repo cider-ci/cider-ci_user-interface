@@ -19,10 +19,38 @@ module Concerns
         hostname: ::Settings[:hostname],
         message: build_message(execution)
       }
-
     end
 
-    private 
+
+    def build_small_badge_params(execution, repository_name, 
+                                 branch_name, execution_name)
+
+      host_info_text= ("Cider-CI @ " + ::Settings[:hostname] ).squish
+      git_info_text= (repository_name + " / "  + branch_name).squish
+      execution_info_text= if execution
+                             execution.name + " " + execution.state
+                           else
+                             "404 Not found, try again later"
+                           end
+
+      { host_info_text: host_info_text,
+        host_info_text_width: FontMetrics.text_width(host_info_text),
+        git_info_text: git_info_text,
+        git_info_text_width: FontMetrics.text_width(git_info_text),
+        execution_info_text: execution_info_text,
+        execution_info_text_width: FontMetrics.text_width(execution_info_text),
+        state: (execution.try(:state) or "unavailable"),
+      }
+    end
+
+
+    def build_small_badge_params_403 view_params
+      execution_info_text= "403 Forbidden"
+      view_params.merge({
+        execution_info_text: execution_info_text,
+        execution_info_text_width: FontMetrics.text_width(execution_info_text),
+        state: 'failed' })
+    end
 
     def build_message execution
       if execution && state= execution[:state]

@@ -1,0 +1,35 @@
+@mixin badge_box()
+  g
+    font-size: 12px
+    text  
+      text-anchor: middle
+    text, tspan
+      font-family: DejaVu Sans
+      font-weight: normal
+
+
+svg.cider-ci
+  &.badge-small
+    rect.host-info
+      fill: hsla(0, 0%, 50%, 1) 
+      stroke-width: 0
+    rect.git-info
+      fill: hsla(0, 0%, 25%, 1) 
+      stroke-width: 0
+    g
+      text
+        text-anchor: middle
+        font-size: 12px
+        fill: white
+        font-family: DejaVu Sans, Verdana, Geneva, sans-serif
+        font-weight: normal
+    rect.execution-info
+      fill: gray
+      &.passed
+        fill: green
+      &.failed
+        fill: red
+      &.executing
+        fill: mix(red,green)
+
+
