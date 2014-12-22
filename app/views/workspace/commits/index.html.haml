@@ -9,11 +9,12 @@
 
 - cache cs do |cache_tag|
 
-  #reload-page.executions-page{data: {cache_tag: cache_tag, reload_timeout: session_adjust_reload_timeout(3)}}
+  .jshook.executions-page{data: { hook: 'reloader',
+                            cache_tag: cache_tag,
+                            reload_timeout: session_adjust_reload_timeout(3)}}
 
     = render 'index_head', params: params
 
     = render 'commits_table', commits: commits, link_params: link_params
 
     = paginate commits, theme: 'default'
-

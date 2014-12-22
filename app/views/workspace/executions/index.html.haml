@@ -5,10 +5,10 @@
 - executions ||= @executions
 - link_params ||= @link_params
 
-.row
+.row.app-breadcrumbs
   .col-md-6
     %ol.breadcrumb.pull-left
-      = render partial: "/breadcrumbs/executions" 
+      = render partial: "/breadcrumbs/executions"
 
 
 - cache @execution_cache_signatures.map{|cs| [@executions,
@@ -16,12 +16,14 @@
     cs.branches_signature, cs.repositories_signature]} do |cache_tag|
 
 
-  #reload-page.executions-page{data: {cache_tag: cache_tag, reload_timeout: session_adjust_reload_timeout(10)}}
+  .executions-page{data: { hook: 'reloader',
+                           cache_tag: cache_tag,
+                           reload_timeout: session_adjust_reload_timeout(10)}}
 
     .pull-right
       =render 'index_filter_form'
 
-    %h1 
+    %h1
       Executions
 
 
@@ -31,5 +33,3 @@
 
     #executions-pagination.replace-without-animation.reload{data: {cache_tag: cache_tag}}
       = paginate executions, theme: 'default'
-
-

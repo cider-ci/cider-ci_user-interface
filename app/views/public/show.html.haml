@@ -7,13 +7,13 @@
   -# %a{href: "http://localhost:8880/cider-ci/ui/public/executions/Cider-CI%20Bash%20Demo%20Project/master/test"}
   -#  %img{src: "http://localhost:8880/cider-ci/ui/public/badges/medium/Cider-CI%20Bash%20Demo%20Project/master/test.svg"}
 
-  - cache WelcomePageSettings.find.cache_signature do 
+  - cache WelcomePageSettings.find.cache_signature do
     #welcome_message
       =markdown(WelcomePageSettings.find.welcome_message)
 
-  %hr 
+  %hr
 
-  #reload-page{data: { reload_timeout: 30}}
+  .jshook{data: { hook: 'reloader', reload_timeout: 30}}
 
 
     %section#radiator.radiator.reload.replace-without-animation
@@ -24,11 +24,11 @@
           %tbody
             %tr
               - row[:items].map(&:deep_symbolize_keys).each do |item|
-                %td 
-                  = render '/public/badges/medium.svg.haml',{view_params: item, 
+                %td
+                  = render '/public/badges/medium.svg.haml',{view_params: item,
                     options: {include_stylesheet: false, xlink_show_value: 'replace'}}
 
-  %hr 
+  %hr
 
   %h2 About Cider-CI
 
@@ -42,6 +42,6 @@
     %strong
       Cider-CI is an application and service stack for highly parallelized testing and continuous integration.
 
-  %p 
-    Read more about Cider-CI on the 
+  %p
+    Read more about Cider-CI on the
     %a{href: "https://github.com/cider-ci/cider-ci"} Cider-CI github project page.

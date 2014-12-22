@@ -2,7 +2,7 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- execution ||= @execution 
+- execution ||= @execution
 - state = execution.state
 - ecs = execution.execution_cache_signature
 - cs = [execution.id,execution.updated_at,ecs.repositories_signature,ecs.commits_signature,
@@ -13,7 +13,9 @@
 
   - tasks ||= @tasks
   - reload_timeout= session_adjust_reload_timeout(%w(failed passed).include?(execution.state) ? 30 : 3)
-  #reload-page{data: { cache_tag: cache_tag, reload_timeout: reload_timeout}}
+
+  .jshook{data: { hook: 'reloader',
+                  cache_tag: cache_tag, reload_timeout: reload_timeout}}
 
     .row
       .col-md-6
@@ -21,24 +23,24 @@
           = render '/breadcrumbs/execution', execution: execution
       .col-md-6
         %ol.breadcrumb.with-circle-separator.pull-right
-          %li 
+          %li
             = link_to tree_attachments_workspace_execution_path(execution) do
               Attachments
           %li#issues-link.reload{data: {cache_tag: ecs.execution_issues_count}}
             - if ecs.execution_issues_count <= 0
               %span.text-muted Issues
-            - else 
+            - else
               = link_to issues_workspace_execution_path(execution) do
                 %span.text-danger #{ecs.execution_issues_count} Issues
-          %li 
+          %li
             = link_to specification_workspace_execution_path(execution) do
               Specification
 
     #issues-alert.reload{data: {cache_tag: ecs.execution_issues_count}}
       - if ecs.execution_issues_count >= 1
         .alert.alert-danger
-          %p 
-            This execution has issues! 
+          %p
+            This execution has issues!
 
 
     #execution.execution
@@ -66,7 +68,7 @@
         %span#header-label.reload.label{data: {cache_tag: execution.state}, class: label_class_for_state(state)}<>
           %i{class: icon_class_for_state(state)}<>
         %span &nbsp; Execution "#{execution.name}"
-      
+
       .row
         .col-md-9
           = render 'summary_speed', execution: execution, cache_tag: cache_tag
@@ -74,7 +76,7 @@
           = render 'tags', tags: execution.tags.sort, id: "execution-tags"
 
       = render 'summary_stats', execution: execution, cache_tag: cache_tag
-      
+
       #commits.commits.reload.replace-without-animation{data: {cache_tag: ecs.commits_signature}}
         %h2 #{ execution.commits.count > 1 ? "Commits" : "Commit"}
         %table.commits.table.table-striped
@@ -83,4 +85,3 @@
             != render partial: "commit_tr", collection: execution.commits, as: :commit
 
       = render 'tasks', execution: execution, tasks: tasks
-

@@ -5,12 +5,13 @@ $ ->
   logger= Logger.create namespace: 'Reloader', level: 'info'
 
   isReloadEnabled= true
+  selector= '[data-hook="reloader"]'
   reloadTimeout= null  # define here, so it will not end up in a deeper closure
 
-  $("#reload-page").attr({'data-reloaded-at': moment().format()}) 
+  $(selector).attr({'data-reloaded-at': moment().format()})
 
   switch $("body").attr("data-session-reload-strategy")
-    when "disabled" 
+    when "disabled"
       isReloadEnabled= false
       replacePageWith= (data)-> #noop
     else
@@ -20,14 +21,14 @@ $ ->
 
   #### Reload timeout ##########################################################
 
-  readReloadTimeout= ($el) -> 
-    $el ||= $("#reload-page")
+  readReloadTimeout= ($el) ->
+    $el ||= $(selector)
     Math.max(1,
       Math.min(60,
         parseFloat($el.attr('data-reload-timeout')) || 10))
 
   setReloadTimeout= (reloadTimeout)->
-    $("#reload-page").attr({'data-reload-timeout': reloadTimeout}) 
+    $(selector).attr({'data-reload-timeout': reloadTimeout})
 
 
   #### Replace #################################################################
@@ -37,7 +38,7 @@ $ ->
     throw "can not replace" unless $old? and $new and id
     $old.replaceWith($new)
     $replaced= $("##{id}")
-    unless $replaced.hasClass("replace-without-animation") 
+    unless $replaced.hasClass("replace-without-animation")
       if ($replaced.parents(".replace-without-animation").length == 0)
         $replaced.hide()
         $replaced.fadeIn(1000)
@@ -46,7 +47,7 @@ $ ->
 
   replacePageWith= (data)->
 
-    $new= $("#reload-page",data)
+    $new= $(selector,data)
 
     $(".reload").each (i,el)->
       try
@@ -62,34 +63,34 @@ $ ->
         logger.error error
 
     setReloadTimeout readReloadTimeout($new)
-    $("#reload-page").attr({'data-reloaded-at': moment().format()}) 
+    $(selector).attr({'data-reloaded-at': moment().format()})
 
 
-  reload= -> 
+  reload= ->
 
     reloadId= Math.random()
-    $("#reload-page").attr("data-reload-id",reloadId)
+    $(selector).attr("data-reload-id",reloadId)
     $.ajax
       url: window.location.href
       dataType: 'html'
       success: (data)->
-        if $("#reload-page").attr("data-reload-id") == reloadId.toString()
+        if $(selector).attr("data-reload-id") == reloadId.toString()
           replacePageWith(data)
-          $("#reload-page").attr({'data-reloaded-at': moment().format()}) 
+          $(selector).attr({'data-reloaded-at': moment().format()})
 
       complete: ()->
-        $("#reload-page").removeAttr("data-reload-id")
+        $(selector).removeAttr("data-reload-id")
 
 
   do reloadLoop= ->
     reloadTimeout= readReloadTimeout()
     logger.debug "reloadLoop",{reloadTimeout: reloadTimeout}
 
-    reloadedAt= $("#reload-page").attr('data-reloaded-at')
+    reloadedAt= $(selector).attr('data-reloaded-at')
     reloadedAtMoment= moment(reloadedAt)
 
     isAfterTimeout= moment().isAfter(reloadedAtMoment.add('seconds',reloadTimeout))
-    doesNotHaveReloadId= not $("#reload-page").attr("data-reload-id")?
+    doesNotHaveReloadId= not $(selector).attr("data-reload-id")?
 
     logger.debug({
       reloadedAt: reloadedAt,
@@ -104,17 +105,17 @@ $ ->
 
 
   #### Some control ############################################################
-   
-  abortCurrent= ->
-    logger.info "abort current" 
-    $("#reload-page").attr("data-reload-id",null)
 
-  disable= -> 
-    logger.info "disable" 
+  abortCurrent= ->
+    logger.info "abort current"
+    $(selector).attr("data-reload-id",null)
+
+  disable= ->
+    logger.info "disable"
     isReloadEnabled= false
 
   reloadAsap= ->
-    logger.info "reload asap" 
+    logger.info "reload asap"
     setReloadTimeout(1)
 
   #### Window ##################################################################
@@ -123,4 +124,3 @@ $ ->
   window.Reloader.disable= disable
   window.Reloader.reloadAsap= reloadAsap
   window.Reloader.abortCurrent= abortCurrent
-

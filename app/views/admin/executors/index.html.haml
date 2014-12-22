@@ -11,10 +11,10 @@
       Add a new executor
 
 
-%h1 
+%h1
   Executors
 
-#reload-page{data: {reload_timeout: session_adjust_reload_timeout(3)}}
+.jshook{data: { hook: 'reloader', reload_timeout: session_adjust_reload_timeout(3)}}
 
 
   %table.table.table-striped.executors.reload{data: {cache_tag:  executors.map(&:id)}}
@@ -30,4 +30,3 @@
     = render partial: 'executor', collection: executors, as: :executor
 
   = paginate executors, theme: 'default'
-
