@@ -5,24 +5,26 @@
 module Formatter
   class << self
 
-    def exception_to_s e
-
+    def exception_to_s(e)
       case Rails.env
-      when "development"
-        e.class.to_s + " " + e.message.to_s + "\n\n" + 
-          e.backtrace.select{|l| l =~ Regexp.new(Rails.root.to_s)}.join("\n") 
-        # + "\n\n" + e.backtrace.join("\n") 
+      when 'development'
+        "#{e.class} #{e.message} #{application_trace(e).join('; ')}"
       else
-        e.class.to_s + " " + e.message.to_s
+        "#{e.class} #{e.message}"
       end
     end
 
-    def exception_to_log_s e, *more 
-      message= e.message.to_s 
-      trace= e.backtrace.select{|l| l =~ Regexp.new(Rails.root.to_s)}.reject{|l| 
-          l =~ Regexp.new(Rails.root.join("vendor").to_s)}.join(", ") 
-      rest= more.map(&:to_s).join(",")
-      [message,trace,rest].join(" ### ")
+    def exception_to_log_s(e, *more)
+      rest = more.map(&:to_s).join(',')
+      [e.message, application_trace(e).join(','), rest].join(' ### ')
+    end
+
+    def application_trace(e)
+      e.backtrace.select do |l|
+        l =~ Regexp.new(Rails.root.to_s)
+      end.reject do |l|
+        l =~ Regexp.new(Rails.root.join('vendor').to_s)
+      end
     end
 
   end

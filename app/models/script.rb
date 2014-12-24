@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Script 
-  DEFAULT_ORDER= 5 
-  DEFAULT_TIMEOUT= 200
+class Script
+  DEFAULT_ORDER = 5
+  DEFAULT_TIMEOUT = 200
 end

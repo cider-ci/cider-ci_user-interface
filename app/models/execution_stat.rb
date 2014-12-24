@@ -3,9 +3,9 @@
 #  See the LICENSE.txt file provided with this software.
 
 class ExecutionStat < ActiveRecord::Base
-  self.primary_key= :execution_id
+  self.primary_key = :execution_id
   belongs_to :execution
-  def to_s 
+  def to_s
     attributes.values.to_s
   end
 end

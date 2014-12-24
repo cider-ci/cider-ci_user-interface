@@ -2,14 +2,11 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Workspace::RepositoriesController < WorkspaceController 
+class Workspace::RepositoriesController < WorkspaceController
+  include Concerns::JsonForAutocomplete
 
   def names
-    @repositories= Repository.reorder(name: :asc) \
-      .instance_exec(params) do |params|
-      (term= params[:term]).blank? ? self : where("name ilike ?",term<<'%')
-    end.distinct.limit(25)
-    render json: @repositories.pluck(:name)
+    render json: build_single_column_json_for_autocomplete(Repository, 'name')
   end
 
 end

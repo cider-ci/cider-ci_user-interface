@@ -3,6 +3,6 @@
 #  See the LICENSE.txt file provided with this software.
 
 class ExecutionCacheSignature < ActiveRecord::Base
-  self.primary_key= :execution_id 
+  self.primary_key = :execution_id
   belongs_to :execution
 end

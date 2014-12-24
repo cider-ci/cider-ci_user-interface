@@ -1,19 +1,19 @@
 class Messaging
-  class << self 
+  class << self
 
-    def publish name, message, routing_key=name 
+    def publish(name, message, routing_key = name)
       @conn || init
-      memoized_create_exchange(name).publish(message.to_json,routing_key: routing_key)
+      memoized_create_exchange(name).publish(message.to_json, routing_key: routing_key)
     end
 
-    private 
+    private
 
     def init
-      begin 
+      begin
 
         @memoized_created_exchanges = {}
 
-        Rails.logger.info "Initializing messaging..." 
+        Rails.logger.info 'Initializing messaging...'
         @conn = Bunny.new Settings.messaging.connection.to_hash
         @conn.start
         @ch = @conn.create_channel
@@ -21,24 +21,23 @@ class Messaging
       rescue Exception => e
 
         Rails.logger.warn Formatter.exception_to_log_s e
-        puts "Messaging is not available in this process!"
+        puts 'Messaging is not available in this process!'
 
-        unless %w(development test).include? Rails.env 
+        unless %w(development test).include? Rails.env
           raise e
         end
 
       end
-
     end
 
-    def create_exchange name, options={}
-      @ch.exchange name, {type: 'topic',durable: true}.merge(options)
+    def create_exchange(name, options = {})
+      @ch.exchange name, { type: 'topic', durable: true }.merge(options)
     end
 
-    def memoized_create_exchange name, options={}
-      ekey = name + "_"  + @conn.hash.to_s
+    def memoized_create_exchange(name, options = {})
+      ekey = name + '_'  + @conn.hash.to_s
       @memoized_created_exchanges[ekey]  \
-        || @memoized_created_exchanges[ekey]= create_exchange(name, options)
+        || @memoized_created_exchanges[ekey] = create_exchange(name, options)
     end
 
   end

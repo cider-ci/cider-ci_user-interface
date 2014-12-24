@@ -7,6 +7,6 @@ class Tree < ActiveRecord::Base
   has_many :commits
   has_many :executions
 
-  default_scope{order(:id)}
+  default_scope { order(:id) }
 
 end

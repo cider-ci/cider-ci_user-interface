@@ -5,8 +5,8 @@
 class AdminController < ApplicationController
 
   before_action do
-    unless admin? 
-      render "public/403", status: :forbidden
+    unless admin?
+      render 'public/403', status: :forbidden
     end
   end
 

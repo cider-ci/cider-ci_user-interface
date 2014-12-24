@@ -3,6 +3,6 @@
 #  See the LICENSE.txt file provided with this software.
 
 class CommitCacheSignature < ActiveRecord::Base
-  self.primary_key= :commit_id 
+  self.primary_key = :commit_id
   belongs_to :commit
 end

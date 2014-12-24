@@ -26,28 +26,11 @@
         = render partial: "navbar/navbar" 
 
       #messages
-        - if flash[:success]
-          .alert.alert-success.alert-dismissable
-            %button.close{type:"button", 'data-dismiss'=>'alert'} &#215
-            = flash[:success]
-        - if flash[:notice]
-          .alert.alert-info.alert-dismissable
-            %button.close{type:"button", 'data-dismiss'=>"alert"} &#215
-            = flash[:notice]
-        - if flash[:error] and (flash[:error].is_a? Array) or flash[:error] = [flash[:error]]
-          - flash[:error].each do |error|
-            - if error
-              .alert.alert-danger.alert-dismissable
-                %button.close{type:"button", 'data-dismiss'=>"alert"} &#215
-                = error
-        - if flash[:warning] and (flash[:warning].is_a? Array) or flash[:warning] = [flash[:warning]]
-          - flash[:warning].each do |error|
-            - if error
-              .alert.alert-warning.alert-dismissable
-                %button.close{type:"button", 'data-dismiss'=>"alert"} &#215
-                = error
-
-
+        - {success: :successes, info: :infos, warning: :warnings, danger: :errors}.each do |bs_type, msg_key|
+          - (@alerts[msg_key] || []).each do |msg|
+            .alert.alert-success.alert-dismissable{class: "alert-#{bs_type}"}
+              %button.close{type:"button", 'data-dismiss'=>'alert'} &#215
+              = msg
 
       %div#application{data: {env: Rails.env}}
 

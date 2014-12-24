@@ -3,21 +3,21 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Task < ActiveRecord::Base
-  self.primary_key= 'id'
-  before_create{self.id ||= SecureRandom.uuid}
+  self.primary_key = 'id'
+  before_create { self.id ||= SecureRandom.uuid }
   belongs_to :execution
   has_many :trials
 
   belongs_to :task_spec
 
-  validates :state, inclusion: {in: Constants::TASK_STATES}
+  validates :state, inclusion: { in: Constants::TASK_STATES }
 
-  default_scope{order(created_at: :desc,id: :asc)}
+  default_scope { order(created_at: :desc, id: :asc) }
 
   scope :with_failed_trials, lambda{
-    where("EXISTS (SELECT 1 FROM trials WHERE trials.task_id = tasks.id AND trials.state = 'failed')")
+    where("EXISTS (SELECT 1 FROM trials WHERE trials.task_id = tasks.id
+          AND trials.state = 'failed')".squish)
   }
-
 
   def to_s
     name

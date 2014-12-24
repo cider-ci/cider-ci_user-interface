@@ -8,19 +8,19 @@ class Executor < ActiveRecord::Base
   has_many :trials
   has_one :executor_with_load, primary_key: 'id', foreign_key: 'id'
 
-  self.primary_key= 'id'
+  self.primary_key = 'id'
 
-  before_create{self.id ||= SecureRandom.uuid}
+  before_create { self.id ||= SecureRandom.uuid }
 
-  default_scope{order(:name)}
-  scope :enabled, lambda{where(enabled: true)}
-  scope :online, lambda{where(ONLINE_SQL_CONDITION)}
+  default_scope { order(:name) }
+  scope :enabled, -> { where(enabled: true) }
+  scope :online, -> { where(ONLINE_SQL_CONDITION) }
 
   def online?
-    !! Executor.where(id: self.id).where(ONLINE_SQL_CONDITION).take
+    !Executor.online.where(id: self.id).first.nil?
   end
 
-    def to_s
+  def to_s
     "#{name} @ #{host}"
   end
 

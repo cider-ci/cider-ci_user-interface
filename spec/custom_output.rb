@@ -8,6 +8,6 @@ class CustomFormatter
   end
 
   def example_started(notification)
-    @output << "example: " << notification.example.description
+    @output << 'example: ' << notification.example.description
   end
 end

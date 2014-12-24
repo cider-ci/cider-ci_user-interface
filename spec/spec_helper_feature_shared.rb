@@ -1,27 +1,27 @@
-require 'addressable/uri' 
+require 'addressable/uri'
 
-# A few global functions shared between all rspec feature tests. 
+# A few global functions shared between all rspec feature tests.
 #
 # * Keep this file lexically sorted.
-# 
-# * Keep this file small and simple.  
+#
+# * Keep this file small and simple.
 #
 # * Only simple functions shall be included.
-#   
+#
 # * Only general functions shall be included.
-#   
+#
 # Favor clearness, and simplicity instead of dryness!
 #
 
 def accept_alert_dialog
   unless Capybara.current_driver == :poltergeist
-    page.driver.browser.switch_to.alert.accept 
+    page.driver.browser.switch_to.alert.accept
   end
 end
 
 def accept_usage_terms
-  if all("h3", text: "Nutzungsbedingungen").size > 0
-    click_button "Akzeptieren"
+  if all('h3', text: 'Nutzungsbedingungen').size > 0
+    click_button 'Akzeptieren'
   end
 end
 
@@ -34,7 +34,7 @@ def assert_change_of_current_path
 end
 
 def assert_error_alert(message = nil)
-  find(".ui-alert.error", text: message)
+  find('.ui-alert.error', text: message)
 end
 
 def assert_exact_url_path(path)
@@ -42,12 +42,12 @@ def assert_exact_url_path(path)
 end
 
 def assert_modal_not_visible
-  expect(page).not_to have_selector ".modal-backdrop"
+  expect(page).not_to have_selector '.modal-backdrop'
 end
 
 def assert_modal_visible(title = nil)
-  within(".modal .ui-modal-head") do
-    expect(find "*", text: title ).to be if title
+  within('.modal .ui-modal-head') do
+    expect(find '*', text: title).to be if title
   end
 end
 
@@ -55,17 +55,17 @@ def assert_partial_url_path(path)
   expect(current_path).to match path
 end
 
-def assert_selected_option select_css_matcher, option_text
+def assert_selected_option(select_css_matcher, option_text)
   expect(find("#{select_css_matcher} option", text: option_text)).to be_selected
 end
 
 def assert_success_message
-  expect(page).to have_selector(".alert-success,.ui-alert.success")
+  expect(page).to have_selector('.alert-success,.ui-alert.success')
 end
 
 def change_value_of_some_input_field
-  expect(page).to have_selector "input[type=text]"
-  all("input[type=text]").sample.set "123"
+  expect(page).to have_selector 'input[type=text]'
+  all('input[type=text]').sample.set '123'
 end
 
 def click_link_from_menu(text, parent_text = nil)
@@ -82,17 +82,16 @@ def click_on_button(text)
 end
 
 def click_on_text(text)
-  find("a, button", text: text, match: :first).click
+  find('a, button', text: text, match: :first).click
 end
 
 def click_primary_action_of_modal
-  find(".ui-modal .primary-button").click
+  find('.ui-modal .primary-button').click
 end
 
 def find_input_with_name(name)
   first("textarea,input[name='#{name}']")
 end
-
 
 # firefox only! - needs browser driver to support it
 def move_mouse_over(element)
@@ -102,18 +101,18 @@ def move_mouse_over(element)
 end
 
 def sign_in_as(login, password = 'password')
-  visit "/public" unless current_path 
+  visit '/public' unless current_path
   find("input[type='text']").set login
   find("input[type='password']").set password
   find("button[type='submit']").click
 end
 
 def sign_out
-  find("#user-actions").click
-  click_on "Sign out"
+  find('#user-actions').click
+  click_on 'Sign out'
 end
 
-def submit_form(id: nil)
+def submit_form(id = nil)
   el = (id ? find("form##{id}") : page)
   el.find("[type='submit']").click
 end

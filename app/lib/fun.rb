@@ -5,12 +5,13 @@
 module Fun
   class << self
 
-    def wrap_exception_with_redirect controller, redirect_path
+    def wrap_exception_with_redirect(controller, redirect_path)
       begin
-        yield 
+        yield
       rescue Exception => e
         Rails.logger.error Formatter.exception_to_s(e)
-        controller.redirect_to redirect_path, flash: {error:  Formatter.exception_to_s(e)}
+        controller.redirect_to redirect_path,
+                               flash: { errors:  [Formatter.exception_to_s(e)] }
       end
     end
 

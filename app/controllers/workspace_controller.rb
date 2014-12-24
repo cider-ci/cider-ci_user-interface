@@ -7,28 +7,31 @@ class WorkspaceController < ApplicationController
   before_action :require_sign_in
 
   helper_method \
-    :branch_names_filter, 
+    :branch_names_filter,
     :commit_text_search_filter,
     :commited_within_last_days_filter,
     :is_branch_head_filter,
     :execution_tags_filter,
-    :repository_names_filter, 
+    :repository_names_filter,
     :with_branch_filter,
     :with_execution_filter
 
-  def execution_tags_filter 
-    params.try('[]',"execution_tags").try(:nil_or_non_blank_value) \
-      .split(",").map(&:strip).reject(&:blank?).sort().uniq() rescue []
+  def execution_tags_filter
+    params.try('[]', 'execution_tags').try(:nil_or_non_blank_value) \
+      .split(',').map(&:strip).reject(&:blank?).sort.uniq rescue []
   end
 
-  def repository_names_filter 
-    params.try('[]',"repository").try('[]',:names).try(:nil_or_non_blank_value) \
-      .split(",").map(&:strip).reject(&:blank?) rescue []
+  def repository_names_filter
+    generic_names_filter 'repository'
   end
 
   def branch_names_filter
-    params.try('[]',"branch").try('[]',:names).try(:nil_or_non_blank_value) \
-      .split(",").map(&:strip).reject(&:blank?) rescue []
+    generic_names_filter 'branch'
+  end
+
+  def generic_names_filter(name)
+    params.try('[]', name).try('[]', :names).try(:nil_or_non_blank_value) \
+      .split(',').map(&:strip).reject(&:blank?) rescue []
   end
 
   def commited_within_last_days_filter
@@ -36,14 +39,11 @@ class WorkspaceController < ApplicationController
   end
 
   def commit_text_search_filter
-    params.try('[]',"commit").try('[]',:text).try(:nil_or_non_blank_value)
+    params.try('[]', 'commit').try('[]', :text).try(:nil_or_non_blank_value)
   end
 
   def require_sign_in
-    unless user?
-      render "public/401", status: :unauthorized
-      return 
-    end
+    render 'public/401', status: :unauthorized unless user?
   end
 
 end

@@ -6,11 +6,10 @@ class Definition < ActiveRecord::Base
 
   belongs_to :specification
 
-  default_scope{order(:name)}
+  default_scope { order(:name) }
 
   validates :name, uniqueness: true, allow_blank: false
-  validates :name, length: {minimum: 1}, allow_nil: false
-
+  validates :name, length: { minimum: 1 }, allow_nil: false
 
   def to_s
     name

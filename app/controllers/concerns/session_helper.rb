@@ -6,11 +6,11 @@ module Concerns
       helper_method :session_adjust_reload_timeout
     end
 
-    def session_adjust_reload_timeout default_value
+    def session_adjust_reload_timeout(default_value)
       case session[:reload_frequency]
-      when "aggressive"
+      when 'aggressive'
         (default_value / 3.0).floor
-      when "slow"
+      when 'slow'
         (default_value * 10)
       else
         default_value

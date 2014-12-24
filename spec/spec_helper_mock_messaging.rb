@@ -1,10 +1,10 @@
 require 'messaging'
 
-if Rails.env.test? 
+if Rails.env.test?
   class Messaging
     class << self
       attr_accessor :published_messages
-      def publish *args
+      def publish(*args)
         (@published_messages ||= []) << args
       end
     end

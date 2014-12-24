@@ -2,10 +2,10 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Workspace::TrialsController < WorkspaceController 
+class Workspace::TrialsController < WorkspaceController
 
-  skip_before_action :require_sign_in, 
-    only: [:show, :attachments]
+  skip_before_action :require_sign_in,
+                     only: [:show, :attachments]
 
   def show
     @trial = Trial.find params[:id]

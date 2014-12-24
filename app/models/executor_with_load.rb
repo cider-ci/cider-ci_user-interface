@@ -3,7 +3,7 @@
 #  See the LICENSE.txt file provided with this software.
 
 class ExecutorWithLoad < Executor
-  self.table_name= :executors_with_load
+  self.table_name = :executors_with_load
 
   belongs_to :executor, primary_key: 'id', foreign_key: 'id'
 

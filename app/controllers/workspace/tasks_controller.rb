@@ -2,15 +2,15 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Workspace::TasksController < WorkspaceController 
+class Workspace::TasksController < WorkspaceController
 
   skip_before_action :require_sign_in, only: [:show]
 
-  def retry 
+  def retry
     @task = Task.find params[:id]
-    Messaging.publish("task.create-trial", {id: @task.id})
-    redirect_to workspace_execution_path(@task.execution), 
-      flash: {success: "A new trial will be executed"}
+    Messaging.publish('task.create-trial', id: @task.id)
+    redirect_to workspace_execution_path(@task.execution),
+                flash: { successes: ['A new trial will be executed'] }
   end
 
   def show

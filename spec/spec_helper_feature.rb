@@ -1,12 +1,11 @@
-ENV["RAILS_ENV"] ||= 'test'
-require File.expand_path("../../config/environment", __FILE__)
+ENV['RAILS_ENV'] ||= 'test'
+require File.expand_path('../../config/environment', __FILE__)
 require 'spec_helper'
 require 'rspec/rails'
 require 'capybara/poltergeist'
-require Rails.root.join("lib","db_helper")
+require Rails.root.join('lib', 'db_helper')
 
-
-Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
 ActiveRecord::Migration.check_pending! if defined?(ActiveRecord::Migration)
 
@@ -17,19 +16,19 @@ end
 RSpec.configure do |config|
   config.use_transactional_fixtures = false
   config.infer_base_class_for_anonymous_controllers = true
-  config.order = "random"
+  config.order = 'random'
 
   Capybara.register_driver :selenium_chrome do |app|
     Capybara::Selenium::Driver.new(app, browser: :chrome)
   end
 
   Capybara.register_driver :poltergeist_debug do |app|
-    Capybara::Poltergeist::Driver.new(app, :inspector => true)
+    Capybara::Poltergeist::Driver.new(app, inspector: true)
   end
 
   Capybara.current_driver = :selenium
 
-  def set_browser example
+  def set_browser(example)
     case example.metadata[:browser]
     when :chrome
       Capybara.current_driver = :selenium_chrome
@@ -46,27 +45,28 @@ RSpec.configure do |config|
 
   config.before(:each) do |example|
     truncate_tables
-    DBHelper.load_data Rails.root.join('db','personas.data.psql')
+    DBHelper.load_data Rails.root.join('db', 'personas.data.psql')
     set_browser(example)
   end
 
   config.after(:each) do |example|
-    if example.exception != nil
-      take_screenshot()
+    unless example.exception.nil?
+      take_screenshot
     end
   end
 
   def take_screenshot
-    @screenshot_dir ||= Rails.root.join("tmp","capybara")
+    @screenshot_dir ||= Rails.root.join('tmp', 'capybara')
     Dir.mkdir @screenshot_dir rescue nil
-    path= @screenshot_dir.join("screenshot_#{Time.zone.now.iso8601.gsub(/:/,'-')}.png")
+    path = @screenshot_dir.join("screenshot_#{Time.zone.now.iso8601.gsub(/:/, '-')}.png")
     case Capybara.current_driver
     when :selenium, :selenium_chrome
       page.driver.browser.save_screenshot(path) rescue nil
     when :poltergeist
-      page.driver.render(path, :full => true) rescue nil
+      page.driver.render(path, full: true) rescue nil
     else
-      Rails.logger.warn "Taking screenshots is not implemented for #{Capybara.current_driver}."
+      Rails.logger.warn "Taking screenshots is not
+        implemented for #{Capybara.current_driver}.".squish
     end
   end
 end

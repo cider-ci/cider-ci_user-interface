@@ -10,9 +10,9 @@ class Branch < ActiveRecord::Base
   has_and_belongs_to_many :commits
   belongs_to :current_commit, class_name: 'Commit', foreign_key: 'current_commit_id'
 
-  default_scope {order(name: :asc)}
+  default_scope { order(name: :asc) }
 
-  before_create do 
+  before_create do
     self.id ||= SecureRandom.uuid
   end
 

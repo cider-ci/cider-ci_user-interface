@@ -6,17 +6,18 @@ class Repository < ActiveRecord::Base
   has_many :branches, dependent: :destroy
 
   before_validation on: :create do
-    raise "origin_uri is required" if self.origin_uri.blank? 
-    self.id= UUIDTools::UUID.sha1_create(UUIDTools::UUID_URL_NAMESPACE, self.origin_uri).to_s
+    raise 'origin_uri is required' if self.origin_uri.blank?
+    self.id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_URL_NAMESPACE,
+                                          self.origin_uri).to_s
     self.name ||= self.id
   end
 
   ######################## Scopes and methods returning AR ####################
-  
+
   default_scope { order(name: :asc).reorder(importance: :desc) }
 
   ######################## Other stuff ########################################
-  
+
   def to_s
     name
   end

@@ -4,10 +4,7 @@
 
 class Admin::StatiController < AdminController
 
-
   def show
   end
 
-
 end
-

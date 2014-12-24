@@ -10,17 +10,8 @@ module ServiceCheck
 
     def check_rabbitmq
       connection = Settings.messaging.connection
-      url = "http://localhost:15672/api/vhosts/"
-      begin 
-        response= HttpMonkey.at(url).basic_auth(connection.username,connection.password).get
-        {success: (response.code <= 299) ? true : false,
-         code: response.code, 
-         message: JSON.parse(response.body)}
-      rescue Exception => e
-        Rails.logger.error Formatter.exception_to_log_s(e, url)
-        {succes: false}
-      end
-
+      url = 'http://localhost:15672/api/vhosts/'
+      http_get url, connection.username, connection.password
     end
 
     def check_api
@@ -30,7 +21,7 @@ module ServiceCheck
     def check_builder
       check_service Settings.internal_builder_service,  Settings.basic_auth
     end
-     
+
     def check_dispatcher
       check_service Settings.internal_dispatcher_service,  Settings.basic_auth
     end
@@ -43,19 +34,20 @@ module ServiceCheck
       check_service Settings.internal_storage_service,  Settings.basic_auth
     end
 
+    def check_service(http_opts, basic_auth)
+      url = service_base_url(http_opts) + '/status'
+      http_get(url, basic_auth.user, basic_auth.secret)
+    end
 
-    def check_service http_opts, basic_auth
-      protocol= "http#{http_opts.ssl ? 's' : ''}"
-      url = service_base_url(http_opts) + "/status"
-
-      begin 
-        response= HttpMonkey.at(url).basic_auth(basic_auth.user,basic_auth.secret).get
-        {success: (response.code <= 299) ? true : false,
-         code: response.code, 
-         message: JSON.parse(response.body)}
+    def http_get(url, username, password)
+      begin
+        response = HttpMonkey.at(url).basic_auth(username, password).get
+        { success: (response.code <= 299) ? true : false,
+          code: response.code,
+          message: JSON.parse(response.body) }
       rescue Exception => e
         Rails.logger.error Formatter.exception_to_log_s(e, url)
-        {succes: false, message: "request failed"}
+        { succes: false, message: 'request failed' }
       end
     end
 

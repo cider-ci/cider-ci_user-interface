@@ -3,36 +3,38 @@
 #  See the LICENSE.txt file provided with this software.
 
 class User < ActiveRecord::Base
-  has_secure_password validations: false  
-  has_many :email_addresses, lambda{order(email_address: :asc)}
+  has_secure_password validations: false
+  has_many :email_addresses, -> { order(email_address: :asc) }
 
   def to_s
     "#{first_name} #{last_name} [#{login}]".squish
   end
 
-  before_save{ self.login_downcased= self.login.downcase}
+  before_save { self.login_downcased = self.login.downcase }
 
-  after_save{ User.check_last_admin_not_gone! }
-  after_destroy{ User.check_last_admin_not_gone! }
+  after_save { User.check_last_admin_not_gone! }
+  after_destroy { User.check_last_admin_not_gone! }
 
   validates :login, presence: true
 
-  validates :login, format: { with: /\A[\w\d]+\z/, message: "Only alphanumic characters allowed" }
+  validates :login, format: { with: /\A[\w\d]+\z/,
+                              message: 'Only alphanumic characters allowed' }
 
-  default_scope lambda{order(:last_name,:first_name)}
+  default_scope { order(:last_name, :first_name) }
 
-  scope :most_recent,lambda{reorder(updated_at: :desc)}
-
+  scope :most_recent, -> { reorder(updated_at: :desc) }
 
   def self.check_last_admin_not_gone!
-    raise "There must be at least one administrator!" if User.users? and not User.admins? 
+    if User.users? and not User.admins?
+      raise 'There must be at least one administrator!'
+    end
   end
 
-  def self.users? 
+  def self.users?
     User.count > 0
   end
 
-  def self.admins? 
+  def self.admins?
     User.where(is_admin: true).count > 0
   end
 

@@ -1,26 +1,24 @@
 # This file is copied to spec/ when you run 'rails generate rspec:install'
-ENV["RAILS_ENV"] ||= 'test'
+ENV['RAILS_ENV'] ||= 'test'
 
-# see here for simplecov config: 
+# see here for simplecov config:
 # require Rails.root.join "config","initializers","000_simplecov"
 
-require File.expand_path("../../config/environment", __FILE__)
+require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
 require 'rspec/autorun'
 
 require 'spec_helper_mock_messaging'
 
-Dir[Rails.root.join("app/models/**/*.rb")].each{|f| require f}
-Dir[Rails.root.join("app/helpers/**/*.rb")].each{|f| require f}
-Dir[Rails.root.join("app/messaging/**/*.rb")].each{|f| require f}
-Dir[Rails.root.join("app/lib/**/*.rb")].each{|f| require f}
-Dir[Rails.root.join("app/controllers/**/*controller.rb")].each{|f| require f}
-
-
+Dir[Rails.root.join('app/models/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('app/helpers/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('app/messaging/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('app/lib/**/*.rb')].each { |f| require f }
+Dir[Rails.root.join('app/controllers/**/*controller.rb')].each { |f| require f }
 
 # Requires supporting ruby files with custom matchers and macros, etc,
 # in spec/support/ and its subdirectories.
-Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
+Dir[Rails.root.join('spec/support/**/*.rb')].each { |f| require f }
 
 # Checks for pending migrations before tests are run.
 # If you are not using ActiveRecord, you can remove this line.
@@ -28,18 +26,18 @@ ActiveRecord::Migration.check_pending! if defined?(ActiveRecord::Migration)
 
 RSpec.configure do |config|
 
-  config.before(:suite) do 
-    #config.use_transactional_fixtures = true
-    #DatabaseCleaner.strategy = :transaction
-    #DatabaseCleaner.clean_with(:truncation)
+  config.before(:suite) do
+    # config.use_transactional_fixtures = true
+    # DatabaseCleaner.strategy = :transaction
+    # DatabaseCleaner.clean_with(:truncation)
   end
 
   config.before(:each) do
-    #DatabaseCleaner.start
+    # DatabaseCleaner.start
   end
 
   config.after(:each) do
-    #DatabaseCleaner.clean
+    # DatabaseCleaner.clean
   end
 
   # If you're not using ActiveRecord, or you'd prefer not to run each of your
@@ -56,5 +54,5 @@ RSpec.configure do |config|
   # order dependency and want to debug it, you can fix the order by providing
   # the seed, which is printed after each run.
   #     --seed 1234
-  config.order = "random"
+  config.order = 'random'
 end
