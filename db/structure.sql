@@ -261,6 +261,7 @@ CREATE TABLE executions (
     updated_at timestamp without time zone DEFAULT now(),
     specification_id uuid,
     expanded_specification_id uuid,
+    result jsonb,
     CONSTRAINT check_executions_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -293,10 +294,10 @@ CREATE VIEW commit_cache_signatures AS
     md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
     md5(string_agg(DISTINCT (executions.updated_at)::text, ', '::text ORDER BY (executions.updated_at)::text)) AS executions_signature
    FROM ((((commits
-   LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
-   LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
-   LEFT JOIN executions ON (((executions.tree_id)::text = (commits.tree_id)::text)))
-   LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
+     LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
+     LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
+     LEFT JOIN executions ON (((executions.tree_id)::text = (commits.tree_id)::text)))
+     LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
   GROUP BY commits.id;
 
 
@@ -320,27 +321,27 @@ CREATE VIEW depths AS
  SELECT cd.id AS commit_id,
     cd.depth
    FROM ( WITH RECURSIVE ancestors(id, depth) AS (
-                        (         SELECT commits.id,
-                                    0 AS depth
-                                   FROM commits
-                                  WHERE ((NOT (EXISTS ( SELECT 1
-                                           FROM commit_arcs
-                                          WHERE ((commits.id)::text = (commit_arcs.child_id)::text)))) AND (commits.depth IS NULL))
-                        UNION
-                                 SELECT parents.id,
-                                    parents.depth
-                                   FROM commits parents
-                                  WHERE ((parents.depth IS NOT NULL) AND (EXISTS ( SELECT 1
-                                           FROM commits children,
-                                            commit_arcs
-                                          WHERE (((children.depth IS NULL) AND ((commit_arcs.child_id)::text = (children.id)::text)) AND ((commit_arcs.parent_id)::text = (parents.id)::text))))))
+                 SELECT commits.id,
+                    0 AS depth
+                   FROM commits
+                  WHERE ((NOT (EXISTS ( SELECT 1
+                           FROM commit_arcs
+                          WHERE ((commits.id)::text = (commit_arcs.child_id)::text)))) AND (commits.depth IS NULL))
                 UNION
-                         SELECT commits.id,
-                            (ancestors_1.depth + 1)
-                           FROM commits,
-                            ancestors ancestors_1,
+                 SELECT parents.id,
+                    parents.depth
+                   FROM commits parents
+                  WHERE ((parents.depth IS NOT NULL) AND (EXISTS ( SELECT 1
+                           FROM commits children,
                             commit_arcs
-                          WHERE ((((commits.id)::text = (commit_arcs.child_id)::text) AND ((ancestors_1.id)::text = (commit_arcs.parent_id)::text)) AND (commits.depth IS NULL))
+                          WHERE (((children.depth IS NULL) AND ((commit_arcs.child_id)::text = (children.id)::text)) AND ((commit_arcs.parent_id)::text = (parents.id)::text)))))
+                UNION
+                 SELECT commits.id,
+                    (ancestors_1.depth + 1)
+                   FROM commits,
+                    ancestors ancestors_1,
+                    commit_arcs
+                  WHERE ((((commits.id)::text = (commit_arcs.child_id)::text) AND ((ancestors_1.id)::text = (commit_arcs.parent_id)::text)) AND (commits.depth IS NULL))
                 )
          SELECT ancestors.id,
             max(ancestors.depth) AS depth
@@ -402,6 +403,7 @@ CREATE TABLE tasks (
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     task_spec_id uuid,
+    result jsonb,
     CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -424,11 +426,11 @@ CREATE VIEW execution_cache_signatures AS
            FROM tasks
           WHERE (tasks.execution_id = executions.id)) AS tasks_signature
    FROM (((((executions
-   LEFT JOIN execution_issues ON ((executions.id = execution_issues.execution_id)))
-   LEFT JOIN commits ON (((executions.tree_id)::text = (commits.tree_id)::text)))
-   LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
-   LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
-   LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
+     LEFT JOIN execution_issues ON ((executions.id = execution_issues.execution_id)))
+     LEFT JOIN commits ON (((executions.tree_id)::text = (commits.tree_id)::text)))
+     LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
+     LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
+     LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
   GROUP BY executions.id;
 
 
@@ -510,6 +512,8 @@ CREATE TABLE executors_with_load (
     relative_load double precision
 );
 
+ALTER TABLE ONLY executors_with_load REPLICA IDENTITY NOTHING;
+
 
 --
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
@@ -526,7 +530,7 @@ CREATE TABLE schema_migrations (
 
 CREATE TABLE specifications (
     id uuid NOT NULL,
-    data json
+    data jsonb
 );
 
 
@@ -548,7 +552,7 @@ CREATE TABLE tags (
 
 CREATE TABLE task_specs (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    data json
+    data jsonb
 );
 
 
@@ -615,7 +619,8 @@ CREATE TABLE trials (
     finished_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
-    scripts json,
+    scripts jsonb,
+    result jsonb,
     CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -1213,7 +1218,7 @@ CREATE RULE "_RETURN" AS
     count(trials.executor_id) AS current_load,
     ((count(trials.executor_id))::double precision / (executors.max_load)::double precision) AS relative_load
    FROM (executors
-   LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY ((ARRAY['dispatching'::character varying, 'executing'::character varying])::text[])))))
+     LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY ((ARRAY['dispatching'::character varying, 'executing'::character varying])::text[])))))
   GROUP BY executors.id;
 
 
@@ -1484,6 +1489,10 @@ INSERT INTO schema_migrations (version) VALUES ('114');
 INSERT INTO schema_migrations (version) VALUES ('115');
 
 INSERT INTO schema_migrations (version) VALUES ('116');
+
+INSERT INTO schema_migrations (version) VALUES ('117');
+
+INSERT INTO schema_migrations (version) VALUES ('118');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
 

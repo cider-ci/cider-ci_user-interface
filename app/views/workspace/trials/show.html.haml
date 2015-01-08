@@ -1,4 +1,4 @@
--#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
@@ -12,14 +12,18 @@
         =render '/breadcrumbs/trial', trial: trial
     .col-md-6
       %ol.breadcrumb.with-circle-separator.pull-right
-        %li
-          %ul.list-inline.list-unstyled
-            %li 
-              - if trial.trial_attachments.count > 0
-                = link_to attachments_workspace_trial_path(trial) do
-                  Attachments
-              - else 
-                %span.text-muted Attachments
+        %li 
+          - if trial.trial_attachments.count > 0
+            = link_to attachments_workspace_trial_path(trial) do
+              Attachments
+          - else 
+            %span.text-muted Attachments
+        %li 
+          - if trial.result 
+            = link_to result_workspace_trial_path(trial) do
+              Result
+          - else 
+            %span.text-muted Result
 
 
   %h1{style: "margin-top: 10px"}

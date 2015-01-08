@@ -1,4 +1,4 @@
-#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
@@ -14,6 +14,12 @@ module ApplicationHelper
       (api_service.host ? "//#{api_service.host}" : '') +
     (api_service.port ? ":#{api_service.port}" : '') +
     api_service.path
+  end
+
+  def render_summary_svgbox(view_params)
+    capture(
+    render partial: 'summary_svgbox', locals: view_params
+    )
   end
 
   def icon_class_for_state(state)
@@ -70,6 +76,8 @@ module ApplicationHelper
       'label-pending'
     when 'executing', 'dispatched'
       'label-executing'
+    else
+      'label-default'
     end
   end
 

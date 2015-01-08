@@ -57,6 +57,19 @@ FactoryGirl.define do
     end
   end
 
+  factory :execution_with_result, class: 'Execution' do
+    state 'passed'
+    tree_id { Digest::SHA1.hexdigest rand.to_s }
+    name { Faker::App.name }
+    result ({ value: 42, summary: '42 OK' })
+    after(:create) do |execution|
+      task = FactoryGirl.create :passed_task,
+                                execution_id: execution.id,
+                                result: { value: 42, summary: '42 OK' }
+      task.trials.first.update_attributes! result: { value: 42, summary: '42 OK' }
+    end
+  end
+
   factory :execution_with_issue, class: 'Execution' do
     state 'failed'
     tree_id { Digest::SHA1.hexdigest rand.to_s }
@@ -72,5 +85,4 @@ FactoryGirl.define do
     description { Faker::Lorem.sentence }
     type { %w(error warning).sample }
   end
-
 end

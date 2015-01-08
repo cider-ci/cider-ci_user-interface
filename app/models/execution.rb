@@ -1,8 +1,10 @@
-#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
 class Execution < ActiveRecord::Base
+
+  serialize :result, JSON
 
   has_one :execution_stat
   has_one :execution_cache_signature
@@ -80,6 +82,17 @@ class Execution < ActiveRecord::Base
 
   def to_s
     sha1
+  end
+
+  def stats_summary
+    stats = execution_stat
+    [(stats.failed > 0) ?  stats.failed : '',
+     (stats.failed > 0) ? '/' : '',
+     stats.total].join('').squish
+  end
+
+  def result_summary?
+    result && result['summary'].present?
   end
 
 end

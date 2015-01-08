@@ -24,6 +24,8 @@
 
 @import lib/svg
 
+@import lib/svg_summary_embedded_colors
+
 @import lib/executions_table
 
 @import lib/dropdown_form_with_button 
@@ -50,17 +52,6 @@ i
 
 .commit-id
   font-family: $font-family-monospace
-
-.execution
-  table.commits
-    tr.commit
-      td.executions, td.actions
-        display: none
-  table.summary
-    td.stats
-      &[data-state='pending'], &[data-state='dispatched'] , &[data-state='executing']
-        display: none
-    
 
 span.nowrap, strong.nowrap
   white-space: nowrap

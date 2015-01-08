@@ -3,7 +3,7 @@ require 'spec_helper_feature_shared'
 
 feature 'Sign-in' do
 
-  scenario 'Sign-in', browser: :firefox  do
+  scenario 'Sign-in' do
 
     visit '/public'
 
@@ -19,8 +19,7 @@ feature 'Sign-in' do
 
   end
 
-  scenario 'Sign-in with wrong password ',
-           browser: :firefox  do
+  scenario 'Sign-in with wrong password' do
     visit '/public' unless current_path
     find("input[type='text']").set 'normin'
     find("input[type='password']").set 'bogus password'
@@ -28,8 +27,7 @@ feature 'Sign-in' do
     expect(page).to have_content 'authentication failed'
   end
 
-  scenario 'Sign-in with wrong login',
-           browser: :firefox  do
+  scenario 'Sign-in with wrong login' do
     visit '/public' unless current_path
     find("input[type='text']").set 'norminx'
     find("input[type='password']").set 'password'
@@ -37,8 +35,7 @@ feature 'Sign-in' do
     expect(page).to have_content 'Neither login nor email address found'
   end
 
-  scenario 'Set email and sign in by email',
-           browser: :firefox  do
+  scenario 'Set email and sign in by email' do
     sign_in_as 'normin'
     find('a#user-actions').click
     click_on('Account')

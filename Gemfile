@@ -8,7 +8,7 @@ gem 'bootstrap-sass', '~> 3.3.1'
 gem 'bootswatch-rails'
 gem 'bunny', '>= 1.3'
 gem 'capybara', group: [:test]
-gem 'cider_ci-support', '= 1.1.0.pre.beta.3', group: [:development, :test]
+gem 'cider_ci-support', '~> 1.1.0', group: [:development, :test]
 gem 'coffee-rails'
 gem 'factory_girl', group: [:development, :test]
 gem 'factory_girl_rails', group: [:development, :test]
@@ -16,7 +16,6 @@ gem 'faker', group: [:development, :test]
 gem 'font-awesome-sass', '>= 4.2.0'
 gem 'foreigner'
 gem 'haml-contrib'
-gem 'haml-lint', '~> 0.10.0'
 gem 'haml-rails'
 gem 'http_monkey'
 gem 'jquery-rails'
@@ -35,16 +34,16 @@ gem 'rails', '4.1.8'
 gem 'rails_config'
 gem 'rest-client'
 gem 'rspec-rails', group: [:development, :test]
+gem 'rubocop', group: [:development, :test]
 gem 'sass'
 gem 'sass-rails'
 gem 'sdoc', group: [:doc], require: false
 gem 'selenium-webdriver', group: [:test]
 gem 'simplecov', require: false, group: :test
-gem 'textacular',
-    git:  'https://github.com/DrTom/textacular.git',
-    ref: 'ab1f5677539b1014f238dc2c644c2e4ef9c56c12'
+gem 'textacular', git:  'https://github.com/DrTom/textacular.git',
+                  ref: '778fd0952f949f64eba3ff03e6b97b247dc54d40'
 gem 'therubyrhino', platform: :jruby
-gem 'uglifier', '>= 1.3.0'
+gem 'uglifier', '~> 1.3'
 gem 'uuidtools'
 
 # TODO, find unused views and partials after we have some tests

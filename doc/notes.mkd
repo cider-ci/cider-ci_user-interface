@@ -1,12 +1,5 @@
-
-    
-    chmod g+rws /home/git/repositories/
-    setfacl -d -m g::rwx  /home/git/repositories/
-
-### Get and restore staging db
-
-1. `bundle exec twister staging get_db_dump`
-2. `pg_restore --disable-triggers -d cider_ci_dev -a tmp/dump_staging_2013-10-04T15\:04\:48+02\:00.pgbin`
+Notes
+-----
 
 ### webcontext / subpath 
 
@@ -22,6 +15,11 @@
 
     git log -n 1 --pretty="%H% n%T %n%an %n%ae %n%ai %n%cn %n%ce %n%ci %n%s" 69d4f46
 
+
+### Git
+    
+    chmod g+rws /home/git/repositories/
+    setfacl -d -m g::rwx  /home/git/repositories/
 
 
 ### Attachments

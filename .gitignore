@@ -22,3 +22,4 @@ config/environments/*.local.yml
 config/settings.local.yml
 config/settings/*.local.yml
 db/seeds.rb
+result.json

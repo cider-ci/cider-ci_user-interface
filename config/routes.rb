@@ -36,6 +36,7 @@ CiderCI::Application.routes.draw do
       member do
         post 'set_failed'
         get 'attachments'
+        get 'result'
       end
     end
 
@@ -50,6 +51,7 @@ CiderCI::Application.routes.draw do
         delete "issues/:issue_id", action: 'delete_issue', as: 'issue'
         post :add_tags
         post :retry_failed
+        get 'result'
       end
     end
     resources :executors
@@ -68,6 +70,7 @@ CiderCI::Application.routes.draw do
     resources :tasks do
       member do
         post 'retry'
+        get 'result'
       end
     end
 
@@ -127,6 +130,11 @@ CiderCI::Application.routes.draw do
 
     get 'executions/:repository_name/:branch_name/:execution_name', 
       action: :redirect_to_execution
+
+
+    get "/:repository_name/:branch_name/:execution_names/summary", 
+      controller: "summary", action: "show", as: "summary"
+
 
     resources :badges , only: [] do
       collection do

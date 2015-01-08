@@ -1,10 +1,11 @@
-#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
 class Workspace::ExecutionsController < WorkspaceController
 
-  include ::Workspace::ExecutionsController::TasksFilter
+  include ::Workspace::ExecutionsControllerModules::TasksFilter
+  include ::Workspace::ExecutionsControllerModules::ExecutionsFilter
 
   skip_before_action :require_sign_in,
                      only: [:show, :tree_attachments, :specification]
@@ -58,25 +59,7 @@ class Workspace::ExecutionsController < WorkspaceController
   def index
     @link_params = params.slice(:branch, :page, :repository, :execution_tags)
 
-    @executions = Execution.reorder(created_at: :desc).page(params[:page])
-
-    @executions = @executions.joins(commits: :branches) \
-      .where(branches: { name: branch_names_filter }) \
-      unless branch_names_filter.empty?
-
-    @executions = @executions.joins(commits: { branches: :repository }) \
-      .distinct.where(repositories: { name: repository_names_filter }) \
-      unless repository_names_filter.empty?
-
-    @executions = @executions.per(Integer(params[:per_page])) \
-      unless params[:per_page].blank?
-
-    @executions = @executions.joins(:tags) \
-      .where(tags: { tag: execution_tags_filter }) \
-      if execution_tags_filter.count > 0
-
-    @executions = @executions.select(:id, :created_at, :tree_id,
-                                     :state, :name, :updated_at)
+    @executions = build_executions_for_params
 
     @execution_cache_signatures = ExecutionCacheSignature \
       .where(%[ execution_id IN (?)], @executions.map(&:id))
@@ -90,7 +73,7 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def show
     @execution = Execution.select(:id, :state, :updated_at,
-                                  :name, :tree_id).find(params[:id])
+                                  :name, :tree_id, :result).find(params[:id])
     require_sign_in unless @execution.public_view_permission?
     @link_params = params.slice(:branch, :page, :repository, :execution_tags)
     @trials = Trial.joins(task: :execution) \
@@ -143,6 +126,10 @@ class Workspace::ExecutionsController < WorkspaceController
   def set_filter_params(params)
     @filter_params = params.slice(:tasks_select_condition,
                                   :name_substring_term, :per_page)
+  end
+
+  def result
+    @execution = Execution.find(params[:id])
   end
 
 end

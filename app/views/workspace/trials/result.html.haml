@@ -1,0 +1,13 @@
+- trial ||= @trial
+.result
+
+  .row
+    .col-md-6
+      %ol.breadcrumb.pull-left
+        = render '/breadcrumbs/trial_result', trial: trial
+
+  %h2 
+    Result 
+
+  = render "structured_data", data: trial.result
+

@@ -1,10 +1,9 @@
 require 'spec_helper_feature'
 require 'spec_helper_feature_shared'
 
-feature 'Browse executions and execution' do
+feature 'Browse executions and execution', browser: :firefox do
 
-  scenario 'Follow from executions to first execution',
-           browser: :firefox  do
+  scenario 'Follow from executions to first execution' do
     sign_in_as 'normin'
     find('a', text: 'Executions').click
     expect(page).to have_content 'Executions'
@@ -14,15 +13,14 @@ feature 'Browse executions and execution' do
     expect(current_path).to be == workspace_execution_path(Execution.first)
   end
 
-  scenario 'Use the executions filter',
-           browser: :firefox  do
+  scenario 'Use the executions filter' do
     sign_in_as 'normin'
     visit workspace_executions_path
     find('input#repository_names').set 'Cider-CI Bash Demo Project'
     find('input#branch_names').set 'master'
     find('input#execution_tags').set 'adam'
     submit_form
-    expect(all('table#executions-table tbody tr.execution').count).to be == 1
+    expect(all('table#executions-table tbody tr.execution').count).to be == 2
     find('input#execution_tags').set 'asdfasdf'
     submit_form
     expect(all('table#executions-table tbody tr.execution').count).to be == 0
@@ -36,11 +34,18 @@ feature 'Browse executions and execution' do
     expect(all('table#executions-table tbody tr.execution').count).to be == 0
     find('input#repository_names').set 'Cider-CI Bash Demo Project'
     submit_form
+    expect(all('table#executions-table tbody tr.execution').count).to be == 2
+  end
+
+  scenario 'filter by tree_id' do
+    sign_in_as 'normin'
+    visit workspace_executions_path
+    expect(all('table#executions-table tbody tr.execution').count).to be == 2
+    visit workspace_executions_path(tree_id: 'b8c74ebd9260b1a2928767625946b937011a03b6')
     expect(all('table#executions-table tbody tr.execution').count).to be == 1
   end
 
-  scenario 'Suggestions for filter',
-           browser: :firefox  do
+  scenario 'Suggestions for filter' do
     sign_in_as 'normin'
     visit workspace_executions_path
 
@@ -54,8 +59,7 @@ feature 'Browse executions and execution' do
     expect(find('.ui-autocomplete').text).to have_content 'adam'
   end
 
-  scenario 'View execution and tree attachment',
-           browser: :firefox do
+  scenario 'View execution and tree attachment' do
     sign_in_as 'normin'
     visit workspace_execution_path(Execution.first)
     find('a', text: 'Attachments').click
@@ -64,8 +68,7 @@ feature 'Browse executions and execution' do
     expect(page.text.downcase).to have_content 'content-type:'
   end
 
-  scenario 'View execution specification',
-           browser: :firefox do
+  scenario 'View execution specification' do
     sign_in_as 'normin'
     visit workspace_execution_path(Execution.first)
     find('a', text: 'Specification').click

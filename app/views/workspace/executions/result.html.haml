@@ -1,0 +1,13 @@
+- execution ||= @execution
+.result
+
+  .row
+    .col-md-6
+      %ol.breadcrumb.pull-left
+        = render '/breadcrumbs/execution_result', execution: execution
+
+  %h2 
+    Result 
+
+  = render "structured_data", data: execution.result
+

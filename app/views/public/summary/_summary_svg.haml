@@ -1,0 +1,24 @@
+%svg.cider-ci.summary(x=0 y=0 width=width height=height
+      xmlns="http://www.w3.org/2000/svg" 
+      xmlns:xlink="http://www.w3.org/1999/xlink"
+      preserveAspectRatio="xMidYMid meet")
+
+  != boxes.join("\n")
+
+  :sass
+    svg.cider-ci.summary
+
+      text
+        font-size: #{font_size}px
+        font-family: DejaVu Sans, Verdana, Geneva, sans-serif
+        font-weight: normal
+        text-anchor: middle
+
+      svg.execution-info
+        g
+          text, a, span
+            font-weight: bold
+
+  - unless embedded
+    :sass 
+      @import lib/svg_summary_standalone_colors 

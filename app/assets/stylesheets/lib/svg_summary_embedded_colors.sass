@@ -1,0 +1,30 @@
+@mixin badge_box()
+  g
+    font-size: 12px
+    text  
+      text-anchor: middle
+    text, tspan
+      font-family: DejaVu Sans
+      font-weight: normal
+
+
+svg.cider-ci.summary
+
+  rect
+    stroke-width: 0
+    &.host-info , &.git-info
+    fill: $jumbotron-bg
+
+    @each $state in $ci-states
+      $i: index($ci-states,$state)
+      &.#{$state}
+        fill: nth($ci-colors-bg,$i)
+
+  g
+    text
+      fill: $text-color
+    text.a.tspan
+      fill: $link-color
+
+
+

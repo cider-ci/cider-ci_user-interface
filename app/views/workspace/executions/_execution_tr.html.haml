@@ -1,4 +1,4 @@
--#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
@@ -26,17 +26,7 @@
 
     %td.stats
 
-      %span.nowrap
-        - if execution.execution_stat.failed > 0
-          %span.execution-stats-badge.badge.failed= execution.execution_stat.failed
-        - if execution.execution_stat.failed > 0 and execution.execution_stat.passed > 0
-          %span : 
-        - if execution.execution_stat.passed> 0
-          %span.execution-stats-badge.badge.passed=  execution.execution_stat.passed
-        - if execution.execution_stat.failed > 0 and execution.execution_stat.passed > 0
-          %span / 
-          %span.execution-stats-badge.badge #{execution.execution_stat.total}
-
+      = render "stats_summary", stats: execution.execution_stat 
  
     %td.created-at= render 'humanized_time_from_now', at: execution.created_at
 

@@ -1,4 +1,4 @@
--#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
@@ -8,7 +8,7 @@
     #welcome_message
       =markdown(WelcomePageSettings.find.welcome_message)
 
-  %hr 
+  %hr  
 
   #reload-page{data: { reload_timeout: 30}}
 
@@ -20,25 +20,28 @@
         %table.table.radiator-table
           %tbody
             %tr
-              - row[:items].map(&:deep_symbolize_keys).each do |item|
+              - row[:items].each do |svg|
                 %td 
-                  = render '/public/badges/medium.svg.haml',{view_params: item, 
-                    options: {include_stylesheet: false, xlink_show_value: 'replace'}}
+                  != svg
 
   %hr 
 
   %h2 About Cider-CI
 
   %p#release-info
-    Version&nbsp;
-    = render partial: 'application/semantic_version', locals:{semver: Settings.release}
+    = link_to "https://github.com/cider-ci/cider-ci_ansible-setup/blob/master/releases.yml" do
+      Version&nbsp;
+      = render partial: 'application/semantic_version', 
+        locals: { semver: Settings.release }
 
 
 
   %p
     %strong
-      Cider-CI is an application and service stack for highly parallelized testing and continuous integration.
+      Cider-CI is an application and service stack for 
+      highly parallelized testing and continuous integration.
 
   %p 
     Read more about Cider-CI on the 
-    %a{href: "https://github.com/cider-ci/cider-ci"} Cider-CI github project page.
+    %a{href: "https://github.com/cider-ci/cider-ci"} 
+      Cider-CI github project page.

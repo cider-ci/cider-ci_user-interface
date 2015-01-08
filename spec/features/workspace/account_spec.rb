@@ -1,7 +1,7 @@
 require 'spec_helper_feature'
 require 'spec_helper_feature_shared'
 
-feature 'Account', browser: :firefox  do
+feature 'Account' do
 
   scenario 'Manage email addresses' do
     sign_in_as 'normin'

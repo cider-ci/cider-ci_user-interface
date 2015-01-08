@@ -5,11 +5,6 @@ tasks:
     main:
       body: bundle exec rubocop
 
-- name: Lint/Stylecheck with HAML-Lint
-  scripts:
-    main:
-      body: bundle exec haml-lint app/views/{a*,m*}/* # tmp exclude styleguide…
-
 - name: Code complexity with flog
   scripts: 
     main: 

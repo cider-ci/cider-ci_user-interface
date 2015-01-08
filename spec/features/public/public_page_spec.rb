@@ -17,13 +17,15 @@ feature 'Public start page', browser: :firefox  do
 
   scenario 'contains the welcome message and the first svg badge for master' do
 
+    Repository.first.update_attributes! public_view_permission: true
+
     visit '/public'
 
     expect(page).to have_content 'Welcome to the Cider-CI UI Tests'
 
-    expect(first('svg.badge-medium')).to have_content 'master'
+    expect(first('svg.cider-ci.summary')).to have_content 'master'
 
-    expect(first('svg.badge-medium')).to have_content 'passed'
+    expect(first('svg.cider-ci.summary')).to have_content 'passed'
 
   end
 
@@ -46,7 +48,7 @@ feature 'Public start page', browser: :firefox  do
 
     # redirects
     expect(page.current_path).to be == \
-      '/workspace/executions/69eedfdb-f4f9-4b6e-b8df-a023df912412'
+      workspace_execution_path(Execution.first)
 
     # however we are not authorized
 
@@ -64,7 +66,7 @@ feature 'Public start page', browser: :firefox  do
 
     # redirects
     expect(page.current_path).to be == \
-      '/workspace/executions/69eedfdb-f4f9-4b6e-b8df-a023df912412'
+      workspace_execution_path(Execution.first)
 
     expect(page).to have_content 'Execution "Tests"'
 

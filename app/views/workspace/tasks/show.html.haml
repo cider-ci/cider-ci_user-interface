@@ -1,4 +1,4 @@
--#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
@@ -8,6 +8,14 @@
   .col-md-6
     %ol.breadcrumb.pull-left
       = render '/breadcrumbs/task', task: task
+  .col-md-6
+    %ol.breadcrumb.with-circle-separator.pull-right
+      %li 
+        - if task.result 
+          = link_to result_workspace_task_path(task) do
+            Result
+        - else 
+          %span.text-muted Result
 
 
 %h1 
@@ -31,10 +39,11 @@
               =(i+1).ordinalize
           %td
             %ul.list-inline 
-              = render partial: 'script_label', 
-                collection: trial.scripts.map{|k,v| v.merge({"id" => k})}, 
-                as: :script,
-                locals: {trial: trial}
+              - if trial.scripts.is_a? Hash
+                = render partial: 'script_label', 
+                  collection: trial.scripts.map{|k,v| v.merge({"id" => k})}, 
+                  as: :script,
+                  locals: {trial: trial}
 
 
 %h2 Properties
@@ -52,4 +61,3 @@
 %h2 Specification
 
 %pre= task.task_spec.data.to_yaml
-

@@ -1,23 +1,25 @@
-#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
 class PublicController < ApplicationController
 
-  include Concerns::ServiceSession
-  include Concerns::BadgeParamsBuilder
   include ActionView::Helpers::TextHelper
+  include Concerns::ServiceSession
+  include Concerns::SummaryBuilder
+  include Concerns::SummaryRenderer
 
   def show
-    @radiator_rows =       begin
+    @radiator_rows =
+      begin
         WelcomePageSettings.find
         .radiator_config.try(:[], 'rows').map do |row|
           { name: row.try(:[], 'name'),
             items: build_items(row) }
         end
       rescue Exception => e
-        Rails.logger.warn ['Failed to parse radiator config',
-                           Formatter.exception_to_log_s(e)]
+        Rails.logger.warn \
+          ['Failed to parse radiator config', Formatter.exception_to_log_s(e)]
         @alerts[:errors] <<  'Failed to build the radiator,
         see the logs for details.'.squish
         []
@@ -26,12 +28,15 @@ class PublicController < ApplicationController
 
   def build_items(row)
     row.try(:[], 'items').map(&:deep_symbolize_keys).map do |item|
-      build_badge_params item[:repository_name],
-                         item[:branch_name], item[:execution_name]
+      render_summary_svg(
+        build_summary_properties(
+          item[:repository_name], item[:branch_name],
+          item[:execution_name], orientation: :vertical))
     end
   end
 
-  def find_user_by_login(login)
+  def find_user_by_login
+    login = params.require(:sign_in)[:login].downcase
     begin
       User.find_by(login_downcased: login) \
         || EmailAddress.find_by!(email_address: login).user
@@ -40,10 +45,13 @@ class PublicController < ApplicationController
     end
   end
 
+  def target_path
+    params[:current_fullpath] || public_path
+  end
+
   def sign_in
     begin
-      user = find_user_by_login params.require(:sign_in)[:login].downcase
-      target_path = (params[:current_fullpath] || public_path)
+      user = find_user_by_login
       if user.authenticate(params.require(:sign_in)[:password])
         create_services_session_cookie user
         redirect_to target_path,

@@ -1,0 +1,12 @@
+%span.stats-summary.nowrap
+  - if stats.failed > 0
+    %span.execution-stats-badge.badge.failed= stats.failed
+  - if stats.failed > 0 and stats.passed > 0
+    %span : 
+  - if stats.passed> 0
+    %span.execution-stats-badge.badge.passed=  stats.passed
+  - if stats.failed > 0 and stats.passed > 0
+    %span / 
+    %span.execution-stats-badge.badge #{stats.total}
+
+

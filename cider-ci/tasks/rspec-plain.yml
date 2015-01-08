@@ -1,5 +1,9 @@
 ---
 tasks:
+- name: controllers public summary_controller
+  scripts:
+    rspec:
+      body: bundle exec rspec "spec/controllers/public/summary_controller_spec.rb"
 - name: db branches_commits_functions
   scripts:
     rspec:

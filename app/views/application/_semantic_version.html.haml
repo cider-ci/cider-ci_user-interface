@@ -1,6 +1,3 @@
-:ruby
-  semver = local_assigns
-
 %span.semantic-version<>
   %span.major<>
     =Settings.release.version_major.to_s
@@ -10,9 +7,11 @@
   %span.minor<>
     %span.divider<>='.'
     =Settings.release.version_patch.to_s
-  %span.version<>
-    %span.divider<>='-'
-    =Settings.release.version_pre.to_s
-  %span.build<>
-    %span.divider<>='+'
-    =Settings.release.version_build.to_s
+  - if Settings.release.version_pre.present?
+    %span.version<>
+      %span.divider<>='-'
+      =Settings.release.version_pre.to_s
+  - if Settings.release.version_build.present?
+    %span.build<>
+      %span.divider<>='+'
+      =Settings.release.version_build.to_s

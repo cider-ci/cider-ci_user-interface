@@ -1,0 +1,13 @@
+- task ||= @task
+.result
+
+  .row
+    .col-md-6
+      %ol.breadcrumb.pull-left
+        = render '/breadcrumbs/task_result', task: task
+
+  %h2 
+    Result 
+
+  = render "structured_data", data: task.result
+

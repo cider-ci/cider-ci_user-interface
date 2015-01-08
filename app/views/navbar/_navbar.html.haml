@@ -1,4 +1,4 @@
--#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
@@ -6,11 +6,10 @@
 
   .navbar-header 
     = link_to public_path, class: "navbar-brand" do
-      %b<
-        Cider-CI
-        - unless Settings.release.version_pre.nil?
-          %small.text-warning<
-            = render partial: 'application/semantic_version'
+      %b<>
+        Cider-CI&nbsp;
+        %span{class:  Settings.release.version_pre.present? ? "text-warning" : ""}<>
+          = render partial: 'application/semantic_version'
 
   .collaps.navbar-collapse
 

@@ -1,0 +1,11 @@
+%svg.execution-info(x=xoffset y=yoffset width=width height=height){id: "execution-info-#{i}"}
+  %rect.execution-info(x=0 y=0 width=width height=height){class: execution[:class]}
+  %g 
+    %text(x="50%" y=yfont )
+      -if execution[:href]
+        %a(xlink:href="#{execution[:href]}" xlink:show='replace')
+          %tspan
+            = text
+      - else
+        %tspan
+          = text

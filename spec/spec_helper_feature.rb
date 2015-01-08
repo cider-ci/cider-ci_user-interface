@@ -39,7 +39,7 @@ RSpec.configure do |config|
     when :firefox
       Capybara.current_driver = :selenium
     else
-      Capybara.current_driver = :rack_test
+      Capybara.current_driver = :selenium
     end
   end
 

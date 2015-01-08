@@ -1,4 +1,4 @@
-#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
@@ -40,6 +40,10 @@ class WorkspaceController < ApplicationController
 
   def commit_text_search_filter
     params.try('[]', 'commit').try('[]', :text).try(:nil_or_non_blank_value)
+  end
+
+  def tree_id_filter
+    params.try('[]', 'tree_id').try(:nil_or_non_blank_value)
   end
 
   def require_sign_in

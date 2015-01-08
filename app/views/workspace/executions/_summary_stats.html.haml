@@ -1,4 +1,4 @@
--#  Copyright (C) 2013, 2014 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
@@ -8,7 +8,7 @@
   - _stat = execution.execution_stat
 
   #stats-and-progress.reload.replace-without-animation{data: {state: execution.state, cache_tag: _stat}}
-    %table.stats-and-progress
+    %table.stats-and-progress.result-summary
       %thead 
       %tbody
         %tr
@@ -16,5 +16,8 @@
             - if _stat[state] > 0
               - fraction= _stat[state]/_stat[:total].to_f
               %td{class: state,data:{ fraction: fraction },style: "width: #{fraction*100}%"}
-                =_stat[state]
-                %i{class: icon_class_for_state(state)}
+                - unless execution.result_summary? 
+                  =_stat[state]
+                  %i{class: icon_class_for_state(state)}
+                - else 
+                  = execution.result['summary']

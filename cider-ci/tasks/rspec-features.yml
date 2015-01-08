@@ -48,6 +48,10 @@ tasks:
   scripts:
     rspec:
       body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/public/sign_in_spec.rb"
+- name: features public sumarry_badges
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/public/sumarry_badges_spec.rb"
 - name: features workspace account
   scripts:
     rspec:
@@ -64,6 +68,10 @@ tasks:
   scripts:
     rspec:
       body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/workspace/executions_spec.rb"
+- name: features workspace results
+  scripts:
+    rspec:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "spec/features/workspace/results_spec.rb"
 - name: features workspace session
   scripts:
     rspec:
