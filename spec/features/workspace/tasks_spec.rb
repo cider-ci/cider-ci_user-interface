@@ -7,8 +7,7 @@ feature 'Tasks' do
     all('.task').map { |e| e['data-state'] }.uniq.sort
   end
 
-  scenario 'Filter tasks from execution show action by state',
-           browser: :firefox  do
+  scenario 'Filter tasks from execution show action by state' do
 
     Execution.destroy_all
     FactoryGirl.create :failed_execution
@@ -34,8 +33,7 @@ feature 'Tasks' do
 
   end
 
-  scenario 'Filter tasks from execution show action by name',
-           browser: :firefox  do
+  scenario 'Filter tasks from execution show action by name' do
 
     sign_in_as 'normin'
     visit workspace_execution_path(Execution.first)

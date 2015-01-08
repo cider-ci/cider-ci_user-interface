@@ -92,7 +92,7 @@ class Execution < ActiveRecord::Base
   end
 
   def result_summary?
-    result && result['summary'].present?
+    result && result['summary'].present? || false
   end
 
 end

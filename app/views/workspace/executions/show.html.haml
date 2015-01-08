@@ -6,8 +6,8 @@
 - state = execution.state
 - ecs = execution.execution_cache_signature
 - cs = [execution.id,execution.updated_at,ecs.repositories_signature,ecs.commits_signature,
-    ecs.branches_signature, ecs.tasks_signature,@tasks_select_condition,ecs.execution_issues_count,
-    @page,@trials.collection_cache_tag]
+    ecs.branches_signature, ecs.tasks_signature,ecs.execution_issues_count,
+    params,@trials.collection_cache_tag]
 
 - cache cs  do |cache_tag|
 
@@ -16,6 +16,7 @@
   #reload-page{data: { cache_tag: cache_tag, reload_timeout: reload_timeout}}
 
     .row
+
       .col-md-6
         %ol.breadcrumb.pull-left
           = render '/breadcrumbs/execution', execution: execution
@@ -33,13 +34,13 @@
           %li 
             = link_to specification_workspace_execution_path(execution) do
               Specification
-          %li 
+
+          %li#result-link.reload{data: {cache_tag: execution.result_summary?.to_s}}
             - if execution.result 
               = link_to result_workspace_execution_path(execution) do
                 Result
             - else 
               %span.text-muted Result
-
 
 
     #issues-alert.reload{data: {cache_tag: ecs.execution_issues_count}}

@@ -22,7 +22,7 @@
   %body{data: {user: user?, admin: admin?, session: {reload: {strategy: session[:reload_strategy]}}}}
     .container
 
-      = cache [current_user,admin?] do 
+      = cache [current_user,admin?,request.original_fullpath] do 
         = render partial: "navbar/navbar" 
 
       #messages

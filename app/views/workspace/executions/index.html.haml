@@ -10,11 +10,9 @@
     %ol.breadcrumb.pull-left
       = render partial: "/breadcrumbs/executions" 
 
-
-- cache @execution_cache_signatures.map{|cs| [@executions,
-    cs.tasks_signature, cs.commits_signature,
-    cs.branches_signature, cs.repositories_signature]} do |cache_tag|
-
+- cache @execution_cache_signatures.map{|cs| [ params, cs.tasks_signature, 
+    cs.commits_signature, cs.branches_signature, 
+    cs.repositories_signature]} do |cache_tag|
 
   #reload-page.executions-page{data: {cache_tag: cache_tag, reload_timeout: session_adjust_reload_timeout(10)}}
 
@@ -23,7 +21,6 @@
 
     %h1 
       Executions
-
 
     .clearfix
 

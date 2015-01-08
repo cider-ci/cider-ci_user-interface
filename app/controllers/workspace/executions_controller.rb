@@ -17,13 +17,9 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def create
     Fun.wrap_exception_with_redirect(self, :back) do
-      create_execution
-      @execution.create_tasks_and_trials
-      branches = @commit.head_of_branches
-      @execution.add_strings_as_tags [branches.map(&:name),
-                                      branches.map(&:repository).map(&:name),
-                                      @current_user.try(:login) || ''].flatten
-      redirect_to workspace_execution_path(@execution),
+      execution = create_execution
+      execution.create_tasks_and_trials
+      redirect_to workspace_execution_path(execution),
                   flash: { successes: ["The execution has been created.
                         Tasks and trials will be created in the background."] }
     end
@@ -31,16 +27,32 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def create_execution
     ActiveRecord::Base.transaction do
-      @commit = Commit.find params[:commit_id]
-      @definition = Definition.find(params[:definition_id])
+      commit = Commit.find params[:commit_id]
+      definition = Definition.find(params[:definition_id])
       create_map = \
-        { specification: @definition.specification,
-          name: @definition.name,
-          tree_id: @commit.tree_id }.merge(
+        { specification: definition.specification,
+          name: definition.name,
+          tree_id: commit.tree_id }.merge(
            params.require(:execution).permit(:priority))
-      @execution = Execution.create! create_map
-      @execution.add_strings_as_tags params[:execution][:tags].split(',')
+      execution = Execution.create! create_map
+      add_default_tags execution
+      execution
     end
+  end
+
+  def add_default_tags(execution)
+    branches = branches_for_commit_param
+    execution.add_strings_as_tags [
+      param_tags, branches.map(&:name), repository_names_for_branches(branches),
+      current_user.try(:login)].flatten.compact
+  end
+
+  def branches_for_commit_param
+    Commit.find(params[:commit_id]).try(:head_of_branches) || []
+  end
+
+  def repository_names_for_branches(branches)
+    branches.map(&:repository).map(&:name).select(&:present?)
   end
 
   def destroy
@@ -58,9 +70,7 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def index
     @link_params = params.slice(:branch, :page, :repository, :execution_tags)
-
     @executions = build_executions_for_params
-
     @execution_cache_signatures = ExecutionCacheSignature \
       .where(%[ execution_id IN (?)], @executions.map(&:id))
   end
@@ -114,12 +124,10 @@ class Workspace::ExecutionsController < WorkspaceController
   end
 
   def update
-    @execution = Execution.find(params[:id])
-    @execution.tags = params[:execution][:tags] \
-      .split(',').map(&:strip).reject(&:blank?) \
-      .map { |s| Tag.find_or_create_by(tag: s) }
-    @execution.update_attributes! params.require(:execution).permit(:priority)
-    redirect_to workspace_execution_path(@execution),
+    execution = Execution.find(params[:id])
+    execution.add_strings_as_tags param_tags
+    execution.update_attributes! params.require(:execution).permit(:priority)
+    redirect_to workspace_execution_path(execution),
                 flash: { successes: ['The execution has been updated.'] }
   end
 
@@ -130,6 +138,10 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def result
     @execution = Execution.find(params[:id])
+  end
+
+  def param_tags
+    params[:execution][:tags].split(',').select(&:present?)
   end
 
 end

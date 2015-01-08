@@ -21,6 +21,7 @@ feature 'Browse commits', browser: :firefox  do
     find('input#branch_names').set('ma')
     find('.ui-autocomplete').find('a', text: 'master').click
     find('input#commit_text').set('Initial')
+    find('select#commited_within_last_days').select('10 years')
     click_on('Filter')
     expect(all('.commit').count).to be == 1
   end

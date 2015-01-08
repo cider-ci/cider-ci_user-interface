@@ -24,9 +24,10 @@ module Workspace::ExecutionsControllerModules::TasksFilter
   end
 
   def filter_tasks_by_condition(tasks)
-    tasks_select_condition = (
+    # @tasks_select_condition must be an instance var!; it is used in views
+    @tasks_select_condition = (
       params[:tasks_select_condition] || :with_failed_trials).to_sym
-    case tasks_select_condition
+    case @tasks_select_condition
     when :all
       tasks
     when :failed

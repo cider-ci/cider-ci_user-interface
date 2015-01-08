@@ -71,7 +71,7 @@ class PublicController < ApplicationController
   def sign_out
     reset_session
     cookies.delete 'cider-ci_services-session'
-    redirect_to (params[:current_fullpath] || public_path),
+    redirect_to target_path,
                 flash: { successes: ['You have been signed out!'] }
   end
 

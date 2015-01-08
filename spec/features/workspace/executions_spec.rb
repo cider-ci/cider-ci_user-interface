@@ -19,21 +19,25 @@ feature 'Browse executions and execution', browser: :firefox do
     find('input#repository_names').set 'Cider-CI Bash Demo Project'
     find('input#branch_names').set 'master'
     find('input#execution_tags').set 'adam'
-    submit_form
+    click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 2
     find('input#execution_tags').set 'asdfasdf'
-    submit_form
+    click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 0
     find('input#execution_tags').set 'adam'
-    find('input#branch_names').set 'asdfasdf'
-    submit_form
+    click_on('Filter')
+    expect(all('table#executions-table tbody tr.execution').count).to be == 2
+    find('input#execution_tags').set 'asdfasdf'
+    click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 0
     find('input#branch_names').set 'master'
     find('input#repository_names').set 'asdfasdf'
-    submit_form
+    click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 0
     find('input#repository_names').set 'Cider-CI Bash Demo Project'
-    submit_form
+    find('input#branch_names').set ''
+    find('input#execution_tags').set ''
+    click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 2
   end
 

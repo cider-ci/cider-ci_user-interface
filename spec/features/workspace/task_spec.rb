@@ -3,8 +3,7 @@ require 'spec_helper_feature_shared'
 
 feature 'Task' do
 
-  scenario 'view as public user and signed-in user',
-           browser: :firefox do
+  scenario 'view as public user and signed-in user' do
 
     task = Task.first
     repos = task.execution.repositories
@@ -23,7 +22,7 @@ feature 'Task' do
 
   end
 
-  scenario 'following links to trials', browser: :firefox do
+  scenario 'following links to trials' do
     task = Task.first
     sign_in_as 'normin'
 
@@ -39,7 +38,7 @@ feature 'Task' do
 
   end
 
-  scenario 'Retrying a task', browser: :firefox do
+  scenario 'Retrying a task' do
     execution = Execution.first
     sign_in_as 'normin'
     visit workspace_execution_path(execution)
