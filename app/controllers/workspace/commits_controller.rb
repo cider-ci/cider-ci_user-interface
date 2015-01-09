@@ -9,6 +9,8 @@ class Workspace::CommitsController < WorkspaceController
 
     @commits = @commits.per(Integer(params[:per_page])) unless params[:per_page].blank?
 
+    filter_by_show_orphans
+
     filter_by_branches_and_repository
 
     filter_by_text_and_time
@@ -16,6 +18,12 @@ class Workspace::CommitsController < WorkspaceController
     set_order_and_select
 
     set_cache_signatures
+  end
+
+  def filter_by_show_orphans
+    unless params[:show_orphans].present?
+      @commits = @commits.joins(:branches)
+    end
   end
 
   def filter_by_branches_and_repository

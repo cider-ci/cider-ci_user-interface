@@ -6,7 +6,6 @@ ENV['RAILS_ENV'] ||= 'test'
 
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
-require Rails.root.join('lib', 'db_helper')
 
 require 'spec_helper_mock_messaging'
 

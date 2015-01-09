@@ -21,11 +21,13 @@ class Execution < ActiveRecord::Base
   has_many :branches, through: :commits
   has_many :repositories, -> { reorder('').uniq }, through: :branches
 
-  has_many :tasks # , foreign_key: [:specification_id,:tree_id]
+  has_many :tasks
+
+  has_many :trials, through: :tasks
 
   validates :state, inclusion: { in: Constants::EXECUTION_STATES }
 
-  default_scope { order(created_at: :desc, tree_id: :asc, specification_id: :asc) }
+  default_scope { order(created_at: :desc, id: :asc) }
 
   serialize :substituted_specification_data
 
@@ -45,20 +47,16 @@ class Execution < ActiveRecord::Base
     TreeAttachment.where("path like '/#{tree_id}/%'")
   end
 
-  def trials
-    Trial.joins(task: :execution).where('executions.tree_id = ?', tree_id)
-  end
-
   def accumulated_time
     trials.where.not(started_at: nil).where.not(finished_at: nil) \
       .select("date_part('epoch', SUM(finished_at - started_at)) as acc_time") \
-      .reorder('').group('executions.tree_id').first[:acc_time]
+      .reorder('').group('tasks.execution_id').first[:acc_time]
   end
 
   def duration
     trials.reorder('') \
       .select("date_part('epoch', MAX(finished_at) - MIN(started_at)) duration") \
-      .group('executions.tree_id').first[:duration]
+      .group('tasks.execution_id').first[:duration]
   end
 
   def create_tasks_and_trials

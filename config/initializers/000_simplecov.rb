@@ -5,7 +5,6 @@ if ENV['RAILS_ENV'] == 'test'
   SimpleCov.start 'rails' do
     # add_filter "/spec/"
     add_filter "app/messaging/messaging.rb"
-    add_filter "lib/db_helper.rb"
     merge_timeout 48 * 3600
     use_merging true
   end

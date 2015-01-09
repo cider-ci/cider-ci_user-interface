@@ -3,7 +3,15 @@ module Workspace::ExecutionsControllerModules::ExecutionsFilter
 
   def build_executions_for_params
     filter_executions_for_tree_id filter_executions_for_tags filter_by_repository_names \
-      filter_executions_for_branch_name build_executions_initial_scope
+      filter_executions_for_branch_name set_per_page build_executions_initial_scope
+  end
+
+  def set_per_page(executions)
+    if params[:per_page].present?
+      executions.per(Integer(params[:per_page]))
+    else
+      executions
+    end
   end
 
   def build_executions_initial_scope

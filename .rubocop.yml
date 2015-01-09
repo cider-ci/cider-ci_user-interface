@@ -2,6 +2,7 @@ AllCops:
   Exclude:
     - 'db/**/*'
     - 'config/**/*'
+    - 'Gemfile'
   RunRailsCops: true
 
 Lint/AmbiguousOperator:

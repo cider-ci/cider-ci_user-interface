@@ -5,9 +5,12 @@
 - execution ||= @execution 
 - state = execution.state
 - ecs = execution.execution_cache_signature
-- cs = [execution.id,execution.updated_at,ecs.repositories_signature,ecs.commits_signature,
-    ecs.branches_signature, ecs.tasks_signature,ecs.execution_issues_count,
-    params,@trials.collection_cache_tag]
+- ccss = CommitCacheSignature.where(%< commit_id IN (?) >, execution.commits.map(&:id))
+- relevant_ccss = [ccss.map(&:commit_id), ccss.map(&:branches_signature), ccss.map(&:repositories_signature), ccss.map(&:executions_signature)].flatten
+
+- cs = [execution.id, execution.updated_at, ecs.repositories_signature,
+    ecs.branches_signature, ecs.tasks_signature, ecs.execution_issues_count,
+    params, @trials.collection_cache_tag] + relevant_ccss
 
 - cache cs  do |cache_tag|
 
@@ -83,13 +86,15 @@
           = render 'tags', tags: execution.tags.sort, id: "execution-tags"
 
       = render 'summary_stats', execution: execution, cache_tag: cache_tag
+
+      - cache relevant_ccss  do |commits_cache_signature|
       
-      #commits.commits.reload.replace-without-animation{data: {cache_tag: ecs.commits_signature}}
-        %h2 #{ execution.commits.count > 1 ? "Commits" : "Commit"}
-        %table.commits.table.table-striped
-          %thead
-          %tbody
-            != render partial: "commit_tr", collection: execution.commits, as: :commit
+        #commits.commits.reload.replace-without-animation{data: {cache_tag: commits_cache_signature}}
+          %h2 #{ execution.commits.count > 1 ? "Commits" : "Commit"}
+          %table.commits.table.table-striped
+            %thead
+              %tbody
+                != render partial: "commit_tr", collection: execution.commits, as: :commit
 
       = render 'tasks', execution: execution, tasks: tasks
 

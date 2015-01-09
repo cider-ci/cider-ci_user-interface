@@ -9,12 +9,13 @@ default: &default
  
 development:
   <<: *default
-  database: cider_ci_dev
+  database: cider_ci_development
 
 test: &test
   <<: *default
   database: cider_ci_test
 
 production:
+  database: cider_ci_production
   <<: *default
 

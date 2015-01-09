@@ -49,6 +49,11 @@
                     (commited_within_last_days_filter || 10)), 
                   class: "form-control input-sm"
 
+            %li
+              .checkbox
+                %label
+                  = check_box_tag :show_orphans , "1", params[:show_orphans].present?
+                  Show orphans
 
             %li
               = render 'per_page_form_group'

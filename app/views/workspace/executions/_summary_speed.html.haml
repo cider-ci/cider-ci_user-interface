@@ -2,14 +2,13 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- execution ||= @execution
-- cs = execution.execution_cache_signature
-- cache [execution.id,execution.updated_at,cs.tasks_signature] do |cache_tag|
-  - speedup = (execution.accumulated_time/execution.duration).round(2) rescue nil
-  - duration = execution.duration.round rescue nil
-  - time = execution.accumulated_time.round rescue nil
+- speedup = (execution.accumulated_time/execution.duration).round(2) rescue nil
+- duration = execution.duration.round rescue nil
+- time = execution.accumulated_time.round rescue nil
 
-  #speed-summary.table-responsive.reload.replace-without-animation{data: {cache_tag: [speedup,duration,time]}}
+- cache [speedup,duration,time] do |cache_tag|
+
+  #speed-summary.table-responsive.reload.replace-without-animation{data: {cache_tag: cache_tag}}
     %table.table.summary
       %thead
       %tbody

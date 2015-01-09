@@ -4,8 +4,8 @@ describe ::Public::SummaryController, type: :controller do
 
   context ' a public viewable execution via personas data' do
     before :all do
-      DBHelper.truncate_tables
-      DBHelper.load_data Rails.root.join('db', 'personas.data.psql')
+      PgTasks.truncate_tables
+      PgTasks.data_restore Rails.root.join('db', 'personas.pgbin')
       Repository.first.update_attributes! public_view_permission: true
     end
 
