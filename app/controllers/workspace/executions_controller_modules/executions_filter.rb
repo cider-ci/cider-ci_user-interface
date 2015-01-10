@@ -21,7 +21,7 @@ module Workspace::ExecutionsControllerModules::ExecutionsFilter
 
   def filter_executions_for_tree_id(executions)
     if tree_id_filter
-      executions.where(tree_id: tree_id_filter)
+      executions.where('executions.tree_id ilike ?', "#{tree_id_filter}%")
     else
       executions
     end

@@ -18,6 +18,16 @@
               value: branch_names_filter.join(", "), 
               data:{autocomplete_path: names_workspace_branches_path}, 
               class: "form-control input-sm"
+
+        %li
+          .form-group
+            %label.sr-only{for: "tree_id"}
+            = text_field_tag :tree_id, tree_id_filter, 
+              placeholder: "tree_id",
+              class: "form-control input-sm"
+
+      %ul.list-inline.pull-right
+
         %li
           .form-group
             %label.sr-only{for: "execution_tags"}
@@ -37,11 +47,5 @@
           =button_tag type: 'submit', class: 'btn btn-sm btn-primary' do
             %i.icon-filter
             Filter
-
-      .help-block{style: "margin-left: 14px"}
-        %small
-          :markdown
-            Values within one field are combined with logical _or_.
-            Multiple fields are combined with logical _and_.
 
 

@@ -10,9 +10,10 @@ class WorkspaceController < ApplicationController
     :branch_names_filter,
     :commit_text_search_filter,
     :commited_within_last_days_filter,
-    :is_branch_head_filter,
     :execution_tags_filter,
+    :is_branch_head_filter,
     :repository_names_filter,
+    :tree_id_filter,
     :with_branch_filter,
     :with_execution_filter
 

@@ -7,7 +7,7 @@ module Concerns
         if (term = params[:term]).blank?
           self
         else
-          where("#{column_name} ilike ?", term << '%')
+          where("#{column_name} ilike ?", "#{term}%")
         end
       end.distinct.limit(25).pluck(column_name)
     end

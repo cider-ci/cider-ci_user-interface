@@ -21,24 +21,46 @@ feature 'Browse executions and execution', browser: :firefox do
     find('input#execution_tags').set 'adam'
     click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 2
+
     find('input#execution_tags').set 'asdfasdf'
     click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 0
+
     find('input#execution_tags').set 'adam'
     click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 2
+
     find('input#execution_tags').set 'asdfasdf'
     click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 0
+
     find('input#branch_names').set 'master'
     find('input#repository_names').set 'asdfasdf'
     click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 0
+
     find('input#repository_names').set 'Cider-CI Bash Demo Project'
     find('input#branch_names').set ''
     find('input#execution_tags').set ''
     click_on('Filter')
     expect(all('table#executions-table tbody tr.execution').count).to be == 2
+
+    # filter by existing tree_id but no execution
+    find('input#repository_names').set 'Cider-CI Bash Demo Project'
+    find('input#branch_names').set ''
+    find('input#execution_tags').set ''
+    find('input#tree_id').set '2fdbf4c'
+    click_on('Filter')
+    expect(all('table#executions-table tbody tr.execution').count).to be == 0
+
+    # filter by existing tree_id with execution
+    find('input#repository_names').set 'Cider-CI Bash Demo Project'
+    find('input#branch_names').set ''
+    find('input#execution_tags').set ''
+    find('input#tree_id').set 'b8c74eb'
+    click_on('Filter')
+    expect(all('table#executions-table tbody tr.execution').count).to be == 1
+
   end
 
   scenario 'filter by tree_id' do

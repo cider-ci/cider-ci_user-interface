@@ -7,7 +7,7 @@ class Workspace::BranchesController < WorkspaceController
   def names
     @branches = Branch.reorder(name: :asc) \
       .instance_exec(params) do |params|
-      (term = params[:term]).blank? ? self : self.where('name ilike ?', term << '%')
+      (term = params[:term]).blank? ? self : self.where('name ilike ?', "#{term}%")
     end.distinct.limit(25)
 
     render json: @branches.pluck(:name)
