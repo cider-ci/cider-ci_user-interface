@@ -9,7 +9,7 @@ default: &default
  
 development:
   <<: *default
-  database: cider_ci_development
+  database: cider_ci_dev
 
 test: &test
   <<: *default

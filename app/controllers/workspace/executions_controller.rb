@@ -6,6 +6,7 @@ class Workspace::ExecutionsController < WorkspaceController
 
   include ::Workspace::ExecutionsControllerModules::TasksFilter
   include ::Workspace::ExecutionsControllerModules::ExecutionsFilter
+  include ::Workspace::ExecutionsControllerModules::ExecutionSelectionBuilder
 
   skip_before_action :require_sign_in,
                      only: [:show, :tree_attachments, :specification]
@@ -26,15 +27,12 @@ class Workspace::ExecutionsController < WorkspaceController
   end
 
   def create_execution
+    commit = Commit.find params[:commit_id]
+    execution_parameters = JSON.parse(params[:execution_data]).merge(
+      tree_id: commit.tree_id)
+
     ActiveRecord::Base.transaction do
-      commit = Commit.find params[:commit_id]
-      definition = Definition.find(params[:definition_id])
-      create_map = \
-        { specification: definition.specification,
-          name: definition.name,
-          tree_id: commit.tree_id }.merge(
-           params.require(:execution).permit(:priority))
-      execution = Execution.create! create_map
+      execution = Execution.create! execution_parameters
       add_default_tags execution
       execution
     end
@@ -78,7 +76,7 @@ class Workspace::ExecutionsController < WorkspaceController
   def new
     @execution = Execution.new
     @commit = Commit.find params[:commit_id]
-    @definitions = Definition.all
+    set_args_for_execution_selection @commit.id
   end
 
   def show
