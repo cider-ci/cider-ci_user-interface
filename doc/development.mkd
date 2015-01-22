@@ -28,7 +28,7 @@ From here the workflow is standard ruby on rails procedure.
 You probably need some data: 
 
 ```shell
-bundle exec rake db:truncate db:load_data FILE=./db/personas.data.psql
+bundle exec rake db:pg:truncate_tables db:pg:data:restore FILE=db/personas.pgbin
 ```
 
 This comes with two "personas": 

@@ -398,7 +398,7 @@ CREATE TABLE tasks (
     state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
     priority integer DEFAULT 5 NOT NULL,
     traits character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
-    name character varying(255),
+    name text,
     error text DEFAULT ''::text NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
@@ -1493,6 +1493,8 @@ INSERT INTO schema_migrations (version) VALUES ('116');
 INSERT INTO schema_migrations (version) VALUES ('117');
 
 INSERT INTO schema_migrations (version) VALUES ('118');
+
+INSERT INTO schema_migrations (version) VALUES ('119');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
 
