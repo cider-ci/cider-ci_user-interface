@@ -3,8 +3,7 @@ require 'spec_helper_feature_shared'
 
 feature 'Browse execution' do
 
-  scenario 'View execution and tree attachment',
-           browser: :firefox do
+  scenario 'View execution and tree attachment' do
     sign_in_as 'normin'
     visit workspace_execution_path(Execution.first)
     find('a', text: 'Attachments').click
@@ -13,8 +12,7 @@ feature 'Browse execution' do
     expect(page.text.downcase).to have_content 'content-type:'
   end
 
-  scenario 'View execution specification',
-           browser: :firefox do
+  scenario 'View execution specification' do
     sign_in_as 'normin'
     visit workspace_execution_path(Execution.first)
     find('a', text: 'Specification').click
@@ -22,8 +20,7 @@ feature 'Browse execution' do
     expect(page).to have_content 'Expanded Specification'
   end
 
-  scenario 'Edit execution ',
-           browser: :firefox do
+  scenario 'Edit execution ' do
     sign_in_as 'normin'
     visit workspace_execution_path(Execution.first)
     find('a', text: 'Edit').click
@@ -33,8 +30,7 @@ feature 'Browse execution' do
     expect(page).to have_content 'footag'
   end
 
-  scenario 'Retry failed tasks',
-           browser: :firefox do
+  scenario 'Retry failed tasks' do
     Execution.destroy_all
     FactoryGirl.create :failed_execution
     sign_in_as 'normin'
@@ -44,8 +40,7 @@ feature 'Browse execution' do
     expect(Messaging.published_messages.last.first).to be == 'task.create-trial'
   end
 
-  scenario 'Delete execution',
-           browser: :firefox do
+  scenario 'Delete execution' do
     sign_in_as 'adam'
     visit workspace_execution_path(Execution.first)
     find('button,a', text: 'Delete').click
@@ -53,23 +48,22 @@ feature 'Browse execution' do
     expect(current_path).to be == workspace_commits_path
   end
 
-  scenario 'Create a execution',
-           browser: :firefox do
+  scenario 'Create a execution' do
     Execution.destroy_all
+    FactoryGirl.create :definition
     sign_in_as 'normin'
     visit workspace_commits_path
     first('button,a', text: 'Execute').click
     find("input[name='execution[tags]']").set 'foobartag'
     submit_form
-    expect(current_path).to be == workspace_execution_path(Execution.first)
     expect(page).to have_content 'execution has been created'
     expect(page).to have_content 'foobartag'
+    expect(current_path).to be == workspace_execution_path(Execution.first)
     expect(Messaging.published_messages.last.first).to  \
       be == 'execution.create-tasks-and-trials'
   end
 
-  scenario 'View and dismiss an execution issue',
-           browser: :firefox do
+  scenario 'View and dismiss an execution issue' do
     Execution.destroy_all
     FactoryGirl.create :execution_with_issue
     issue_description = ExecutionIssue.first.description

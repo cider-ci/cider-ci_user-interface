@@ -1,16 +1,16 @@
 require 'spec_helper_feature'
 require 'spec_helper_feature_shared'
 
-feature 'Browse executions and execution', browser: :firefox do
+feature 'Browse executions and execution' do
 
   scenario 'Follow from executions to first execution' do
     sign_in_as 'normin'
     find('a', text: 'Executions').click
     expect(page).to have_content 'Executions'
     expect(current_path).to be == workspace_executions_path
-    first('td a').click
+    first('td a', text: 'Tests').click
     expect(page).to have_content 'Execution "Tests"'
-    expect(current_path).to be == workspace_execution_path(Execution.first)
+    expect(current_path).to be == workspace_execution_path(Execution.find_by(name: 'Tests'))
   end
 
   scenario 'Use the executions filter' do
@@ -20,7 +20,7 @@ feature 'Browse executions and execution', browser: :firefox do
     find('input#branch_names').set 'master'
     find('input#execution_tags').set 'adam'
     click_on('Filter')
-    expect(all('table#executions-table tbody tr.execution').count).to be == 2
+    expect(all('table#executions-table tbody tr.execution').count).to be == 9
 
     find('input#execution_tags').set 'asdfasdf'
     click_on('Filter')
@@ -28,7 +28,7 @@ feature 'Browse executions and execution', browser: :firefox do
 
     find('input#execution_tags').set 'adam'
     click_on('Filter')
-    expect(all('table#executions-table tbody tr.execution').count).to be == 2
+    expect(all('table#executions-table tbody tr.execution').count).to be == 9
 
     find('input#execution_tags').set 'asdfasdf'
     click_on('Filter')
@@ -43,7 +43,7 @@ feature 'Browse executions and execution', browser: :firefox do
     find('input#branch_names').set ''
     find('input#execution_tags').set ''
     click_on('Filter')
-    expect(all('table#executions-table tbody tr.execution').count).to be == 2
+    expect(all('table#executions-table tbody tr.execution').count).to be == 9
 
     # filter by existing tree_id but no execution
     find('input#repository_names').set 'Cider-CI Bash Demo Project'
@@ -66,7 +66,7 @@ feature 'Browse executions and execution', browser: :firefox do
   scenario 'filter by tree_id' do
     sign_in_as 'normin'
     visit workspace_executions_path
-    expect(all('table#executions-table tbody tr.execution').count).to be == 2
+    expect(all('table#executions-table tbody tr.execution').count).to be == 9
     visit workspace_executions_path(tree_id: 'b8c74ebd9260b1a2928767625946b937011a03b6')
     expect(all('table#executions-table tbody tr.execution').count).to be == 1
   end

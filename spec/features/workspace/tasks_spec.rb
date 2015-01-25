@@ -36,19 +36,19 @@ feature 'Tasks' do
   scenario 'Filter tasks from execution show action by name' do
 
     sign_in_as 'normin'
-    visit workspace_execution_path(Execution.first)
+    visit workspace_execution_path(Execution.find_by(name: 'All'))
 
     find('select#tasks_select_condition').select('All')
     click_on('Filter')
 
     expect(all('.task').count).to be >= 10
 
-    find('input#name_substring_term').set('port OR attached')
+    find('input#name_substring_term').set('Attachments OR Port')
     click_on('Filter')
 
     expect(all('.task').count).to be == 2
-    expect(page).to have_content 'port'
-    expect(page).to have_content 'attached'
+    expect(page).to have_content 'Attachments'
+    expect(page).to have_content 'Port'
 
   end
 

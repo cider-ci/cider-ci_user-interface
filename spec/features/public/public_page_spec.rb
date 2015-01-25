@@ -1,7 +1,7 @@
 require 'spec_helper_feature'
 require 'spec_helper_feature_shared'
 
-feature 'Public start page', browser: :firefox  do
+feature 'Public start page' do
 
   scenario 'automatic redirect from root to public page' do
     visit '/'
@@ -29,8 +29,7 @@ feature 'Public start page', browser: :firefox  do
 
   end
 
-  scenario 'redirect for non existing execution',
-           browser: :firefox do
+  scenario 'redirect for non existing execution' do
 
     visit '/public/executions/notarepo/master/tests'
 
@@ -38,8 +37,7 @@ feature 'Public start page', browser: :firefox  do
 
   end
 
-  scenario 'public execution redirect to private repo',
-           browser: :firefox do
+  scenario 'public execution redirect to private repo' do
 
     Repository.find('f182ec87-591a-58bc-b08e-7e83679a4b68') \
       .update_attributes! public_view_permission: false
@@ -48,7 +46,7 @@ feature 'Public start page', browser: :firefox  do
 
     # redirects
     expect(page.current_path).to be == \
-      workspace_execution_path(Execution.first)
+      workspace_execution_path(Execution.find_by(name: 'Tests'))
 
     # however we are not authorized
 
@@ -56,8 +54,7 @@ feature 'Public start page', browser: :firefox  do
 
   end
 
-  scenario 'public execution redirect for public repo',
-           browser: :firefox do
+  scenario 'public execution redirect for public repo' do
 
     Repository.find('f182ec87-591a-58bc-b08e-7e83679a4b68') \
       .update_attributes! public_view_permission: true
@@ -66,7 +63,7 @@ feature 'Public start page', browser: :firefox  do
 
     # redirects
     expect(page.current_path).to be == \
-      workspace_execution_path(Execution.first)
+      workspace_execution_path(Execution.find_by(name: 'Tests'))
 
     expect(page).to have_content 'Execution "Tests"'
 
