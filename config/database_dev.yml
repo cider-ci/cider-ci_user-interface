@@ -1,21 +1,20 @@
-
 default: &default
   adapter: postgresql
   encoding: unicode
   host: localhost
-  pool: 25
-  username: thomas
-  password: thomas
+  pool: 10
+  username: cider-ci
+  password: cider-ci
  
 development:
   <<: *default
-  database: cider_ci_dev
+  database: cider-ci_development
 
 test: &test
   <<: *default
-  database: cider_ci_test
+  database: cider-ci_test
 
 production:
-  database: cider_ci_production
+  database: cider-ci_production
   <<: *default
 
