@@ -6,7 +6,7 @@ task_defaults:
     rbenv: true
     ruby: true
     nodejs: true
-    pg93: true
+    postgresql: true
 
   environment_variables:
     RAILS_ENV: test
@@ -21,19 +21,32 @@ task_defaults:
     coverage_last_run:
       glob: 'coverage/.last_run.json'
       content-type: application/json
+    styleguide_artefacts:
+      glob: 'tmp/styleguide-ref.tar.gz'
+      content-type: application/x-compressed
+    styleguide_hashes:
+      glob: 'dev/test/styleguide-shasums.txt'
+      content-type: text/plain
 
 
   scripts:
+
     bundle: 
       timeout: 500
       order: 1
       body: bundle
+
     configer_db:
       order: 2
-      body: cider-ci/bin/create_db_config_file.rb
+      body: .cider-ci/bin/create_db_config_file.rb
+
     setup_database:
       order: 3
       body: bundle exec rake db:reset 
+
+    main: 
+      order: 6
+
     drop_test_db: 
       order: 8
       type: post_process

@@ -8,7 +8,8 @@ gem 'bootstrap-sass', '~> 3.3.1'
 gem 'bootswatch-rails'
 gem 'bunny', '>= 1.3'
 gem 'capybara', group: [:test]
-gem 'cider_ci-support', '~> 1.1.0', group: [:development, :test]
+gem 'cider_ci-support', '~> 1.2.0', group: [:development, :test]
+gem 'cider_ci-rspec_support', '>= 1.0.3', '< 2.0.0', group: [:development, :test]
 gem 'coffee-rails'
 gem 'factory_girl', group: [:development, :test]
 gem 'factory_girl_rails', group: [:development, :test]

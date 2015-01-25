@@ -1,0 +1,111 @@
+---
+"./spec/features/admin/definitions_spec.rb":
+  name: "./spec/features/admin/definitions_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/admin/definitions_spec.rb"
+"./spec/features/admin/executors_spec.rb":
+  name: "./spec/features/admin/executors_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/admin/executors_spec.rb"
+"./spec/features/admin/repositories_spec.rb":
+  name: "./spec/features/admin/repositories_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/admin/repositories_spec.rb"
+"./spec/features/admin/timeout_settings_spec.rb":
+  name: "./spec/features/admin/timeout_settings_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/admin/timeout_settings_spec.rb"
+"./spec/features/admin/users_spec.rb":
+  name: "./spec/features/admin/users_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/admin/users_spec.rb"
+"./spec/features/admin/view_service_stati_spec.rb":
+  name: "./spec/features/admin/view_service_stati_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/admin/view_service_stati_spec.rb"
+"./spec/features/admin/welcome_page_spec.rb":
+  name: "./spec/features/admin/welcome_page_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/admin/welcome_page_spec.rb"
+"./spec/features/public/attachments_spec.rb":
+  name: "./spec/features/public/attachments_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/public/attachments_spec.rb"
+"./spec/features/public/badges_small_spec.rb":
+  name: "./spec/features/public/badges_small_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/public/badges_small_spec.rb"
+"./spec/features/public/badges_spec.rb":
+  name: "./spec/features/public/badges_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/public/badges_spec.rb"
+"./spec/features/public/public_page_spec.rb":
+  name: "./spec/features/public/public_page_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/public/public_page_spec.rb"
+"./spec/features/public/sign_in_spec.rb":
+  name: "./spec/features/public/sign_in_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/public/sign_in_spec.rb"
+"./spec/features/public/sumarry_badges_spec.rb":
+  name: "./spec/features/public/sumarry_badges_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/public/sumarry_badges_spec.rb"
+"./spec/features/workspace/account_spec.rb":
+  name: "./spec/features/workspace/account_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/account_spec.rb"
+"./spec/features/workspace/commits_spec.rb":
+  name: "./spec/features/workspace/commits_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/commits_spec.rb"
+"./spec/features/workspace/execution_spec.rb":
+  name: "./spec/features/workspace/execution_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/execution_spec.rb"
+"./spec/features/workspace/executions_spec.rb":
+  name: "./spec/features/workspace/executions_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/executions_spec.rb"
+"./spec/features/workspace/results_spec.rb":
+  name: "./spec/features/workspace/results_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/results_spec.rb"
+"./spec/features/workspace/session_spec.rb":
+  name: "./spec/features/workspace/session_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/session_spec.rb"
+"./spec/features/workspace/task_spec.rb":
+  name: "./spec/features/workspace/task_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/task_spec.rb"
+"./spec/features/workspace/tasks_spec.rb":
+  name: "./spec/features/workspace/tasks_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/tasks_spec.rb"
+"./spec/features/workspace/trial_spec.rb":
+  name: "./spec/features/workspace/trial_spec.rb"
+  scripts:
+    main:
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/trial_spec.rb"
