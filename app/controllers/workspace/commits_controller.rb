@@ -3,57 +3,11 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Workspace::CommitsController < WorkspaceController
+  include Workspace::CommitsControllerModules::CommitsFilter
 
   def index
-    @commits = Commit.distinct.page(params[:page])
-
-    @commits = @commits.per(Integer(params[:per_page])) unless params[:per_page].blank?
-
-    filter_by_show_orphans
-
-    filter_by_branches_and_repository
-
-    filter_by_text_and_time
-
-    set_order_and_select
-
+    @commits = build_commits_for_params
     set_cache_signatures
-  end
-
-  def filter_by_show_orphans
-    unless params[:show_orphans].present?
-      @commits = @commits.joins(:branches)
-    end
-  end
-
-  def filter_by_branches_and_repository
-    unless branch_names_filter.empty?
-      @commits = @commits.joins(:branches) \
-        .where(branches: { name: branch_names_filter })
-    end
-
-    unless repository_names_filter.empty?
-      @commits = @commits.joins(branches: :repository) \
-        .where(repositories: { name: repository_names_filter })
-    end
-  end
-
-  def filter_by_text_and_time
-    if commit_text_search_filter
-      @commits = @commits.basic_search(commit_text_search_filter, false)
-    end
-
-    if commited_within_last_days_filter
-      @commits = @commits \
-        .where(%[ "commits"."committer_date"  > ( now() - interval '? days') ],
-               commited_within_last_days_filter)
-    end
-  end
-
-  def set_order_and_select
-    @commits = @commits.reorder(committer_date: :desc, depth: :desc)
-    @commits = @commits.select(:committer_date, :committer_name,
-                               :depth, :id, :subject, :tree_id, :updated_at)
   end
 
   def set_cache_signatures

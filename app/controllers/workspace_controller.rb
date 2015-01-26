@@ -36,7 +36,7 @@ class WorkspaceController < ApplicationController
   end
 
   def commited_within_last_days_filter
-    Integer(params[:commited_within_last_days]) rescue nil
+    Integer(params[:commited_within_last_days]) rescue 10
   end
 
   def commit_text_search_filter

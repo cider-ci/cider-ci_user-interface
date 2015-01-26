@@ -11,7 +11,7 @@ tasks:
     name: Code similarity with flay
     scripts: 
       main: 
-        body: bundle exec cider-ci_flay app/
+        body: bundle exec cider-ci_flay -m 18 app/
 
   lint_ruby:
     name: Lint/Stylecheck with Rubocop

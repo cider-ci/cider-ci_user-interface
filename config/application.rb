@@ -53,7 +53,7 @@ module CiderCI
 
     config.active_record.timestamped_migrations = false
 
-    config.log_level= ENV["RAILS_LOG_LEVEL"] if ENV["RAILS_LOG_LEVEL"].present? 
+    config.log_level= ENV["RAILS_LOG_LEVEL"].present? ? ENV["RAILS_LOG_LEVEL"] : :info
 
     config.log_tags = [:port, :remote_ip, lambda{|req| Time.now.strftime("%T")} ]
 
