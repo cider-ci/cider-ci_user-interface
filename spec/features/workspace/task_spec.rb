@@ -43,6 +43,9 @@ feature 'Task' do
     sign_in_as 'normin'
     visit workspace_execution_path(execution)
 
+    find('select#tasks_select_condition').select('All')
+    click_on('Filter')
+
     find('#tasks').first('a,button', text: 'Retry').click
     expect(page).to have_content 'retrying'
 
