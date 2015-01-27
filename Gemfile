@@ -26,7 +26,7 @@ gem 'kaminari'
 gem 'kramdown'
 gem 'newrelic_rpm'
 gem 'pg', platform: 'mri'
-gem 'pg_tasks', '>= 1.0.0', '< 2.0.0'
+gem 'pg_tasks', '>= 1.1.0', '< 2.0.0'
 gem 'poltergeist', group: [:test]
 gem 'pry', group: [:development, :test]
 gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
