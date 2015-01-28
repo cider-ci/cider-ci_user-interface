@@ -6,7 +6,8 @@ module Workspace::ExecutionsControllerModules::TasksFilter
   extend ActiveSupport::Concern
 
   def set_and_filter_tasks(params)
-    @tasks = filter_tasks_by_substring_search filter_tasks_by_condition \
+    @tasks = filter_tasks_by_substring_search \
+      filter_tasks_by_condition \
       @execution.tasks.reorder(:name).page(params[:page])
   end
 
@@ -25,8 +26,7 @@ module Workspace::ExecutionsControllerModules::TasksFilter
 
   def filter_tasks_by_condition(tasks)
     # @tasks_select_condition must be an instance var!; it is used in views
-    @tasks_select_condition = (
-      params[:tasks_select_condition] || :unpassed).to_sym
+    @tasks_select_condition = tasks_select_condition
     case @tasks_select_condition
     when :all
       tasks
@@ -36,6 +36,23 @@ module Workspace::ExecutionsControllerModules::TasksFilter
       tasks.where("state <> 'passed'")
     when :with_failed_trials
       tasks.with_failed_trials
+    when :passed
+      tasks.where(state: 'passed')
+    when
+      tasks
+    end
+  end
+
+  def tasks_select_condition
+    if params[:tasks_select_condition].present?
+      params[:tasks_select_condition].to_sym
+    else
+      case @execution.state
+      when 'pending', 'executing'
+        :unpassed
+      else
+        @execution.state.to_sym
+      end
     end
   end
 

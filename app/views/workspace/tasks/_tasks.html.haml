@@ -13,7 +13,7 @@
       %fieldset
         .pull-right
           %ul.list-inline
-            %li 
+            %li#tasks-select-condition-item.reload{data: {cache_tag: @tasks_select_condition}}
               .form-group
                 %label.sr-only{for: "tasks_select_condition"}
                 = select_tag :tasks_select_condition, 

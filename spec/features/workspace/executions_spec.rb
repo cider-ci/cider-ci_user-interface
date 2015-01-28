@@ -87,8 +87,8 @@ feature 'Browse executions and execution' do
 
   scenario 'View execution and tree attachment' do
     sign_in_as 'normin'
-    visit workspace_execution_path(Execution.first)
-    find('a', text: 'Attachments').click
+    visit workspace_execution_path(Execution.find_by name: 'Attachments-Demo')
+    first('a', text: 'Attachments').click
     find('a', text: 'log/hello.log').click
     expect(page).to have_content 'Attachment /log/hello.log'
     expect(page.text.downcase).to have_content 'content-type:'
