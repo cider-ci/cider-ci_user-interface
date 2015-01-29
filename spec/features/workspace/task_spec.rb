@@ -53,4 +53,17 @@ feature 'Task' do
       be == 'task.create-trial'
   end
 
+  scenario 'View and dismiss an execution issue' do
+    Execution.destroy_all
+    FactoryGirl.create :execution_with_issue
+    sign_in_as 'normin'
+    visit workspace_execution_path(Execution.first)
+    find('li.trial a').click
+    expect(page.text).to match /trial has .+ issue/
+    find('a', text: 'Issue').click
+    find('.issue.panel') # there is a issue panel
+    find('a,button', text: 'Dismiss').click
+    expect(all('.issue.panel')).to be_empty
+  end
+
 end

@@ -33,7 +33,8 @@
               %span.text-muted Issues
             - else 
               = link_to issues_workspace_execution_path(execution) do
-                %span.text-danger #{ecs.execution_issues_count} Issues
+                %span.text-danger= pluralize(ecs.execution_issues_count,"Issue")
+
           %li 
             = link_to specification_workspace_execution_path(execution) do
               Specification
@@ -49,8 +50,7 @@
     #issues-alert.reload{data: {cache_tag: ecs.execution_issues_count}}
       - if ecs.execution_issues_count >= 1
         .alert.alert-danger
-          %p 
-            This execution has issues! 
+          %p This execution has #{pluralize(ecs.execution_issues_count,"issue")}! 
 
 
     #execution.execution

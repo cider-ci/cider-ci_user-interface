@@ -3,8 +3,7 @@ require 'spec_helper_feature_shared'
 
 feature 'Trial' do
 
-  scenario 'view trial as public user and signed-in user',
-           browser: :firefox do
+  scenario 'view trial as public user and signed-in user' do
 
     trial = Trial.first
     repos = trial.task.execution.repositories
@@ -26,7 +25,7 @@ feature 'Trial' do
 
   end
 
-  scenario 'View attachment', browser: :firefox  do
+  scenario 'View attachment' do
 
     attachment = TrialAttachment.first
     trial_id = attachment.path.split('/').second
@@ -47,6 +46,14 @@ feature 'Trial' do
     repos.each { |r| r.update_attributes! public_view_permission: true }
     visit current_path
     expect(page).not_to have_content '401 Unauthorized'
+
+  end
+
+  scenario 'View and dismiss a trial issue' do
+    Execution.destroy_all
+    FactoryGirl.create :execution_with_issue
+    sign_in_as 'normin'
+    visit workspace_execution_path(Execution.first)
 
   end
 

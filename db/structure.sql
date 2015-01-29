@@ -368,8 +368,8 @@ CREATE TABLE email_addresses (
 
 CREATE TABLE execution_issues (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    title text,
     description text,
-    stacktrace text,
     type character varying(255) DEFAULT 'error'::character varying NOT NULL,
     execution_id uuid NOT NULL,
     created_at timestamp without time zone DEFAULT now(),
@@ -606,6 +606,22 @@ CREATE TABLE trial_attachments (
 
 
 --
+-- Name: trial_issues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE trial_issues (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    title text,
+    description text,
+    type character varying(255) DEFAULT 'error'::character varying NOT NULL,
+    trial_id uuid NOT NULL,
+    created_at timestamp without time zone DEFAULT now(),
+    updated_at timestamp without time zone DEFAULT now(),
+    CONSTRAINT valid_type CHECK (((type)::text = ANY ((ARRAY['error'::character varying, 'warning'::character varying])::text[])))
+);
+
+
+--
 -- Name: trials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -782,6 +798,14 @@ ALTER TABLE ONLY tree_attachments
 
 ALTER TABLE ONLY trial_attachments
     ADD CONSTRAINT trial_attachments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: trial_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY trial_issues
+    ADD CONSTRAINT trial_issues_pkey PRIMARY KEY (id);
 
 
 --
@@ -1096,6 +1120,13 @@ CREATE UNIQUE INDEX index_trial_attachments_on_path ON trial_attachments USING b
 
 
 --
+-- Name: index_trial_issues_on_trial_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_trial_issues_on_trial_id ON trial_issues USING btree (trial_id);
+
+
+--
 -- Name: index_trials_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1300,6 +1331,13 @@ CREATE TRIGGER update_updated_at_column_of_trial_attachments BEFORE UPDATE ON tr
 
 
 --
+-- Name: update_updated_at_column_of_trial_issues; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_trial_issues BEFORE UPDATE ON trial_issues FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
 -- Name: update_updated_at_column_of_trials; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1441,6 +1479,14 @@ ALTER TABLE ONLY tasks
 
 
 --
+-- Name: trial_issues_trial_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY trial_issues
+    ADD CONSTRAINT trial_issues_trial_id_fk FOREIGN KEY (trial_id) REFERENCES trials(id) ON DELETE CASCADE;
+
+
+--
 -- Name: trials_task_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1497,6 +1543,10 @@ INSERT INTO schema_migrations (version) VALUES ('118');
 INSERT INTO schema_migrations (version) VALUES ('119');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
+
+INSERT INTO schema_migrations (version) VALUES ('120');
+
+INSERT INTO schema_migrations (version) VALUES ('121');
 
 INSERT INTO schema_migrations (version) VALUES ('15');
 

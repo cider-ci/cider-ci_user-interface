@@ -23,6 +23,7 @@ class Trial < ActiveRecord::Base
   before_create { self.id ||= SecureRandom.uuid }
   belongs_to :task
   belongs_to :executor
+  has_many :trial_issues
 
   def trial_attachments
     TrialAttachment.where("path like '/#{id}/%'")

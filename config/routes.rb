@@ -37,6 +37,8 @@ CiderCI::Application.routes.draw do
         post 'set_failed'
         get 'attachments'
         get 'result'
+        get :issues, action: 'issues'
+        delete "issues/:issue_id", action: 'delete_issue', as: 'issue'
       end
     end
 

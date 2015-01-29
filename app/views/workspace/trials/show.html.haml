@@ -3,6 +3,7 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - trial ||= @trial 
+- issues = trial.trial_issues
 - cache [trial.cache_signature,
           trial.trial_attachments.collection_cache_tag,admin?] do
 
@@ -18,12 +19,27 @@
               Attachments
           - else 
             %span.text-muted Attachments
+
+        %li#issues-link.reload{data: {cache_tag: issues.count}}
+          - if issues.count <= 0
+            %span.text-muted Issues
+          - else 
+            = link_to issues_workspace_trial_path(trial) do
+              %span.text-danger= pluralize(issues.count,"Issue")
+
         %li 
           - if trial.result 
             = link_to result_workspace_trial_path(trial) do
               Result
           - else 
             %span.text-muted Result
+
+
+  #issues-alert.reload{data: {cache_tag: issues.count}}
+    - if issues.count >= 1
+      .alert.alert-danger
+        %p This trial has #{pluralize(issues.count,"issue")}! 
+
 
 
   %h1{style: "margin-top: 10px"}

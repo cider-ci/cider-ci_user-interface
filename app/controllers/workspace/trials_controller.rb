@@ -23,4 +23,14 @@ class Workspace::TrialsController < WorkspaceController
     @trial = Trial.find params[:id]
   end
 
+  def issues
+    @trial = Trial.find(params[:id])
+    @issues = @trial.trial_issues.page(params[:page])
+  end
+
+  def delete_issue
+    TrialIssue.find(params[:issue_id]).destroy
+    redirect_to issues_workspace_trial_path(params[:id])
+  end
+
 end

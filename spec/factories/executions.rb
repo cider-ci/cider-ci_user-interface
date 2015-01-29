@@ -78,11 +78,13 @@ FactoryGirl.define do
     after(:create) do |execution|
       FactoryGirl.create :execution_issue,
                          type: 'error', execution: execution
+      FactoryGirl.create :failed_task, execution: execution
     end
   end
 
   factory :execution_issue do
-    description { Faker::Lorem.sentence }
+    title { Faker::Lorem.words(3).join(' ') }
+    description { Faker::Lorem.paragraph }
     type { %w(error warning).sample }
   end
 end
