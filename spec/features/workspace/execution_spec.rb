@@ -53,8 +53,8 @@ feature 'Browse execution' do
     FactoryGirl.create :definition
     sign_in_as 'normin'
     visit workspace_commits_path
-    first('button,a', text: 'Execute').click
-    find("input[name='execution[tags]']").set 'foobartag'
+    first('button,a', text: 'Run').click
+    first("input[name='execution[tags]']").set 'foobartag'
     submit_form
     expect(page).to have_content 'execution has been created'
     expect(page).to have_content 'foobartag'

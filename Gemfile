@@ -42,6 +42,7 @@ gem 'sass-rails'
 gem 'sdoc', group: [:doc], require: false
 gem 'selenium-webdriver', group: [:test]
 gem 'simplecov', require: false, group: :test
+gem 'simplecov-html', require: false, group: ['test'], git: 'https://github.com/eins78/simplecov-html.git', ref: '3fac7b20bbe3967d1f9d55c3166f348d620a2005'
 gem 'textacular', git:  'https://github.com/DrTom/textacular.git', ref: '778fd0952f949f64eba3ff03e6b97b247dc54d40'
 gem 'therubyrhino', platform: :jruby
 gem 'uglifier', '~> 1.3'

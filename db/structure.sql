@@ -256,12 +256,13 @@ CREATE TABLE executions (
     state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
     tree_id character varying(40) NOT NULL,
     name character varying(255) NOT NULL,
-    priority integer DEFAULT 5,
+    priority integer DEFAULT 0,
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     specification_id uuid,
     expanded_specification_id uuid,
     result jsonb,
+    description text,
     CONSTRAINT check_executions_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -396,7 +397,7 @@ CREATE TABLE tasks (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     execution_id uuid NOT NULL,
     state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    priority integer DEFAULT 5 NOT NULL,
+    priority integer DEFAULT 0 NOT NULL,
     traits character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
     name text,
     error text DEFAULT ''::text NOT NULL,
@@ -1547,6 +1548,8 @@ INSERT INTO schema_migrations (version) VALUES ('12');
 INSERT INTO schema_migrations (version) VALUES ('120');
 
 INSERT INTO schema_migrations (version) VALUES ('121');
+
+INSERT INTO schema_migrations (version) VALUES ('122');
 
 INSERT INTO schema_migrations (version) VALUES ('15');
 

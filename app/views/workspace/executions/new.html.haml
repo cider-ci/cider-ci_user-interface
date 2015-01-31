@@ -2,31 +2,52 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- commit ||= @commit
-- execution ||= @execution
-%h1 
-  New Execution for Commit
-  %span.commit-id #{commit.id[0..5]}
-    
-= form_for @execution, url: workspace_executions_path,  method: 'POST', html: {class: "form-horizontal", role: "form" } do |f|
+- commits = @commits
 
-  = hidden_field_tag :commit_id, params[:commit_id]
+%h1 Run a Execution 
 
-  =form_group "Execution", control_id: "definition_id" do
-    = select_tag :execution_data, 
-      options_for_select(*@args_for_execution_selection),
-      autofocus: true, class: "form-control"
+#commits
+  %h2 For #{ commits.count > 1 ? "Commits" : "Commit"}
+  %table.commits.table.table-striped
+    %thead
+      %tbody
+        != render partial: "commit_tr", collection: commits, as: :commit
 
-  =form_group "Tags", control_id: "execution_tags" do
-    =text_field :execution, :tags, 
-      placeholder: "new tag 1, new tag 2, ...", 
-      data:{autocomplete_path: workspace_tags_path}, 
-      value: "", class: "form-control"
 
-  =form_group "Priority" do |opts|
-    = f.text_field :priority, type: :number, class: "form-control", id: opts[:control_id]
+- @creatable_executions.map{|attrs| Execution.new(attrs)}.each do |execution| 
 
-  =form_group "" do
-    =button_tag type: 'submit', class: "btn btn-primary pull-right" do
-      %i.icon-execution
-      Execute
+  .well.well-sm
+
+    %h4= execution.name
+
+    - if execution.description.present? 
+      = markdown(execution.description)
+
+
+    = form_for execution, url: workspace_executions_path,  
+      method: 'POST', html: {class: "form-inline", role: "form" } do |f|
+
+      = f.hidden_field :tree_id
+
+      .form-group
+        = f.text_field :name, class: "form-control hidden"
+
+      .form-group
+        = f.text_field :specification_id, class: "form-control hidden"
+
+      .form-group
+        %label Tags: 
+        = f.text_field  :tags, 
+          placeholder: "tag 1, tag 2, ...", 
+          data:{autocomplete_path: workspace_tags_path}, 
+          value: "", class: "form-control"
+
+      .form-group
+        %label Priority:
+        = f.text_field :priority, type: :number, class: "form-control" 
+
+      .form-group
+        =button_tag type: 'submit', class: "btn btn-primary" do
+          %i.icon-execution
+          Run 
+

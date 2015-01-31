@@ -1,11 +1,18 @@
 executions:
   Tests: 
-    default: true
     specification: 
       _cider-ci_include: /.cider-ci/test_spec.yml
+    description: >
+      Run all the tests.
   Coverage: 
     specification: 
       _cider-ci_include: /.cider-ci/coverage_spec.yml
-  Code-Check: 
+    description: >
+      Determine and validate the coverage of the tests.
+      Needs to be run **after** the `Tests` have passed. 
+  Code-Checks: 
     specification: 
       _cider-ci_include: /.cider-ci/code-check_spec.yml
+    description: >
+      Ensure code-style, complexity, and (the absence) of  
+      duplications are up to standards. 

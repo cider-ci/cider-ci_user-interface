@@ -4,16 +4,18 @@ module Workspace::ExecutionsControllerModules
     extend ActiveSupport::Concern
     include Concerns::UrlBuilder
 
-    def set_args_for_execution_selection(id)
+    def set_creatable_executions(id)
       db_definitions = formatted_db_definitions
       dotfile_definitions = get_dotfile_definitions_with_rescue id
 
       definitions = db_definitions.merge(dotfile_definitions) \
         .map {  |_, v| v }.sort_by { |v| v[:name] }
 
-      @args_for_execution_selection =
-        [definitions.map { |d| [d[:name], selected_data_value(d)] },
-         selected_data_value(definitions.find { |v| v[:default] } || {})]
+      @creatable_executions = definitions.map do |values|
+        values.slice(:name, :specification_id, :description).merge(tree_id: id)
+      end.reject do |values|
+        Execution.find_by(tree_id: id, name: values[:name])
+      end.sort_by { |v|v[:name] }
     end
 
     private

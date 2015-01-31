@@ -113,8 +113,8 @@ def sign_out
 end
 
 def submit_form(id = nil)
-  el = (id ? find("form##{id}") : page)
-  el.find("[type='submit']").click
+  el = (id ? first("form##{id}") : page)
+  el.first("[type='submit']").click
 end
 
 def current_fragment

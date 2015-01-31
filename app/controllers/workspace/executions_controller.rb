@@ -27,12 +27,9 @@ class Workspace::ExecutionsController < WorkspaceController
   end
 
   def create_execution
-    commit = Commit.find params[:commit_id]
-    execution_parameters = JSON.parse(params[:execution_data]).merge(
-      tree_id: commit.tree_id)
-
     ActiveRecord::Base.transaction do
-      execution = Execution.create! execution_parameters
+      execution = Execution.create! params[:execution].permit(
+        :tree_id, :specification_id, :name, :description)
       add_default_tags execution
       execution
     end
@@ -46,7 +43,7 @@ class Workspace::ExecutionsController < WorkspaceController
   end
 
   def branches_for_commit_param
-    Commit.find(params[:commit_id]).try(:head_of_branches) || []
+    Commit.where(tree_id: params[:execution][:tree_id]).map(&:head_of_branches).flatten
   end
 
   def repository_names_for_branches(branches)
@@ -74,9 +71,13 @@ class Workspace::ExecutionsController < WorkspaceController
   end
 
   def new
-    @execution = Execution.new
-    @commit = Commit.find params[:commit_id]
-    set_args_for_execution_selection @commit.id
+    @commits = Commit.where(tree_id: params[:tree_id])
+    set_creatable_executions params[:tree_id]
+    if @creatable_executions.empty?
+      @alerts[:warnings] << "There are no executions available to be run.
+      The desired execution might already exist
+      or it was not defined in the first place.".squish
+    end
   end
 
   def show

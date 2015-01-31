@@ -3,5 +3,6 @@
 FactoryGirl.define do
   factory :definition do
     name { Faker::Name.last_name }
+    specification { Specification.first }
   end
 end
