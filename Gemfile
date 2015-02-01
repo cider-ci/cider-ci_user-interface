@@ -26,7 +26,6 @@ gem 'kaminari'
 gem 'kramdown'
 gem 'newrelic_rpm'
 gem 'pg', platform: 'mri'
-gem 'pg_tasks', '>= 1.1.0', '< 2.0.0'
 gem 'poltergeist', group: [:test]
 gem 'pry', group: [:development, :test]
 gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
@@ -49,6 +48,7 @@ gem 'uglifier', '~> 1.3'
 gem 'uuidtools'
 
 
+gem 'pg_tasks', '>= 1.2.0', '< 2.0.0'
 # gem 'pg_tasks', git: 'https://github.com/DrTom/rails_pg-tasks.git', ref: '6ef9f33dc3057b09c81f429234002cad63815f5b'
 # gem 'pg_tasks', path: '/Users/thomas/Programming/ROR/pg_tasks'
 

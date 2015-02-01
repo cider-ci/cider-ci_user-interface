@@ -1,5 +1,43 @@
 
 
+SELECT trials.*
+FROM trials
+INNER JOIN tasks ON tasks.id = trials.task_id
+INNER JOIN executions ON executions.id = tasks.execution_id
+WHERE ((trials.state = 'pending'
+        AND exists(
+                     (SELECT 1
+                      FROM executors_with_load
+                      WHERE (((relative_load < 1
+                               AND enabled = TRUE)
+                              AND (tasks.traits <@ executors_with_load.traits))
+                             AND (last_ping_at > (now() - interval '1 Minutes'))))))
+       AND NOT EXISTS(
+                        (SELECT 1
+                         FROM trials active_trials
+                         INNER JOIN tasks active_tasks ON active_tasks.id = active_trials.task_id
+                         WHERE ((active_trials.state IN ('executing', 'dispatching'))
+                                AND active_tasks.exclusive_global_resources && tasks.exclusive_global_resources))))
+ORDER BY executions.priority DESC,
+         executions.created_at ASC,
+         tasks.priority DESC,
+         tasks.created_at ASC,
+         trials.created_at ASC LIMIT 1
+        ;
+
+
+
+SELECT 1
+FROM trials active_trials
+INNER JOIN tasks active_tasks ON active_tasks.id = active_trials.task_id
+WHERE true 
+AND (active_trials.state IN ('executing', 'dispatching'))
+AND active_tasks.exclusive_global_resources && active_tasks.exclusive_global_resources 
+;
+
+
+
+
 explain ANALYZE
 SELECT id
 FROM trials

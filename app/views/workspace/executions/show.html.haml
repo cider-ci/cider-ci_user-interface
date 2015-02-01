@@ -78,6 +78,7 @@
         %span#header-label.reload.label{data: {cache_tag: execution.state}, class: label_class_for_state(state)}<>
           %i{class: icon_class_for_state(state)}<>
         %span &nbsp; Execution "#{execution.name}"
+
       
       .row
         .col-md-9
@@ -86,6 +87,9 @@
           = render 'tags', tags: execution.tags.sort, id: "execution-tags"
 
       = render 'summary_stats', execution: execution, cache_tag: cache_tag
+
+      - if execution.description.present?
+        .execution-description= markdown(execution.description) 
 
       - cache relevant_ccss  do |commits_cache_signature|
       

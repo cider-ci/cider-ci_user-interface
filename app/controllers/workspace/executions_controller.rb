@@ -82,7 +82,7 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def show
     @execution = Execution.select(:id, :state, :updated_at,
-                                  :name, :tree_id, :result).find(params[:id])
+                                  :name, :tree_id, :description, :result).find(params[:id])
     require_sign_in unless @execution.public_view_permission?
     @link_params = params.slice(:branch, :page, :repository, :execution_tags)
     @trials = Trial.joins(task: :execution) \

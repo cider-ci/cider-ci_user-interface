@@ -23,17 +23,13 @@
     - if execution.description.present? 
       = markdown(execution.description)
 
-
     = form_for execution, url: workspace_executions_path,  
       method: 'POST', html: {class: "form-inline", role: "form" } do |f|
 
       = f.hidden_field :tree_id
-
-      .form-group
-        = f.text_field :name, class: "form-control hidden"
-
-      .form-group
-        = f.text_field :specification_id, class: "form-control hidden"
+      = f.hidden_field :description
+      = f.hidden_field :name
+      = f.hidden_field :specification_id
 
       .form-group
         %label Tags: 

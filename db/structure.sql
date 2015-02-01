@@ -405,6 +405,7 @@ CREATE TABLE tasks (
     updated_at timestamp without time zone DEFAULT now(),
     task_spec_id uuid,
     result jsonb,
+    exclusive_resources character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
     CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -1079,6 +1080,13 @@ CREATE INDEX index_tasks_on_created_at ON tasks USING btree (created_at);
 
 
 --
+-- Name: index_tasks_on_exclusive_resources; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tasks_on_exclusive_resources ON tasks USING btree (exclusive_resources);
+
+
+--
 -- Name: index_tasks_on_execution_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1550,6 +1558,8 @@ INSERT INTO schema_migrations (version) VALUES ('120');
 INSERT INTO schema_migrations (version) VALUES ('121');
 
 INSERT INTO schema_migrations (version) VALUES ('122');
+
+INSERT INTO schema_migrations (version) VALUES ('123');
 
 INSERT INTO schema_migrations (version) VALUES ('15');
 
