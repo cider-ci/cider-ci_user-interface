@@ -53,6 +53,8 @@ feature 'Browse execution' do
     FactoryGirl.create :definition
     sign_in_as 'normin'
     visit workspace_commits_path
+    find('select#commited_within_last_days').select('10 years')
+    click_on('Filter')
     first('button,a', text: 'Run').click
     first("input[name='execution[tags]']").set 'foobartag'
     submit_form
