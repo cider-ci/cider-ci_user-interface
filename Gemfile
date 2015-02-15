@@ -32,7 +32,7 @@ gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
 gem 'puma'
 gem 'rack-mini-profiler'
 gem 'rails', '4.1.8'
-gem 'rails_config', git: 'https://github.com/DrTom/rails_config.git', ref: '3c8c94612da5f9470034abfdf65a4234efcec9bb'  
+gem 'rails_config', git: 'https://github.com/DrTom/rails_config.git', ref: 'master'  
 gem 'rest-client'
 gem 'rspec-rails', group: [:development, :test]
 gem 'rubocop', group: [:development, :test]

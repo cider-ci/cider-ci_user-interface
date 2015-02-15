@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/DrTom/rails_config.git
-  revision: 3c8c94612da5f9470034abfdf65a4234efcec9bb
-  ref: 3c8c94612da5f9470034abfdf65a4234efcec9bb
+  revision: 1c277ea9ef06dcd3c5a258805ecadab7884e6a16
+  ref: master
   specs:
     rails_config (0.5.0.beta1)
       activesupport (>= 3.0)
