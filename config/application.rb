@@ -6,15 +6,15 @@ require 'rails/all'
 # you've limited to :test, :development, or :production.
 Bundler.require(:default, Rails.env)
 
-# fixes an issue with Oracles java, jruby and encrypted cookies 
-if RUBY_PLATFORM == "java"
-  # jce_class.getDeclaredField("isRestricted") will throw an exception 
+# fixes an issue with Oracles java, jruby and encrypted cookies
+if RUBY_PLATFORM == 'java'
+  # jce_class.getDeclaredField("isRestricted") will throw an exception
   # on the free java implementation; but we don't to patch it there anyways
-  begin  
-    jce_class =  java::lang::Class.forName("javax.crypto.JceSecurity")
-    field = jce_class.getDeclaredField("isRestricted")
+  begin
+    jce_class =  java::lang::Class.forName('javax.crypto.JceSecurity')
+    field = jce_class.getDeclaredField('isRestricted')
     field.setAccessible(true)
-    field.set(nil,false)
+    field.set(nil, false)
   rescue Exception => e
   end
 end
@@ -32,15 +32,15 @@ module CiderCI
     # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
     # config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
     # config.i18n.default_locale = :de
-     
+
     # Turn time stamping off,  there is an issue with timezones (in dev. mode
-    # at least) etc.  ; 
+    # at least) etc.  ;
     # timestamping is handled via triggers and defaults in
     # postgres
     config.active_record.record_timestamps = false
-    
+
     config.autoload_paths += \
-      %w(lib services messaging).map{|dir| Rails.root.join("app",dir)} 
+      %w(lib services messaging).map { |dir| Rails.root.join('app', dir) }
 
     config.active_record.schema_format = :sql
 
@@ -48,19 +48,18 @@ module CiderCI
     config.generators.javascripts = false
     config.generators.stylesheets = false
 
-    config.generators.view_specs= false
+    config.generators.view_specs = false
     config.generators.helper_specs = false
 
     config.active_record.timestamped_migrations = false
 
-    config.log_level= ENV["RAILS_LOG_LEVEL"].present? ? ENV["RAILS_LOG_LEVEL"] : :info
+    config.log_level = ENV['RAILS_LOG_LEVEL'].present? ? ENV['RAILS_LOG_LEVEL'] : :info
 
-    config.log_tags = [:port, :remote_ip, lambda{|req| Time.now.strftime("%T")} ]
+    config.log_tags = [:port, :remote_ip, ->(req) { Time.now.strftime('%T') }]
 
     config.action_controller.relative_url_root = ENV['RAILS_RELATIVE_URL_ROOT'] or '/cider-ci/ui'
 
     config.cache_store = :memory_store
-
 
   end
 end

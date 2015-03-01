@@ -4,6 +4,7 @@
 
 - block_output ||= nil
 %tr.executor.reload{id: executor.id,  data: {cache_tag: "#{executor.updated_at}  #{executor.current_load}"}}
+  %td.name #{executor.name} 
   %td.enabled
     - if executor.enabled 
       %i.success.fa.fa-check
@@ -17,13 +18,10 @@
         %i.success.icon-online.fa.fa-heart
       - else
         %i.warning.fa.fa-heart-o
-  %td.last-ping-at
-    =render 'humanized_time_from_now', at: executor.last_ping_at
-  %td.name #{executor.name} @ #{executor.host}
   %td
     .load.badge
       %i{class: (executor.relative_load > 0 ? "icon-executing" : "")}
       %span #{executor.current_load} / #{executor.max_load}
-  %td= executor.traits.join(", ")
+
   - if block_output
     = block_output 

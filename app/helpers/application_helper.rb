@@ -4,21 +4,9 @@
 
 module ApplicationHelper
 
-  def api_path
-    Settings.api_service.path
-  end
-
-  def api_base_url
-    api_service =  Settings.api_service
-    '' + Concerns::UrlBuilder.protocol(api_service) +
-      (api_service.host ? "//#{api_service.host}" : '') +
-    (api_service.port ? ":#{api_service.port}" : '') +
-    api_service.path
-  end
-
   def render_summary_svgbox(view_params)
     capture(
-    render partial: 'summary_svgbox', locals: view_params
+      render partial: 'summary_svgbox', locals: view_params
     )
   end
 

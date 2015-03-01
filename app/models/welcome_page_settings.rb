@@ -1,3 +1,3 @@
 class WelcomePageSettings < ActiveRecord::Base
-  include Concerns::Settings
+  include ::Concerns::BaseSettings
 end

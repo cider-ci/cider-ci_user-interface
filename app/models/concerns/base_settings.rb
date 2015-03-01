@@ -3,7 +3,7 @@
 #  See the LICENSE.txt file provided with this software.
 
 module Concerns
-  module Settings
+  module BaseSettings
     extend ActiveSupport::Concern
 
     module ClassMethods

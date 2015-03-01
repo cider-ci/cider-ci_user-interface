@@ -21,7 +21,7 @@ class Executor < ActiveRecord::Base
   end
 
   def to_s
-    "#{name} @ #{host}"
+    "#{name}"
   end
 
 end

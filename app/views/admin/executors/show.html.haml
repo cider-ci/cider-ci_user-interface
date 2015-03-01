@@ -1,0 +1,78 @@
+- executor ||= @executor
+
+%ol.breadcrumb 
+  = render "/breadcrumbs/admin/executor"
+
+.btn-group.actions.pull-right
+
+
+  =link_to admin_executor_path(@executor), method: 'DELETE', class: "btn btn-danger btn-sm" do
+    %i.icon-delete
+    Delete
+  =link_to edit_admin_executor_path(@executor) , class: "btn btn-warning btn-sm" do
+    %i.icon-edit
+    Edit
+
+
+%h1 Executor "#{@executor.name}"
+
+%h2 Status
+
+%table.table.table-striped
+  %thead
+  %tbody
+    %tr 
+      %td Enabled
+      %td.enabled
+        - if @executor.enabled 
+          %i.success.fa.fa-check
+        - else 
+          %i.icon-unchecked
+    %tr
+      %td Online
+      %td.online
+        - unless executor.enabled 
+          %i.icon-offline
+        - else
+          - if executor.online? 
+            %i.success.icon-online.fa.fa-heart
+          - else
+            %i.warning.fa.fa-heart-o
+
+    %tr
+      %td Last ping
+      %td.last-ping-at
+        =render 'humanized_time_from_now', at: executor.last_ping_at
+
+    %tr 
+      %td Load
+      %td
+        .load.badge
+          %i{class: (executor.relative_load > 0 ? "icon-executing" : "")}
+          %span #{executor.current_load} / #{executor.max_load}
+
+%h2 Http-Properties
+
+%table.table.table-striped
+  %thead
+  %tbody
+    %tr 
+      %td Base URL
+      %td= @executor.base_url
+    %tr 
+      %td Basic Auth. User Name
+      %td= @executor.name
+    %tr 
+      %td Basic Auth. Password
+      %td= OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'),Settings.secret,@executor.name)
+
+
+
+
+%h2 Traits
+
+- @executor.traits.each do |trait| 
+  %span.label.label-default= trait
+
+
+

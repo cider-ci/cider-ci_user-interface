@@ -2,7 +2,8 @@ class TrialAttachment < ActiveRecord::Base
   include Concerns::UrlBuilder
 
   def url
-    service_base_url(::Settings.storage_service) + '/trial-attachments' + path
+    service_base_url(::Settings.services.storage.http_external, omit_protocol: true) \
+      + '/trial-attachments' + path
   end
 
   def trial_id

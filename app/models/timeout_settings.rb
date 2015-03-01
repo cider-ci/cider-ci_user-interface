@@ -3,5 +3,5 @@
 #  See the LICENSE.txt file provided with this software.
 
 class TimeoutSettings < ActiveRecord::Base
-  include Concerns::Settings
+  include ::Concerns::BaseSettings
 end

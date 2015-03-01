@@ -57,7 +57,7 @@ class Admin::DefinitionsController < AdminController
         @definition = Definition.find params[:id]
         @specification =
           Specification.find_or_create_by_data! \
-          YAML.load(params[:specification][:data])
+            YAML.load(params[:specification][:data])
         @definition.update_attributes! params[:definition] \
           .permit!.merge(specification: @specification)
         redirect_to admin_definitions_path,

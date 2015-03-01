@@ -32,17 +32,21 @@ class Admin::ExecutorsController < AdminController
   def update
       @executor =  Executor.find params[:id]
       @executor.update_attributes! processed_params
-      redirect_to admin_executors_path,
+      redirect_to admin_executor_path(@executor),
                   flash: { successes: ['The executor has been updated.'] }
   end
 
   def processed_params
     traits = params[:executor].try(:[], :traits).try(:split, ',')
-    .try(:map) { |s|s.strip }.try(:sort).try(:uniq)
-    params[:executor].try(:permit, :name, :host, :port, :ssl, :server_overwrite,
-                          :server_host, :server_port, :server_ssl, :max_load,
+    .try(:map) { |s| s.strip }.try(:sort).try(:uniq)
+    params[:executor].try(:permit, :name,
+                          :max_load, :base_url,
                           :enabled, :traits) \
                       .try(:merge, traits: traits)
+  end
+
+  def show
+    @executor = ExecutorWithLoad.find params[:id]
   end
 
 end

@@ -33,10 +33,10 @@
 
       .form-group
         %label Tags: 
-        = f.text_field  :tags, 
+        = text_field_tag :tags, "", 
           placeholder: "tag 1, tag 2, ...", 
           data:{autocomplete_path: workspace_tags_path}, 
-          value: "", class: "form-control"
+          class: "form-control"
 
       .form-group
         %label Priority:

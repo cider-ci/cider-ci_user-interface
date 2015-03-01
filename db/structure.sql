@@ -470,21 +470,15 @@ CREATE VIEW execution_stats AS
 CREATE TABLE executors (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying(255),
-    host character varying(255) NOT NULL,
-    port integer DEFAULT 8443 NOT NULL,
-    ssl boolean DEFAULT true NOT NULL,
-    server_overwrite boolean DEFAULT false,
-    server_ssl boolean DEFAULT true,
-    server_host character varying(255) DEFAULT '192.168.0.1'::character varying,
-    server_port integer DEFAULT 8080,
     max_load integer DEFAULT 4 NOT NULL,
     enabled boolean DEFAULT true NOT NULL,
-    app character varying(255),
-    app_version character varying(255),
     traits character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
     last_ping_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    updated_at timestamp without time zone DEFAULT now(),
+    base_url character varying(255),
+    CONSTRAINT executors_base_url_constraints CHECK ((((base_url)::text ~* '^http[s|]\://\S+$'::text) OR (base_url IS NULL))),
+    CONSTRAINT executors_name_constraints CHECK (((name)::text ~* '^[A-Za-z0-9]+$'::text))
 );
 
 
@@ -495,21 +489,13 @@ CREATE TABLE executors (
 CREATE TABLE executors_with_load (
     id uuid,
     name character varying(255),
-    host character varying(255),
-    port integer,
-    ssl boolean,
-    server_overwrite boolean,
-    server_ssl boolean,
-    server_host character varying(255),
-    server_port integer,
     max_load integer,
     enabled boolean,
-    app character varying(255),
-    app_version character varying(255),
     traits character varying(255)[],
     last_ping_at timestamp without time zone,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
+    base_url character varying(255),
     current_load bigint,
     relative_load double precision
 );
@@ -919,6 +905,13 @@ CREATE UNIQUE INDEX exectutions_tree_id_lower_name_idx ON executions USING btree
 
 
 --
+-- Name: executors_on_lower_name_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX executors_on_lower_name_idx ON executors USING btree (lower((name)::text));
+
+
+--
 -- Name: index_branches_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1035,13 +1028,6 @@ CREATE UNIQUE INDEX index_executions_tags_on_execution_id_and_tag_id ON executio
 --
 
 CREATE INDEX index_executions_tags_on_tag_id_and_execution_id ON executions_tags USING btree (tag_id, execution_id);
-
-
---
--- Name: index_executors_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_executors_on_name ON executors USING btree (name);
 
 
 --
@@ -1240,21 +1226,13 @@ CREATE INDEX users_to_tsvector_idx3 ON users USING gin (to_tsvector('english'::r
 CREATE RULE "_RETURN" AS
     ON SELECT TO executors_with_load DO INSTEAD  SELECT executors.id,
     executors.name,
-    executors.host,
-    executors.port,
-    executors.ssl,
-    executors.server_overwrite,
-    executors.server_ssl,
-    executors.server_host,
-    executors.server_port,
     executors.max_load,
     executors.enabled,
-    executors.app,
-    executors.app_version,
     executors.traits,
     executors.last_ping_at,
     executors.created_at,
     executors.updated_at,
+    executors.base_url,
     count(trials.executor_id) AS current_load,
     ((count(trials.executor_id))::double precision / (executors.max_load)::double precision) AS relative_load
    FROM (executors
@@ -1560,6 +1538,8 @@ INSERT INTO schema_migrations (version) VALUES ('121');
 INSERT INTO schema_migrations (version) VALUES ('122');
 
 INSERT INTO schema_migrations (version) VALUES ('123');
+
+INSERT INTO schema_migrations (version) VALUES ('124');
 
 INSERT INTO schema_migrations (version) VALUES ('15');
 

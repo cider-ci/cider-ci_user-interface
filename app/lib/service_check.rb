@@ -16,28 +16,28 @@ module ServiceCheck
     end
 
     def check_api
-      check_service Settings.internal_api_service,  Settings.basic_auth
+      check_service Settings.services.api.http,  Settings.basic_auth
     end
 
     def check_builder
-      check_service Settings.internal_builder_service,  Settings.basic_auth
+      check_service Settings.services.builder.http,  Settings.basic_auth
     end
 
     def check_dispatcher
-      check_service Settings.internal_dispatcher_service,  Settings.basic_auth
+      check_service Settings.services.dispatcher.http,  Settings.basic_auth
     end
 
     def check_repository
-      check_service Settings.internal_repository_service,  Settings.basic_auth
+      check_service Settings.services.repository.http,  Settings.basic_auth
     end
 
     def check_storage
-      check_service Settings.internal_storage_service,  Settings.basic_auth
+      check_service Settings.services.storage.http,  Settings.basic_auth
     end
 
     def check_service(http_opts, basic_auth)
       url = service_base_url(http_opts) + '/status'
-      http_get(url, basic_auth.user, basic_auth.secret)
+      http_get(url, basic_auth.username, basic_auth.password)
     end
 
   end

@@ -4,14 +4,8 @@
 
 = render_executor_row executor do
   %td 
-    %ul.list-inline
-      %li 
-        =link_to admin_executor_path(executor), method: 'DELETE', class: "btn btn-danger btn-sm" do
-          %i.icon-delete
-          Delete
-      %li 
-        =link_to edit_admin_executor_path(executor) , class: "btn btn-warning btn-sm" do
-          %i.icon-edit
-          Edit
+    =link_to admin_executor_path(executor) , class: "btn btn-info btn-sm" do
+      %i.fa.fa-eye
+      Show more
 
 

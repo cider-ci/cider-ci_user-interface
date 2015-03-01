@@ -2,7 +2,7 @@ default: &default
   adapter: postgresql
   encoding: unicode
   host: localhost
-  pool: 10
+  pool: 3
   username: cider-ci
   password: cider-ci
  

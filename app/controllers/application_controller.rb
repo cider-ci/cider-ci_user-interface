@@ -9,6 +9,7 @@ class ApplicationController < ActionController::Base
 
   include Concerns::ServiceSession
   include Concerns::SessionHelper
+  include Concerns::UrlBuilder
 
   helper_method :current_user, :user?, :users?, :admin?
 

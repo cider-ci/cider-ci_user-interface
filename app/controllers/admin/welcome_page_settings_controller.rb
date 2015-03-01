@@ -16,7 +16,7 @@ class Admin::WelcomePageSettingsController < AdminController
 
   def update
     rescue_path =       edit_admin_welcome_page_settings_path(
-        params[:welcome_page_settings])
+      params[:welcome_page_settings])
 
     Fun.wrap_exception_with_redirect self, rescue_path do
       ActiveRecord::Base.transaction do

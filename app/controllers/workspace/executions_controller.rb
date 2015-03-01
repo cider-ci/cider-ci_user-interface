@@ -17,12 +17,21 @@ class Workspace::ExecutionsController < WorkspaceController
   end
 
   def create
-    Fun.wrap_exception_with_redirect(self, :back) do
-      execution = create_execution
-      execution.create_tasks_and_trials
-      redirect_to workspace_execution_path(execution),
-                  flash: { successes: ["The execution has been created.
-                        Tasks and trials will be created in the background."] }
+    begin
+      url = service_base_url(::Settings.services.builder.http) + '/executions/'
+
+      data = Execution.new(params[:execution].permit!).attributes \
+        .select { |k, v| v.present? }.instance_eval { Hash[self] }
+
+      resp = RestClient::Resource.new(
+        url, ::Settings.basic_auth.username, ::Settings.basic_auth.password) \
+        .post(Hash[data].to_json, content_type: :json)
+
+      redirect_to workspace_execution_path(JSON.parse(resp).deep_symbolize_keys[:id])
+
+    rescue Exception => e
+      @alerts[:errors] << Formatter.exception_to_s(e)
+      render 'public/error', status: 500
     end
   end
 
@@ -71,12 +80,17 @@ class Workspace::ExecutionsController < WorkspaceController
   end
 
   def new
-    @commits = Commit.where(tree_id: params[:tree_id])
-    set_creatable_executions params[:tree_id]
-    if @creatable_executions.empty?
-      @alerts[:warnings] << "There are no executions available to be run.
+    begin
+      @commits = Commit.where(tree_id: params[:tree_id])
+      set_creatable_executions params[:tree_id]
+      if @creatable_executions.empty? and @alerts[:errors].empty?
+        @alerts[:warnings] << "There are no executions available to be run.
       The desired execution might already exist
       or it was not defined in the first place.".squish
+      end
+    rescue Exception => e
+      @alerts[:errors] << Formatter.exception_to_s(e)
+      render 'public/error', status: 500
     end
   end
 

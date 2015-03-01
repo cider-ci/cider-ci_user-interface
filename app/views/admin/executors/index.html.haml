@@ -4,6 +4,10 @@
 
 - executors ||= @executors
 
+%ol.breadcrumb 
+  = render "/breadcrumbs/admin/executors"
+
+
 %ul.list-inline.actions.pull-right
   %li
     =link_to new_admin_executor_path, class: "btn btn-primary" do
@@ -20,12 +24,10 @@
   %table.table.table-striped.executors.reload{data: {cache_tag:  executors.map(&:id)}}
     %thead
       %tr
+        %th Name 
         %th Enabled
         %th Online
-        %th Last ping
-        %th Name @ IP
         %th Load
-        %th Provided traits
     %tbody
     = render partial: 'executor', collection: executors, as: :executor
 

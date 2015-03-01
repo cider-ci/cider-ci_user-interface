@@ -1,28 +1,27 @@
 CiderCI::Application.routes.draw do
 
-  get '/workspace/dashboard', controller: "workspace" , action: "dashboard"
-
+  get '/workspace/dashboard', controller: 'workspace', action: 'dashboard'
 
   namespace 'workspace' do
 
-    get :user 
+    get :user
 
     namespace 'api' do
       get :index
     end
 
-    resource :account, only: [:edit,:update] do
-      post :email_addresses, to: "accounts#add_email_address"
-      delete '/email_address/:email_address', email_address: /[^\/]+/, to: "accounts#delete_email_address", as: 'delete_email_address'
-      post '/email_address/:email_address/as_primary', email_address: /[^\/]+/, to: "accounts#as_primary_email_address", as: 'primary_email_address'
+    resource :account, only: [:edit, :update] do
+      post :email_addresses, to: 'accounts#add_email_address'
+      delete '/email_address/:email_address', email_address: /[^\/]+/, to: 'accounts#delete_email_address', as: 'delete_email_address'
+      post '/email_address/:email_address/as_primary', email_address: /[^\/]+/, to: 'accounts#as_primary_email_address', as: 'primary_email_address'
     end
 
-    resource :session, only: [:edit,:update]
+    resource :session, only: [:edit, :update]
 
     # TODO: doesn't work if the tag contains dots o_O
     resources :tags, only: [:index, :show]
 
-    get 'branch_heads' #, controller: "workspace" 
+    get 'branch_heads' # , controller: "workspace"
 
     resources :branches do
       collection do
@@ -38,7 +37,7 @@ CiderCI::Application.routes.draw do
         get 'attachments'
         get 'result'
         get :issues, action: 'issues'
-        delete "issues/:issue_id", action: 'delete_issue', as: 'issue'
+        delete 'issues/:issue_id', action: 'delete_issue', as: 'issue'
       end
     end
 
@@ -50,7 +49,7 @@ CiderCI::Application.routes.draw do
         get :tree_attachments
         get :specification
         get :issues, action: 'issues'
-        delete "issues/:issue_id", action: 'delete_issue', as: 'issue'
+        delete 'issues/:issue_id', action: 'delete_issue', as: 'issue'
         post :add_tags
         post :retry_failed
         get 'result'
@@ -76,10 +75,9 @@ CiderCI::Application.routes.draw do
       end
     end
 
-
-    get '/attachments/:kind/*path', controller: :attachments, 
-      action: :show, constraints: { path: /.*/ },
-      as: :attachment
+    get '/attachments/:kind/*path', controller: :attachments,
+                                    action: :show, constraints: { path: /.*/ },
+                                    as: :attachment
 
   end
 
@@ -96,13 +94,13 @@ CiderCI::Application.routes.draw do
     resources :definitions
     resources :users do
       member do
-        #resources :email_addreses
-        get '/email_addresses', action: 'email_addressses' 
-        post '/email_addresses', action: 'add_email_address' 
+        # resources :email_addreses
+        get '/email_addresses', action: 'email_addressses'
+        post '/email_addresses', action: 'add_email_address'
         put '/email_address/:email_address', email_address: /[^\/]+/, action: :put_email_address, as: :email_address
         post '/email_address/:email_address/as_primary', email_address: /[^\/]+/, action: :as_primary_email_address, as: :primary_email_address
         delete '/email_address/:email_address', email_address: /[^\/]+/, action: :delete_email_address, as: :delete_email_address
-        #delete '/email_address/:email_address', email_address: /[^\/]+/, action: 'delete_email_address', as: :email_address
+        # delete '/email_address/:email_address', email_address: /[^\/]+/, action: 'delete_email_address', as: :email_address
       end
     end
     resources :executors do
@@ -111,14 +109,14 @@ CiderCI::Application.routes.draw do
       end
     end
     resources :repositories do
-      post 're_initialize_git' 
+      post 're_initialize_git'
       post 'update_git'
     end
     get 'env'
     post 'dispatch_trials'
   end
 
-  resource :public, only: [:show], controller: "public"
+  resource :public, only: [:show], controller: 'public'
 
   namespace 'public' do
     post 'sign_in'
@@ -126,34 +124,31 @@ CiderCI::Application.routes.draw do
 
     # ħttp://localhost:8880/cider-ci/ui/public/attachments/Cider-CI%20Bash%20Demo%20Project/master/Tests/log/hello.txt
     #
-    get 'attachments/:repository_name/:branch_name/:execution_name/*path', 
-      action: :redirect_to_tree_attachment_content , 
-      constraints: { path: /.*/ }
+    get 'attachments/:repository_name/:branch_name/:execution_name/*path',
+        action: :redirect_to_tree_attachment_content,
+        constraints: { path: /.*/ }
 
-    get 'executions/:repository_name/:branch_name/:execution_name', 
-      action: :redirect_to_execution
+    get 'executions/:repository_name/:branch_name/:execution_name',
+        action: :redirect_to_execution
 
+    get '/:repository_name/:branch_name/:execution_names/summary',
+        controller: 'summary', action: 'show', as: 'summary'
 
-    get "/:repository_name/:branch_name/:execution_names/summary", 
-      controller: "summary", action: "show", as: "summary"
-
-
-    resources :badges , only: [] do
+    resources :badges, only: [] do
       collection do
-        get "medium/:repository_name/:branch_name/:execution_name", action: "medium"
-        get "small/:repository_name/:branch_name/:execution_name", action: "small"
+        get 'medium/:repository_name/:branch_name/:execution_name', action: 'medium'
+        get 'small/:repository_name/:branch_name/:execution_name', action: 'small'
         # get ":repository/:branch_name/:execution_name"
       end
     end
   end
 
   namespace 'perf' do
-    root controller: "perf", action: "root"
+    root controller: 'perf', action: 'root'
   end
 
-  get /.*/, controller: "application", action: "redirect"
+  get /.*/, controller: 'application', action: 'redirect'
 
-  
   root 'application#redirect'
 
   # The priority is based upon order of creation: first created -> highest priority.

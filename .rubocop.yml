@@ -1,8 +1,11 @@
 AllCops:
   Exclude:
-    - 'db/**/*'
-    - 'config/**/*'
     - 'Gemfile'
+    - 'config/application.rb'
+    - 'config/environments/**/*'
+    - 'config/initializers/backtrace_silencers.rb'
+    - 'config/routes.rb'
+    - 'db/**/*'
   RunRailsCops: true
 
 Lint/AmbiguousOperator:
@@ -102,6 +105,9 @@ Style/IfUnlessModifier:
 # Cop supports --auto-correct.
 # Configuration parameters: Width.
 Style/IndentationWidth:
+  Enabled: false
+
+Style/ModuleFunction:
   Enabled: false
 
 Style/MultilineBlockChain:

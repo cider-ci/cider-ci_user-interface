@@ -1,7 +1,7 @@
 module ActionView
   module Helpers
     module CacheHelper
-      def fragment_for(name = {}, options = nil, &block) #:nodoc:
+      def fragment_for(name = {}, options = nil, &_block) #:nodoc:
         Rails.logger.info "USING THE PATCH CACHE METHOD name: #{name} "
         if fragment = controller.read_fragment(name, options)
           fragment

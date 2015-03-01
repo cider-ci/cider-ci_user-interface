@@ -8,7 +8,7 @@ module Workspace::ExecutionsControllerModules::TasksFilter
   def set_and_filter_tasks(params)
     @tasks = filter_tasks_by_substring_search \
       filter_tasks_by_condition \
-      @execution.tasks.reorder(:name).page(params[:page])
+        @execution.tasks.reorder(:name).page(params[:page])
   end
 
   def filter_tasks_by_substring_search(tasks)

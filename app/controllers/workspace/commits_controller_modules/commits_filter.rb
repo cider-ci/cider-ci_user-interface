@@ -4,11 +4,11 @@ module Workspace::CommitsControllerModules::CommitsFilter
   def build_commits_for_params
     filter_by_time \
       filter_by_text \
-      filter_by_respository \
-      filter_by_branches \
-      filter_by_show_orphans \
-      per_page \
-      commits_initial_scope
+        filter_by_respository \
+          filter_by_branches \
+            filter_by_show_orphans \
+              per_page \
+                commits_initial_scope
   end
 
   def commits_initial_scope
