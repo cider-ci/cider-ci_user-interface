@@ -9,7 +9,10 @@
       %b<>
         Cider-CI&nbsp;
         %span{class:  Settings.release.version_pre.present? ? "text-warning" : ""}<>
-          = render partial: 'application/semantic_version'
+          = render partial: 'application/semantic_version', 
+            locals: { semver: Settings.release }
+
+
 
   .collaps.navbar-collapse
 
