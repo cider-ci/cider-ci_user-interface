@@ -29,12 +29,10 @@
   %h2 About Cider-CI
 
   %p#release-info
-    = link_to "https://github.com/cider-ci/cider-ci_ansible-setup/blob/master/releases.yml" do
+    = link_to "https://github.com/cider-ci/cider-ci/blob/master/releases.yml" do
       Version&nbsp;
       = render partial: 'application/semantic_version', 
-        locals: { semver: Settings.release }
-
-
+        locals: { semver: Settings.releases[0] }
 
   %p
     %strong
