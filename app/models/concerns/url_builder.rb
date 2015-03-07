@@ -5,7 +5,7 @@ module Concerns
 
     included do
       if self < ActionController::Base
-        helper_method :service_base_url, :protocol, :api_base_url, :api_path
+        helper_method :service_base_url, :protocol, :api_path
       end
     end
 
@@ -26,10 +26,6 @@ module Concerns
       else
         ''
       end
-    end
-
-    def api_base_url
-      service_base_url(Settings.services.api.http_external, omit_protocol: true)
     end
 
     def api_path

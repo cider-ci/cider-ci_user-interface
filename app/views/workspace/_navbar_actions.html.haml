@@ -12,13 +12,11 @@
     Commits
 
 %li.dropdown.admin-frontpage-actions
-  %a.dropdown-toggle{href: workspace_api_index_path, data: {toggle: 'dropdown'}} 
-    %i.icon-api
-    API
-    %b.caret
 
-  %ul.dropdown-menu
-    = render partial: '/workspace/api/menu_items.html.haml'
+%li
+  = link_to (api_path + "/api-browser/index.html#" + api_path)  do
+    %i.icon-api
+    API Browser 
 
 %li
   =link_to "/cider-ci/docs/" do
