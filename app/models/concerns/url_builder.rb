@@ -10,10 +10,7 @@ module Concerns
     end
 
     def service_base_url(conf, options = {})
-      protocol(conf, options) +
-        (conf.host ? "//#{conf.host}" : '') +
-      (conf.port ? ":#{conf.port}" : '') +
-      service_path(conf)
+      Settings.server_base_url + service_path(conf)
     end
 
     def service_path(conf)
