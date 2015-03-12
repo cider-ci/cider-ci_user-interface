@@ -2,6 +2,8 @@ CiderCI::Application.routes.draw do
 
   get '/workspace/dashboard', controller: 'workspace', action: 'dashboard'
 
+  post '/configuration_management/invoke', controller: 'configuration_management', action: 'invoke'
+
   namespace 'workspace' do
 
     get :user

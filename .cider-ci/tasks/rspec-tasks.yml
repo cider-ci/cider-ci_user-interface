@@ -1,4 +1,9 @@
 ---
+"./spec/controllers/configuration_management_controller_spec.rb":
+  name: "./spec/controllers/configuration_management_controller_spec.rb"
+  scripts:
+    main:
+      body: bundle exec rspec "./spec/controllers/configuration_management_controller_spec.rb"
 "./spec/controllers/public/summary_controller_spec.rb":
   name: "./spec/controllers/public/summary_controller_spec.rb"
   scripts:

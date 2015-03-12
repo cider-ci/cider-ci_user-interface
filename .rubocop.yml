@@ -17,6 +17,9 @@ Lint/AmbiguousRegexpLiteral:
 Lint/AssignmentInCondition:
   Enabled: false
 
+Lint/Eval:
+  Enabled: false
+
 Lint/DeprecatedClassMethods:
   Enabled: false
 
