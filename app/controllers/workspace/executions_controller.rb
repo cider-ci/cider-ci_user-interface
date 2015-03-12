@@ -16,47 +16,26 @@ class Workspace::ExecutionsController < WorkspaceController
     @_lookup_context.prefixes << 'workspace/tasks'
   end
 
+  def build_create_request_data
+    Execution.new(params[:execution].permit!).attributes \
+      .select { |k, v| v.present? }.instance_eval { Hash[self] }
+  end
+
+  def request_create(data)
+    url = service_base_url(::Settings.services.builder.http) + '/executions/'
+    RestClient::Resource.new(
+      url, ::Settings.basic_auth.username, ::Settings.basic_auth.password) \
+      .post(Hash[data].to_json, content_type: :json)
+  end
+
   def create
     begin
-      url = service_base_url(::Settings.services.builder.http) + '/executions/'
-
-      data = Execution.new(params[:execution].permit!).attributes \
-        .select { |k, v| v.present? }.instance_eval { Hash[self] }
-
-      resp = RestClient::Resource.new(
-        url, ::Settings.basic_auth.username, ::Settings.basic_auth.password) \
-        .post(Hash[data].to_json, content_type: :json)
-
+      resp = request_create(build_create_request_data)
       redirect_to workspace_execution_path(JSON.parse(resp).deep_symbolize_keys[:id])
-
     rescue Exception => e
       @alerts[:errors] << Formatter.exception_to_s(e)
       render 'public/error', status: 500
     end
-  end
-
-  def create_execution
-    ActiveRecord::Base.transaction do
-      execution = Execution.create! params[:execution].permit(
-        :tree_id, :specification_id, :name, :description)
-      add_default_tags execution
-      execution
-    end
-  end
-
-  def add_default_tags(execution)
-    branches = branches_for_commit_param
-    execution.add_strings_as_tags [
-      param_tags, branches.map(&:name), repository_names_for_branches(branches),
-      current_user.try(:login)].flatten.compact
-  end
-
-  def branches_for_commit_param
-    Commit.where(tree_id: params[:execution][:tree_id]).map(&:head_of_branches).flatten
-  end
-
-  def repository_names_for_branches(branches)
-    branches.map(&:repository).map(&:name).select(&:present?)
   end
 
   def destroy

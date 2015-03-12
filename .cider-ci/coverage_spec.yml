@@ -26,4 +26,4 @@ tasks:
   scripts:
     coverage:
 
-      body: bundle exec cider-ci_coverage --upload
+      body: bundle exec cider-ci_coverage --limit 93 --upload

@@ -90,7 +90,7 @@ class PublicController < ApplicationController
                                                        params[:branch_name],
                                                        params[:execution_name])
       if  tree_attachment = TreeAttachment \
-                             .find_by(path: "/#{@execution.tree_id}/#{params[:path]}")
+        .find_by(path: "/#{@execution.tree_id}/#{params[:path]}")
         redirect_to workspace_attachment_path('tree_attachment', tree_attachment.path)
       else
         render_404 "You are looking for the attchment `#{params[:path]}`

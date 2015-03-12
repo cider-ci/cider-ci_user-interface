@@ -7,7 +7,7 @@ module Workspace::CommitsControllerModules::CommitsFilter
         filter_by_respository \
           filter_by_branches \
             filter_by_show_orphans \
-              per_page \
+              filter_per_page \
                 commits_initial_scope
   end
 
@@ -18,7 +18,7 @@ module Workspace::CommitsControllerModules::CommitsFilter
               :depth, :id, :subject, :tree_id, :updated_at)
   end
 
-  def per_page(commits)
+  def filter_per_page(commits)
     if params[:per_page].present?
       commits.per(Integer(params[:per_page]))
     else
@@ -61,9 +61,22 @@ module Workspace::CommitsControllerModules::CommitsFilter
   end
 
   def filter_by_time(commits)
+    days = 10
+    while  days < (365 * 100) and \
+      chain_days(commits, days).limit(2 * per_page).count('commits.id') <= per_page
+      days *= 10
+    end
+    chain_days(commits, days)
+  end
+
+  def chain_days(commits, days)
     commits.where(
       %[ "commits"."committer_date"  > ( now() - interval '? days') ],
-      commited_within_last_days_filter)
+      days)
+  end
+
+  def per_page
+    Integer(params[:per_page]) rescue Kaminari.config.default_per_page
   end
 
 end

@@ -477,8 +477,7 @@ CREATE TABLE executors (
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     base_url character varying(255),
-    CONSTRAINT executors_base_url_constraints CHECK ((((base_url)::text ~* '^http[s|]\://\S+$'::text) OR (base_url IS NULL))),
-    CONSTRAINT executors_name_constraints CHECK (((name)::text ~* '^[A-Za-z0-9]+$'::text))
+    CONSTRAINT executors_name_constraints CHECK (((name)::text ~* '^[A-Za-z0-9\-\_]+$'::text))
 );
 
 
@@ -908,7 +907,7 @@ CREATE UNIQUE INDEX exectutions_tree_id_lower_name_idx ON executions USING btree
 -- Name: executors_on_lower_name_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX executors_on_lower_name_idx ON executors USING btree (lower((name)::text));
+CREATE UNIQUE INDEX executors_on_lower_name_idx ON executors USING btree (lower((name)::text));
 
 
 --

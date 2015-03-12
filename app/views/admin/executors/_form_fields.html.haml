@@ -7,19 +7,11 @@
   = form_group "Name", control_id: 'executor_name', cols_control: 4 do
     = text_field :executor, :name, value: executor.name, autofocus: true, class: 'form-control'
 
-  = form_group "Base URL", control_id: 'executor_name', cols_control: 6 do
+  = form_group "Base URL", control_id: 'executor_base_url', cols_control: 6 do
     = text_field :executor, :base_url, value: executor.base_url, class: 'form-control'
-
-
-.well
 
   = form_group "Enabled", control_id: 'executor_enabled' do
     .checkbox
       = check_box :executor, :enabled, value: executor.enabled
 
-  = form_group "Traits", control_id: 'executor_traits', cols_control: 8 do
-    = text_field :executor, :traits, value: executor.try(:traits).try(:join,", "), class: 'form-control'
-
-  = form_group "Max load", control_id: 'executor_max_load', cols_control: 2  do
-    = text_field :executor, :max_load, value: executor.max_load, type: 'number', class: 'form-control'
 

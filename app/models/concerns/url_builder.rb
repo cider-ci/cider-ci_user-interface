@@ -5,11 +5,11 @@ module Concerns
 
     included do
       if self < ActionController::Base
-        helper_method :service_base_url, :protocol, :api_path
+        helper_method :api_path
       end
     end
 
-    def service_base_url(conf, options = {})
+    def service_base_url(conf, _options = {})
       Settings.server_base_url + service_path(conf)
     end
 
@@ -17,16 +17,8 @@ module Concerns
       (conf.path || "#{conf.context}#{conf.sub_context}")
     end
 
-    def protocol(conf, options = {})
-      unless options[:omit_protocol]
-        conf.ssl ? 'https:' : 'http:'
-      else
-        ''
-      end
-    end
-
     def api_path
-      service_path(Settings.services.api.http_external)
+      service_path(Settings.services.api.http)
     end
 
   end

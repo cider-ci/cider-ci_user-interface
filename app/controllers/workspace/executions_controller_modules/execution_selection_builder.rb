@@ -9,14 +9,16 @@ module Workspace::ExecutionsControllerModules
         fetch_dotfile_executions(id) || formatted_db_definitions
     end
 
+    def get_executions(id)
+      url = service_base_url(::Settings.services.builder.http) +
+        "/executions/available/#{id}"
+      RestClient::Resource.new(url, ::Settings.basic_auth.username,
+                               ::Settings.basic_auth.password).get
+    end
+
     def fetch_dotfile_executions(id)
       begin
-        url = service_base_url(::Settings.services.builder.http) +
-          "/executions/available/#{id}"
-
-        resp = RestClient::Resource.new(url, ::Settings.basic_auth.username,
-                                        ::Settings.basic_auth.password).get
-
+        resp = get_executions(id)
         JSON.parse(resp).map(&:deep_symbolize_keys).map do |values|
           values.slice(:name, :specification_id, :description, :tree_id)
         end.sort_by { |v| v[:name] }

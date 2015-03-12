@@ -38,18 +38,6 @@
           %ul.list-inline
 
             %li
-              .form-group
-                %label.sr-only{for: "commit_text"}
-                = select_tag :commited_within_last_days, 
-                  options_for_select([["commited within the last 24 hours",1],
-                    ["commited within the last 10 days",10],
-                    ["commited within the last 3 months",92],
-                    ["commited within the last 2 years",730],
-                    ["commited within the last 10 years",3650]],
-                    (commited_within_last_days_filter || 10)), 
-                  class: "form-control input-sm"
-
-            %li
               .checkbox
                 %label
                   = check_box_tag :show_orphans , "1", params[:show_orphans].present?
@@ -68,13 +56,6 @@
               = button_tag type: 'submit', class: 'btn btn-sm btn-primary' do
                 %i.icon-filter
                 Filter
-
-      .help-block{style: "margin-left: 14px"}
-        %small
-          :markdown
-            Values within one field are combined with logical _or_.
-            Multiple fields are combined with logical  _and_.
-
 
 
   %h1 
