@@ -23,15 +23,22 @@ class Workspace::ExecutionsController < WorkspaceController
 
   def request_create(data)
     url = service_base_url(::Settings.services.builder.http) + '/executions/'
-    RestClient::Resource.new(
-      url, ::Settings.basic_auth.username, ::Settings.basic_auth.password) \
-      .post(Hash[data].to_json, content_type: :json)
+
+    RestClient::Request.new(
+      method: :post,
+      url: url,
+      user: ::Settings.basic_auth.username,
+      password: ::Settings.basic_auth.password,
+      verify_ssl: false,
+      payload: data.to_json,
+      headers: { accept:  :json,
+                 content_type:  :json })
   end
 
   def create
     begin
-      resp = request_create(build_create_request_data)
-      redirect_to workspace_execution_path(JSON.parse(resp).deep_symbolize_keys[:id])
+      resp = request_create(build_create_request_data).execute
+      redirect_to workspace_execution_path(JSON.parse(resp.body).deep_symbolize_keys[:id])
     rescue Exception => e
       @alerts[:errors] << Formatter.exception_to_s(e)
       render 'public/error', status: 500

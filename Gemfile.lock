@@ -150,13 +150,6 @@ GEM
       haml (>= 4.0.0.rc.1)
       hpricot (~> 0.8.6)
       ruby_parser (~> 3.1.1)
-    http_monkey (0.0.4)
-      http_objects (~> 0.0.4)
-      httpi (~> 2.0.0)
-      rack
-    http_objects (0.0.5)
-    httpi (2.0.2)
-      rack
     i18n (0.7.0)
     jdbc-postgres (9.4.1200)
     jquery-rails (3.1.2)
@@ -352,7 +345,6 @@ DEPENDENCIES
   foreigner
   haml-contrib
   haml-rails
-  http_monkey
   jdbc-postgres
   jquery-rails
   jquery-ui-rails

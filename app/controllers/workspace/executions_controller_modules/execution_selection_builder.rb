@@ -3,6 +3,7 @@ module Workspace::ExecutionsControllerModules
     class SpecEmptyWarning < Exception; end
     extend ActiveSupport::Concern
     include Concerns::UrlBuilder
+    include Concerns::HTTP
 
     def set_creatable_executions(id)
       @creatable_executions =
@@ -12,14 +13,12 @@ module Workspace::ExecutionsControllerModules
     def get_executions(id)
       url = service_base_url(::Settings.services.builder.http) +
         "/executions/available/#{id}"
-      RestClient::Resource.new(url, ::Settings.basic_auth.username,
-                               ::Settings.basic_auth.password).get
+      http_get(url)[:message]
     end
 
     def fetch_dotfile_executions(id)
       begin
-        resp = get_executions(id)
-        JSON.parse(resp).map(&:deep_symbolize_keys).map do |values|
+        get_executions(id).map(&:deep_symbolize_keys).map do |values|
           values.slice(:name, :specification_id, :description, :tree_id)
         end.sort_by { |v| v[:name] }
 

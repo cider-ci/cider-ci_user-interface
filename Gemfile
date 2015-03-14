@@ -34,7 +34,6 @@ gem 'sass-rails'
 gem 'bcrypt-ruby'
 gem 'bootswatch-rails'
 gem 'bunny', '>= 1.3'
-gem 'http_monkey'
 gem 'kaminari'
 gem 'newrelic_rpm'
 gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
