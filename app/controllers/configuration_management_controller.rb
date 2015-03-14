@@ -29,14 +29,20 @@ class ConfigurationManagementController < ApplicationController
   end
 
   def invoke
-    case request.content_type.try(:downcase)
-    when /application\/ruby/
-      invoke_ruby
-    when /application\/sql/
-      invoke_sql
-    else
-      render status: 422,
-             plain: "Don't know how to process content type '#{request.content_type}'."
+    begin
+      case request.content_type.try(:downcase)
+      when /application\/ruby/
+        invoke_ruby
+      when /application\/sql/
+        invoke_sql
+      else
+        render status: 422,
+               plain: "Don't know how to process content type '#{request.content_type}'."
+      end
+    rescue Exception => e
+      Rails.logger.error Formatter.exception_to_log_s e
+      render status: 500,
+             plain: "```\n#{request.body.gets}\n```\n\n\n #{Formatter.exception_to_s(e)}"
     end
   end
 
