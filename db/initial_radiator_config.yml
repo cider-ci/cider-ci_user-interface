@@ -3,11 +3,26 @@ rows:
 - name: Bash Demo Project
   items:
   - repository_name: Cider-CI Bash Demo Project
-    branch_name: master
-    execution_name: Tests
-  - repository_name: Cider-CI Bash Demo Project
     branch_name: wip
-    execution_name: Tests
-  - repository_name: No repository
-    branch_name: nix
-    execution_name: No tests
+    execution_name: 
+      - Attachments-Demo
+      - Chain-Prerequisite-Demo
+      - Environment-Variables-Demo
+      - Exclusive-Resources-Demo
+      - Ports-Demo 
+      - Result-Demo
+      - Submodule-Demo
+      - Tests
+      - Trigger-Demo
+  - repository_name: Cider-CI Bash Demo Project
+    branch_name: master
+    execution_name: 
+      - Attachments-Demo
+      - Chain-Prerequisite-Demo
+      - Environment-Variables-Demo
+      - Exclusive-Resources-Demo
+      - Ports-Demo 
+      - Result-Demo
+      - Submodule-Demo
+      - Tests
+      - Trigger-Demo
