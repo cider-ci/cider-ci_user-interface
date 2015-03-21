@@ -1,8 +1,6 @@
 task_defaults:
 
   traits:
-    imagemagick: true
-    libimage-exiftool-perl: true
     rbenv: true
     ruby: true
     nodejs: true
