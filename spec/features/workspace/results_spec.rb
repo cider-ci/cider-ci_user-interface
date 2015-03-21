@@ -12,7 +12,7 @@ feature 'Result', browser: :firefox do
     click_on 'Result'
     expect(current_path).to match %r{/workspace/executions/[^/]+/result}
     expect(page).to have_content '6.45%'
-    click_on 'Job'
+    click_on 'Execution'
     find('select#tasks_select_condition').select('All')
     click_on('Filter')
     first('a', text: 'Result Embedding Demo').click

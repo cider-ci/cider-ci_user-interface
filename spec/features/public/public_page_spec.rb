@@ -65,7 +65,7 @@ feature 'Public start page' do
     expect(page.current_path).to be == \
       workspace_execution_path(Execution.find_by(name: 'Tests'))
 
-    expect(page).to have_content 'Job "Tests"'
+    expect(page).to have_content 'Execution "Tests"'
 
   end
 

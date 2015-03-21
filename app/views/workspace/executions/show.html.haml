@@ -50,7 +50,7 @@
     #issues-alert.reload{data: {cache_tag: ecs.execution_issues_count}}
       - if ecs.execution_issues_count >= 1
         .alert.alert-danger
-          %p This job has #{pluralize(ecs.execution_issues_count,"issue")}! 
+          %p This execution has #{pluralize(ecs.execution_issues_count,"issue")}! 
 
 
     #execution.execution
@@ -77,7 +77,7 @@
       %h1
         %span#header-label.reload.label{data: {cache_tag: execution.state}, class: label_class_for_state(state)}<>
           %i{class: icon_class_for_state(state)}<>
-        %span &nbsp; Job "#{execution.name}"
+        %span &nbsp; Execution "#{execution.name}"
 
       
       .row

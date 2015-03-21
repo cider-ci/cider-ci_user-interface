@@ -5,11 +5,11 @@ feature 'Browse executions and execution' do
 
   scenario 'Follow from executions to first execution' do
     sign_in_as 'normin'
-    find('a', text: 'Jobs').click
-    expect(page).to have_content 'Jobs'
+    find('a', text: 'Executions').click
+    expect(page).to have_content 'Executions'
     expect(current_path).to be == workspace_executions_path
     first('td a', text: 'Tests').click
-    expect(page).to have_content 'Job "Tests"'
+    expect(page).to have_content 'Execution "Tests"'
     expect(current_path).to be == workspace_execution_path(Execution.find_by(name: 'Tests'))
   end
 

@@ -73,12 +73,12 @@ feature 'Browse execution' do
     issue_description = ExecutionIssue.first.description
     sign_in_as 'normin'
     visit workspace_execution_path(Execution.first)
-    expect(page.text).to match /job has .+ issue/
+    expect(page.text).to match /execution has .+ issue/
     find('a', text: 'Issue').click
     expect(page).to have_content issue_description
     find('a,button', text: 'Dismiss').click
     expect(page).not_to have_content issue_description
-    click_link('Job', exact: true)
+    click_link('Execution', exact: true)
     expect(current_path).to be == workspace_execution_path(Execution.first)
   end
 
