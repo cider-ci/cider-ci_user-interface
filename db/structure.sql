@@ -275,10 +275,8 @@ CREATE TABLE repositories (
     id uuid NOT NULL,
     origin_uri character varying(255),
     name character varying(255),
-    importance integer DEFAULT 0 NOT NULL,
     git_fetch_and_update_interval integer DEFAULT 60,
     git_update_interval integer,
-    transient_properties_id uuid DEFAULT uuid_generate_v4(),
     created_at timestamp without time zone DEFAULT now(),
     updated_at timestamp without time zone DEFAULT now(),
     public_view_permission boolean DEFAULT false NOT NULL
@@ -1539,6 +1537,8 @@ INSERT INTO schema_migrations (version) VALUES ('122');
 INSERT INTO schema_migrations (version) VALUES ('123');
 
 INSERT INTO schema_migrations (version) VALUES ('124');
+
+INSERT INTO schema_migrations (version) VALUES ('125');
 
 INSERT INTO schema_migrations (version) VALUES ('15');
 
