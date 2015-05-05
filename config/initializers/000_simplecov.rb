@@ -1,6 +1,6 @@
 # it is important that this file is loaded prior to any
 # code that is to be checked for coverage
-if ENV['RAILS_ENV'] == 'test'
+if ENV['RAILS_ENV'] == 'test' || ENV['ENABLE_SIMPLECOV'].present?
   require 'simplecov'
   SimpleCov.start 'rails' do
     # add_filter "/spec/"

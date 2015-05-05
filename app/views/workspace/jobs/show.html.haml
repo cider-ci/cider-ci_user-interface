@@ -1,0 +1,104 @@
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Licensed under the terms of the GNU Affero General Public License v3.
+-#  See the LICENSE.txt file provided with this software.
+
+- job ||= @job 
+- state = job.state
+- ecs = job.job_cache_signature
+- ccss = CommitCacheSignature.where(%< commit_id IN (?) >, job.commits.map(&:id))
+- relevant_ccss = [ccss.map(&:commit_id), ccss.map(&:branches_signature), ccss.map(&:repositories_signature), ccss.map(&:jobs_signature)].flatten
+
+- cs = [job.id, job.updated_at, ecs.repositories_signature,
+    ecs.branches_signature, ecs.tasks_signature, ecs.job_issues_count,
+    params, @trials.collection_cache_tag] + relevant_ccss
+
+- cache cs  do |cache_tag|
+
+  - tasks ||= @tasks
+  - reload_timeout= session_adjust_reload_timeout(%w(failed passed).include?(job.state) ? 30 : 3)
+  #reload-page{data: { cache_tag: cache_tag, reload_timeout: reload_timeout}}
+
+    .row
+
+      .col-md-6
+        %ol.breadcrumb.pull-left
+          = render '/breadcrumbs/job', job: job
+      .col-md-6
+        %ol.breadcrumb.with-circle-separator.pull-right
+          %li 
+            = link_to workspace_tree_attachments_path(job.tree_id) do
+              Tree-Attachments
+          %li#issues-link.reload{data: {cache_tag: ecs.job_issues_count}}
+            - if ecs.job_issues_count <= 0
+              %span.text-muted Issues
+            - else 
+              = link_to issues_workspace_job_path(job) do
+                %span.text-danger= pluralize(ecs.job_issues_count,"Issue")
+
+          %li 
+            = link_to job_specification_workspace_job_path(job) do
+              Job-Specification
+
+          %li#result-link.reload{data: {cache_tag: job.result_summary?.to_s}}
+            - if job.result 
+              = link_to result_workspace_job_path(job) do
+                Result
+            - else 
+              %span.text-muted Result
+
+
+    #issues-alert.reload{data: {cache_tag: ecs.job_issues_count}}
+      - if ecs.job_issues_count >= 1
+        .alert.alert-danger
+          %p This job has #{pluralize(ecs.job_issues_count,"issue")}! 
+
+
+    #job.job{data: {id: job.id, name: job.name, state: job.state}}
+
+      %ul.list-inline.actions.pull-right
+        %li.for-admin
+          = form_tag workspace_job_path(job), method: 'DELETE' do
+            = hidden_field_tag :authenticity_token, form_authenticity_token
+            = button_tag type: :submit, class: "btn btn-danger" do
+              %i.icon-trash
+              Delete
+        %li.for-signed-in-user
+          =link_to edit_workspace_job_path(job), class: "btn btn-warning" do
+            %i.icon-edit
+            Edit
+        %li.for-signed-in-user
+          = form_tag retry_failed_workspace_job_path(job,@filter_params), method: 'POST', remote: false do
+            = hidden_field_tag :authenticity_token, form_authenticity_token
+            = button_tag type: :submit, class: "btn btn-primary" do
+              %i.icon-retry
+              Retry failed
+
+
+      %h1
+        %span#header-label.reload.label{data: {cache_tag: job.state}, class: label_class_for_state(state)}<>
+          %i{class: icon_class_for_state(state)}<>
+        %span &nbsp; Job "#{job.name}"
+
+      
+      .row
+        .col-md-9
+          = render 'summary_speed', job: job, cache_tag: cache_tag
+        .col-md-3.text-right
+          = render 'tags', tags: job.tags.sort, id: "job-tags"
+
+      = render 'summary_stats', job: job, cache_tag: cache_tag
+
+      - if job.description.present?
+        .job-description= markdown(job.description) 
+
+      - cache relevant_ccss  do |commits_cache_signature|
+      
+        #commits.commits.reload.replace-without-animation{data: {cache_tag: commits_cache_signature}}
+          %h2 #{ job.commits.count > 1 ? "Commits" : "Commit"}
+          %table.commits.table.table-striped
+            %thead
+              %tbody
+                != render partial: "commit_tr", collection: job.commits, as: :commit
+
+      = render 'tasks', job: job, tasks: tasks
+

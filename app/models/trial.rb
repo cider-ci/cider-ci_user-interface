@@ -18,8 +18,8 @@ end
 
 class Trial < ActiveRecord::Base
   self.primary_key = 'id'
-  serialize :result, JSON
-  serialize :scripts, CiderCI::JSONScripts
+  # serialize :result, JSON
+  # serialize :scripts, CiderCI::JSONScripts
   before_create { self.id ||= SecureRandom.uuid }
   belongs_to :task
   belongs_to :executor

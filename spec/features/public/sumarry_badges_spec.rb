@@ -4,55 +4,55 @@ require 'spec_helper_feature_shared'
 feature 'Summary Badges' do
 
   def adjust_data
-    Execution.destroy_all
+    Job.destroy_all
     Repository.first.update_attributes! \
       name: 'TestRepo',
       public_view_permission: true
   end
 
-  scenario 'viewing a summary badge for a executing execution' do
+  scenario 'viewing a summary badge for a executing job' do
     adjust_data
-    FactoryGirl.create :executing_execution,
+    FactoryGirl.create :executing_job,
                        tree_id: Branch.find_by(name: 'master').current_commit.tree_id,
                        name: 'Tests'
     visit '/public/testrepo/master/tests/summary.svg'
-    expect(find('svg.execution-info')).to have_content 'executing'
+    expect(find('svg.job-info')).to have_content 'executing'
   end
 
   scenario 'viewing a summary badge for a executing with result' do
     adjust_data
-    FactoryGirl.create :execution_with_result,
+    FactoryGirl.create :job_with_result,
                        tree_id: Branch.find_by(name: 'master').current_commit.tree_id,
                        name: 'Tests'
     visit '/public/testrepo/master/tests/summary.svg'
-    expect(find('svg.execution-info')).to have_content '42 OK'
+    expect(find('svg.job-info')).to have_content '42 OK'
   end
 
-  scenario 'viewing a summary badge for a failed execution' do
+  scenario 'viewing a summary badge for a failed job' do
     adjust_data
-    FactoryGirl.create :failed_execution,
+    FactoryGirl.create :failed_job,
                        tree_id: Branch.find_by(name: 'master').current_commit.tree_id,
                        name: 'Tests'
     visit '/public/testrepo/master/tests/summary.svg'
-    expect(find('svg.execution-info')).to have_content 'failed'
+    expect(find('svg.job-info')).to have_content 'failed'
   end
 
-  scenario 'viewing a summary badge for a passed execution' do
+  scenario 'viewing a summary badge for a passed job' do
     adjust_data
-    FactoryGirl.create :passed_execution,
+    FactoryGirl.create :passed_job,
                        tree_id: Branch.find_by(name: 'master').current_commit.tree_id,
                        name: 'Tests'
     visit '/public/testrepo/master/tests/summary.svg'
-    expect(find('svg.execution-info')).to have_content 'passed'
+    expect(find('svg.job-info')).to have_content 'passed'
   end
 
   scenario 'viewing a summary badge for pending tests' do
     adjust_data
-    FactoryGirl.create :pending_execution,
+    FactoryGirl.create :pending_job,
                        tree_id: Branch.find_by(name: 'master').current_commit.tree_id,
                        name: 'Tests'
     visit '/public/testrepo/master/tests/summary.svg'
-    expect(find('svg.execution-info')).to have_content 'pending'
+    expect(find('svg.job-info')).to have_content 'pending'
   end
 
   scenario 'viewing a summary badge for a not existing repository' do
@@ -71,7 +71,7 @@ feature 'Summary Badges' do
     expect(first('svg')).to have_content 'Not found'
   end
 
-  scenario 'viewing a summary badge for a not existing execution' do
+  scenario 'viewing a summary badge for a not existing job' do
     adjust_data
     visit '/public/testrepo/master/tests/summary.svg'
     expect(first('svg')).to have_content 'Not available'
@@ -81,7 +81,7 @@ feature 'Summary Badges' do
 
   scenario 'viewing a summary badge for a not public repository' do
     adjust_data
-    FactoryGirl.create :passed_execution,
+    FactoryGirl.create :passed_job,
                        tree_id: Branch.find_by(name: 'master').current_commit.tree_id,
                        name: 'Tests'
     Repository.first.update_attributes! public_view_permission: false

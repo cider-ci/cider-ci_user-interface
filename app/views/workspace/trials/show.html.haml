@@ -3,6 +3,7 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - trial ||= @trial 
+- scripts ||= @scripts
 - issues = trial.trial_issues
 - cache [trial.cache_signature,
           trial.trial_attachments.collection_cache_tag,admin?] do
@@ -64,7 +65,7 @@
       %b #{executor_name}.
 
   -unless trial.error.blank?
-    %h3 Execution Error
+    %h3 Job Error
     %pre
       %code= trial.error
 
@@ -86,9 +87,9 @@
       %h2 Scripts 
       %ul.list-inline 
         = render partial: 'script_label', 
-          collection: trial.scripts.map{|k,v| v.merge({"id" => k})}, 
+          collection: scripts, 
           as: :script
 
       %ul.list-unstyled.scripts
         = render partial: 'script', 
-          collection: trial.scripts.map{|k,v| v.merge({"id" => k})}
+          collection: scripts

@@ -1,0 +1,26 @@
+.row
+  .col-md-9
+    %ol.breadcrumb.pull-left
+      = render '/breadcrumbs/job', job: @job
+      %li.active JobSpecification
+
+
+%section.job-specification
+
+  %h1 JobSpecification 
+
+
+  - if @job.job_specification 
+
+    %p This is the job_specification which was used to build the corresponding tasks.
+
+    %pre= @job.job_specification.data.to_yaml
+
+  - else 
+
+    %p.text-danger
+
+      There is no specification. Possibly something went wrong. Have a look at
+      the job-issues or the log files.
+
+

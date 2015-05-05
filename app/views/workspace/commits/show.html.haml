@@ -1,0 +1,51 @@
+- commit = @commit
+#commit{data: {id: commit.id}}
+
+  .row
+    .col-md-6
+      %ol.breadcrumb.pull-left
+        = render '/breadcrumbs/commit', commit: commit
+
+    .col-md-6
+      %ol.breadcrumb.with-circle-separator.pull-right
+        %li
+          =link_to workspace_tree_dotfile_path(tree_id: @commit.tree_id), class: ""  do
+            %span Dotfile
+        %li 
+          = link_to workspace_jobs_path(tree_id: commit.tree_id) do
+            Jobs 
+        %li 
+          = link_to workspace_tree_attachments_path(commit.tree_id) do
+            Tree-Attachments
+
+  %ul.list-inline.actions.pull-right
+    - if commit.branches.count > 0
+      %li.for-signed-in-user
+        =link_to new_workspace_job_path(tree_id: commit.tree_id), class: "btn btn-primary run-a-job"  do
+          %i.icon-job
+          %span Run job
+
+
+  %h1 Commit "#{commit.subject}"
+
+  Commit-id: 
+  %span.to-clipboard #{commit.id}, tree-id: 
+  %span.to-clipboard #{commit.tree_id}. 
+
+
+  %p
+    Authored
+    -if commit.committer_name == commit.author_name
+      and committed 
+    by 
+    %em #{commit.author_name}
+    -if commit.committer_name != commit.author_name
+      and committed by
+      %em #{commit.commitor_name} 
+    %span<=render 'humanized_time_from_now', at: commit.author_date
+    %span<>.
+
+
+  %p.body #{commit.body}
+
+

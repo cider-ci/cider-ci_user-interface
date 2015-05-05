@@ -5,7 +5,7 @@
 - trial ||= @trial
 - cache trial.cache_signature do 
   - task = trial.task
-  - execution = task.execution
+  - job = task.job
   - state ||= trial.state
   %tr
     %td
@@ -23,9 +23,9 @@
 
     %td 
       %small
-        =execution.name
+        =job.name
         on
-        =link_to_commit execution.commit
+        =link_to_commit job.commit
 
     %td
       = link_to workspace_trial_path(trial) do

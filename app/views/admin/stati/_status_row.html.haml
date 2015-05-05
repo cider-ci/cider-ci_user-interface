@@ -1,14 +1,15 @@
 %tr 
   %td= name
   %td 
-    - if result[:success]
+    - if result.is_success
       %i.success.icon-online.fa.fa-fw.fa-heart
       OK 
     - else
       %i.warning.fa.fa-fw.fa-heart-o
       Failed 
   %td
-    %pre.pre-scrollable= result.to_yaml
-
-
+    - if result.content.present?
+      %pre.pre-scrollable= result.content.to_yaml
+    - else
+      %pre.pre-scrollable== result.to_h.to_yaml
 

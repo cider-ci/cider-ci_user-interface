@@ -3,25 +3,18 @@ module Concerns
     extend ActiveSupport::Concern
 
     def http_get(url, username = ::Settings.basic_auth.username,
-                 password = ::Settings.basic_auth.password)
-      begin
-        request = RestClient::Request.new(
-          method: :get,
-          url: url,
-          user: username,
-          password: password,
-          verify_ssl: false,
-          headers: { accept:  :json,
-                     content_type:  :json })
-        response = request.execute
-        { success: (response.code <= 299) ? true : false,
-          code: response.code,
-          message: JSON.parse(response.body) }
-      rescue Exception => e
-        Rails.logger.error Formatter.exception_to_log_s(e, url)
-        { succes: false, message: 'request failed' }
-      end
-    end
+                 password = ::Settings.basic_auth.password, &block)
 
+      http_request = Faraday.new(url: url) do |f|
+        f.basic_auth username, password
+        # f.use Faraday::Response::RaiseError
+        f.request :retry
+        f.adapter Faraday.default_adapter
+        f.ssl.verify = false
+      end
+
+      http_request.get block
+    end
   end
+
 end

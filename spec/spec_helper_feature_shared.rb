@@ -121,6 +121,6 @@ def current_fragment
   Addressable::URI.parse(current_url).fragment
 end
 
-def visit(_most_recent_execution)
+def visit(_most_recent_job)
   visit(Execufion.reorder('created_at DESC').first)
 end

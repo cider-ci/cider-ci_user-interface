@@ -18,9 +18,7 @@
 #= require jquery_ujs
 #= require jquery.ui.all
 #= require bootstrap
-#= require codemirror
-#= require moment
-#= require underscore
+#= require bundle
 #= require logger
 #= require_tree ./reload
 #= require_tree ./misc 

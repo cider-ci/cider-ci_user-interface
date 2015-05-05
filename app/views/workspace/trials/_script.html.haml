@@ -3,9 +3,9 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - state =script["state"]
-%li.script.well{data: {state: state}}  
+%li.script.well{data: {state: state, name: script["name"], started_at: script["started_at"]}}  
 
-  %h3{id: script["id"], name: script["name"]}
+  %h3{id: script["name"], name: script["name"]}
     %span.label{class: label_class_for_state(state)}<>
       %i{class: icon_class_for_state(state)}<>
     %span &nbsp; "#{script["name"]}"
@@ -32,13 +32,5 @@
         %pre.script{class: att_name}= script[att_name]
 
 
-  %h4 Other properties
-  %table.table.table-bordered.table-condensed
-    %thead
-    %tbody
-      - script.reject{|k,v| %(id trial_id state created_at updated_at started_at finished_at name body error stderr stdout).include? k}.sort.each do |k,v|
-        %tr 
-          %td=k 
-          %td
-            %pre.script{style: "border: none; padding: 0; margin: 0"}<>= (v.is_a? Array or v.is_a? Hash) ? v.to_yaml : v
-
+  %h4 All properties
+  %pre.script= script.to_yaml

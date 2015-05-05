@@ -10,7 +10,8 @@ feature 'Managing Executors as Admin ', browser: :firefox  do
     expect(current_path).to be == admin_executors_path
   end
 
-  scenario 'Creating a new executor'  do
+  scenario 'Create, Edit and Delete executor'  do
+
     Executor.destroy_all
     sign_in_as 'adam'
     visit admin_executors_path
@@ -20,27 +21,21 @@ feature 'Managing Executors as Admin ', browser: :firefox  do
     click_on 'Create'
     expect(page).to have_content 'has been created'
     expect(page).to have_content 'Executor1'
-  end
 
-  scenario 'Editing a executor' do
-    sign_in_as 'adam'
-    visit admin_executors_path
     first('a,button', text: 'Show more').click
     first('a,button', text: 'Edit').click
     find('input#executor_name').set 'NewExecutorName'
     click_on('Save')
     expect(page).to have_content 'been updated'
     expect(page).to have_content 'NewExecutorName'
-  end
 
-  scenario 'Deleting a executor' do
     executors_count = Executor.count
-    sign_in_as 'adam'
     visit admin_executors_path
     first('a,button', text: 'Show more').click
     first('a,button', text: 'Delete').click
     expect(page).to have_content 'been deleted'
     expect(Executor.count).to be == executors_count - 1
+
   end
 
 end

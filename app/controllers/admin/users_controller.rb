@@ -31,8 +31,7 @@ class Admin::UsersController < AdminController
       search_options = { \
         users: { login: search_term, last_name: search_term,
                  first_name: search_term }, \
-        email_addresses: { email_address: search_term,
-                           searchable: search_term } }
+        email_addresses: { email_address: search_term } }
       @users = \
         @users.joins('LEFT OUTER JOIN email_addresses
                      ON email_addresses.user_id = users.id'.squish) \

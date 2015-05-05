@@ -10,7 +10,7 @@ module Concerns
       validate :id_matches_data, on: :update
 
       before_create do |instance|
-        instance.id = Specification.id_hash(instance.data)
+        instance.id = JobSpecification.id_hash(instance.data)
       end
 
       default_scope { order(:id) }

@@ -9,13 +9,13 @@ class Workspace::TasksController < WorkspaceController
   def retry
     set_task
     Messaging.publish('task.create-trial', id: @task.id)
-    redirect_to workspace_execution_path(@task.execution),
+    redirect_to workspace_job_path(@task.job),
                 flash: { successes: ['A new trial will be executed'] }
   end
 
   def show
     set_task
-    require_sign_in unless @task.execution.public_view_permission?
+    require_sign_in unless @task.job.public_view_permission?
   end
 
   def result

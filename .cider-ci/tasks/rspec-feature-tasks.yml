@@ -74,16 +74,16 @@
   scripts:
     main:
       body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/commits_spec.rb"
-"./spec/features/workspace/execution_spec.rb":
-  name: "./spec/features/workspace/execution_spec.rb"
+"./spec/features/workspace/job_spec.rb":
+  name: "./spec/features/workspace/job_spec.rb"
   scripts:
     main:
-      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/execution_spec.rb"
-"./spec/features/workspace/executions_spec.rb":
-  name: "./spec/features/workspace/executions_spec.rb"
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/job_spec.rb"
+"./spec/features/workspace/jobs_spec.rb":
+  name: "./spec/features/workspace/jobs_spec.rb"
   scripts:
     main:
-      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/executions_spec.rb"
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/jobs_spec.rb"
 "./spec/features/workspace/results_spec.rb":
   name: "./spec/features/workspace/results_spec.rb"
   scripts:
@@ -94,11 +94,11 @@
   scripts:
     main:
       body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/session_spec.rb"
-"./spec/features/workspace/task_spec.rb":
-  name: "./spec/features/workspace/task_spec.rb"
+"./spec/features/workspace/task_specification.rb":
+  name: "./spec/features/workspace/task_specification.rb"
   scripts:
     main:
-      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/task_spec.rb"
+      body: DISPLAY=":$XVNC_PORT" bundle exec rspec "./spec/features/workspace/task_specification.rb"
 "./spec/features/workspace/tasks_spec.rb":
   name: "./spec/features/workspace/tasks_spec.rb"
   scripts:

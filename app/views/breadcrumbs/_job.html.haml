@@ -1,0 +1,9 @@
+= render partial: "/breadcrumbs/jobs" 
+
+%li 
+  = link_to workspace_jobs_path(tree_id: job.tree_id), class: "aktive" do
+    Related jobs
+%li 
+  = link_to workspace_job_path(job), class: "aktive" do
+    Job
+

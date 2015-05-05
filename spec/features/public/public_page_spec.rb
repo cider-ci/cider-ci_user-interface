@@ -29,24 +29,24 @@ feature 'Public start page' do
 
   end
 
-  scenario 'redirect for non existing execution' do
+  scenario 'redirect for non existing job' do
 
-    visit '/public/executions/notarepo/master/tests'
+    visit '/public/jobs/notarepo/master/tests'
 
     expect(page).to have_content '404 Not found'
 
   end
 
-  scenario 'public execution redirect to private repo' do
+  scenario 'public job redirect to private repo' do
 
     Repository.find('f182ec87-591a-58bc-b08e-7e83679a4b68') \
       .update_attributes! public_view_permission: false
 
-    visit '/public/executions/Cider-CI%20Bash%20Demo%20Project/master/tests'
+    visit '/public/jobs/Cider-CI%20Bash%20Demo%20Project/master/tests'
 
     # redirects
     expect(page.current_path).to be == \
-      workspace_execution_path(Execution.find_by(name: 'Tests'))
+      workspace_job_path(Job.find_by(name: 'Tests'))
 
     # however we are not authorized
 
@@ -54,18 +54,18 @@ feature 'Public start page' do
 
   end
 
-  scenario 'public execution redirect for public repo' do
+  scenario 'public job redirect for public repo' do
 
     Repository.find('f182ec87-591a-58bc-b08e-7e83679a4b68') \
       .update_attributes! public_view_permission: true
 
-    visit '/public/executions/Cider-CI%20Bash%20Demo%20Project/master/tests'
+    visit '/public/jobs/Cider-CI%20Bash%20Demo%20Project/master/tests'
 
     # redirects
     expect(page.current_path).to be == \
-      workspace_execution_path(Execution.find_by(name: 'Tests'))
+      workspace_job_path(Job.find_by(name: 'Tests'))
 
-    expect(page).to have_content 'Execution "Tests"'
+    expect(page).to have_content 'Job "Tests"'
 
   end
 

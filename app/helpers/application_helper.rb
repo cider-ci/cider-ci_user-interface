@@ -16,10 +16,12 @@ module ApplicationHelper
       'icon-executing'
     when 'failed'
       'icon-failed'
-    when 'pending'
-      'icon-pending'
     when 'passed'
       'icon-passed'
+    when 'pending'
+      'icon-pending'
+    when 'skipped'
+      'icon-skipped'
     end
   end
 
@@ -64,6 +66,8 @@ module ApplicationHelper
       'label-pending'
     when 'executing', 'dispatched'
       'label-executing'
+    when 'aborted', 'skipped'
+      'label-warning'
     else
       'label-default'
     end

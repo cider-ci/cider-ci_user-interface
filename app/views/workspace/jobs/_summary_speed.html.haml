@@ -1,0 +1,25 @@
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Licensed under the terms of the GNU Affero General Public License v3.
+-#  See the LICENSE.txt file provided with this software.
+
+- speedup = (job.accumulated_time/job.duration).round(2) rescue nil
+- duration = job.duration.round rescue nil
+- time = job.accumulated_time.round rescue nil
+
+- cache [speedup,duration,time] do |cache_tag|
+
+  #speed-summary.table-responsive.reload.replace-without-animation{data: {cache_tag: cache_tag}}
+    %table.table.summary
+      %thead
+      %tbody
+        %tr
+          - if speedup
+            %td Speedup: #{speedup}
+          - if duration
+            %td 
+              Duration: 
+              %span.humanize-duration{data: {duration: duration}} #{duration} seconds
+          - if time
+            %td 
+              Processing time: 
+              %span.humanize-duration{data: {duration: time}} #{time} seconds

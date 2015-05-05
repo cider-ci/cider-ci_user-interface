@@ -1,9 +1,9 @@
 - host_info_width= view_params[:host_info_text_width] + 24
 - git_info_x_offset= host_info_width 
 - git_info_width= view_params[:git_info_text_width] + 24
-- execution_info_x_offset= git_info_x_offset + git_info_width
-- execution_info_width= view_params[:execution_info_text_width] + 24
-- total_width= host_info_width + git_info_width + execution_info_width
+- job_info_x_offset= git_info_x_offset + git_info_width
+- job_info_width= view_params[:job_info_text_width] + 24
+- total_width= host_info_width + git_info_width + job_info_width
 
 %svg.cider-ci.badge-small(x=0 y=0 width=total_width height=20
       xmlns="http://www.w3.org/2000/svg" 
@@ -25,9 +25,9 @@
     %g 
       %text(x="50%" y=14)= view_params[:git_info_text]
 
-  %svg.execution-info(x=execution_info_x_offset y=0 height=20 width=execution_info_width)
-    %rect.execution-info(x=0 y=0 height=20 width=execution_info_width){class: view_params[:state]}
+  %svg.job-info(x=job_info_x_offset y=0 height=20 width=job_info_width)
+    %rect.job-info(x=0 y=0 height=20 width=job_info_width){class: view_params[:state]}
     %g 
-      %text(x="50%" y=14)= view_params[:execution_info_text]
+      %text(x="50%" y=14)= view_params[:job_info_text]
 
 

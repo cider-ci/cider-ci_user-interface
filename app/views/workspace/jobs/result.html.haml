@@ -1,0 +1,13 @@
+- job ||= @job
+.result
+
+  .row
+    .col-md-6
+      %ol.breadcrumb.pull-left
+        = render '/breadcrumbs/job_result', job: job
+
+  %h2 
+    Result 
+
+  = render "structured_data", data: job.result
+

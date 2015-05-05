@@ -1,0 +1,14 @@
+
+.panel.panel-danger
+  .panel-heading
+    .h1 
+      Dotfile Error
+      - if @dotfile_response.status.present?
+        #{@dotfile_response.status}
+
+  .panel-body
+    %p The response-body might help to understand the cause of the problem: 
+
+    - if @dotfile_response.body.present? 
+      %pre
+        = @dotfile_response.body

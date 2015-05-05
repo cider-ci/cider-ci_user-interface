@@ -45,11 +45,11 @@ CiderCI::Application.routes.draw do
 
     resources :branch_update_triggers
     resources :commits
-    resources :executions do
+    resources :jobs do
       member do
         get :tasks
         get :tree_attachments
-        get :specification
+        get :job_specification
         get :issues, action: 'issues'
         delete 'issues/:issue_id', action: 'delete_issue', as: 'issue'
         post :add_tags
@@ -57,6 +57,12 @@ CiderCI::Application.routes.draw do
         get 'result'
       end
     end
+
+    resources :trees, only: [] do 
+      get :attachments
+      get :dotfile
+    end
+
     resources :executors
 
     resources :repositories do
@@ -93,7 +99,6 @@ CiderCI::Application.routes.draw do
     resource :status
 
     resources :branch_update_triggers
-    resources :definitions
     resources :users do
       member do
         # resources :email_addreses
@@ -126,21 +131,21 @@ CiderCI::Application.routes.draw do
 
     # ħttp://localhost:8880/cider-ci/ui/public/attachments/Cider-CI%20Bash%20Demo%20Project/master/Tests/log/hello.txt
     #
-    get 'attachments/:repository_name/:branch_name/:execution_name/*path',
+    get 'attachments/:repository_name/:branch_name/:job_name/*path',
         action: :redirect_to_tree_attachment_content,
         constraints: { path: /.*/ }
 
-    get 'executions/:repository_name/:branch_name/:execution_name',
-        action: :redirect_to_execution
+    get 'jobs/:repository_name/:branch_name/:job_name',
+        action: :redirect_to_job
 
-    get '/:repository_name/:branch_name/:execution_names/summary',
+    get '/:repository_name/:branch_name/:job_names/summary',
         controller: 'summary', action: 'show', as: 'summary'
 
     resources :badges, only: [] do
       collection do
-        get 'medium/:repository_name/:branch_name/:execution_name', action: 'medium'
-        get 'small/:repository_name/:branch_name/:execution_name', action: 'small'
-        # get ":repository/:branch_name/:execution_name"
+        get 'medium/:repository_name/:branch_name/:job_name', action: 'medium'
+        get 'small/:repository_name/:branch_name/:job_name', action: 'small'
+        # get ":repository/:branch_name/:job_name"
       end
     end
   end

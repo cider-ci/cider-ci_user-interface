@@ -10,8 +10,8 @@ class Branch < ActiveRecord::Base
   has_and_belongs_to_many :commits
   belongs_to :current_commit, class_name: 'Commit', foreign_key: 'current_commit_id'
 
-  def executions
-    Execution.joins(commits: :head_of_branches).where('branches.id = ?', id)
+  def jobs
+    Job.joins(commits: :head_of_branches).where('branches.id = ?', id)
   end
 
   default_scope { order(name: :asc) }

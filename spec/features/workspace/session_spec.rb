@@ -25,7 +25,7 @@ feature 'Account', browser: :firefox  do
     click_on 'Save'
     expect(page).to have_content('The session parameters have been set')
 
-    visit workspace_executions_path
+    visit workspace_jobs_path
     visit edit_workspace_session_path
 
     expect(find('input#mini_profiler_enabled')).to be_checked
@@ -38,7 +38,7 @@ feature 'Account', browser: :firefox  do
     click_on 'Save'
     expect(page).to have_content('The session parameters have been set')
 
-    visit workspace_executions_path
+    visit workspace_jobs_path
     visit edit_workspace_session_path
 
     expect(find('select#reload_frequency').value).to be == 'slow'

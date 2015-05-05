@@ -1,13 +1,14 @@
 class BranchesCommits < ActiveRecord::Migration
 
   def up
+
     create_table :branches_commits , id: false do |t| 
       t.uuid :branch_id
       t.string :commit_id, limit: 40
     end
     execute 'ALTER TABLE branches_commits ADD PRIMARY KEY (commit_id,branch_id);'
-    add_foreign_key :branches_commits, :commits, dependent: :delete
-    add_foreign_key :branches_commits, :branches, dependent: :delete
+    add_foreign_key :branches_commits, :commits, on_delete: :cascade
+    add_foreign_key :branches_commits, :branches, on_delete: :cascade
 
     execute %[
       CREATE OR REPLACE FUNCTION with_descendants(varchar(40)) RETURNS table(descendant_id varchar)

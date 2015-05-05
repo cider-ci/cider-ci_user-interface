@@ -48,7 +48,10 @@ RSpec.configure do |config|
 
   config.before(:each) do |example|
     truncate_tables
-    PgTasks.data_restore Rails.root.join('db', 'personas.pgbin')
+    User.find_or_create_by(login: 'adam', is_admin: true).update_attributes!(
+      first_name: 'Adam', last_name: 'Admin', password: 'password')
+    User.find_or_create_by(login: 'normin').update_attributes!(
+      first_name: 'Normin', last_name: 'Normalo', password: 'password')
     set_browser(example)
   end
 

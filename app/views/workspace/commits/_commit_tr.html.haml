@@ -5,15 +5,15 @@
 - commit ||= @commit
 - cs = @commit_cache_signatures ? @commit_cache_signatures.select{|cs| cs.commit_id == commit.id}.first :  commit.commit_cache_signature
 
-- cache [commit.cache_signature, cs.branches_signature, cs.executions_signature, cs.repositories_signature] do |cache_tag|
+- cache [commit.cache_signature, cs.branches_signature, cs.jobs_signature, cs.repositories_signature] do |cache_tag|
   - branches = commit.branches.select(:name,:current_commit_id).reorder("branches.name ASC")
   - repositories = commit.repositories.uniq.sort
 
   %tr.commit.reload{{id: "commit-tr_#{commit.id}",data: {cache_tag: cache_tag}}}
 
     %td.id.links
-      -# =link_to workspace_commit_path(commit) do
-      %span.commit-id= commit.id[0..5]
+      =link_to workspace_commit_path(commit), class: "show-commit" do
+        %span.commit-id= commit.id[0..5]
       = render 'remote_links', commit: commit, repositories: commit.repositories.uniq.sort
 
     %td.subject
@@ -26,7 +26,7 @@
     %td.repositories
       %ul.list-unstyled
         - repositories.each do |repository| 
-          %li<>
+          %li.repository{data: {name: repository.name }}<>
             %span.nowrap
               -# %i.icon-repository
               %strong.nowrap= repository.name
@@ -35,23 +35,23 @@
       %ul.list-unstyled
         = render partial: "branch_li", collection: branches, as: :branch, locals: {commit: commit}
 
-    %td.executions
+    %td.jobs
       %ul.list-unstyled
-        - commit.executions.each do |execution|
-          %li 
+        - commit.jobs.each do |job|
+          %li.job{data: {name: job.name, state: job.state}}
             %span.nowrap
               %span<>
-                =link_to workspace_execution_path(execution), class: "label #{label_class_for_state(execution.state)}" do
-                  %i{class: icon_class_for_state(execution.state)}<>
-              = link_to workspace_execution_path(execution)  do
-                %span{style: "margin-left: 0.5em"}=execution.name.truncate(12)
+                =link_to workspace_job_path(job), class: "label #{label_class_for_state(job.state)}" do
+                  %i{class: icon_class_for_state(job.state)}<>
+              = link_to workspace_job_path(job)  do
+                %span{style: "margin-left: 0.5em"}=job.name.truncate(12)
 
     %td.actions
       %ul.actions.list-inline
         - if commit.branches.count > 0
           %li
-            =link_to new_workspace_execution_path(tree_id: commit.tree_id), class: "btn btn-xs btn-primary"  do
-              %i.icon-execution
+            =link_to new_workspace_job_path(tree_id: commit.tree_id), class: "btn btn-xs btn-primary run-a-job"  do
+              %i.icon-job
               %span Run &hellip; 
 
 -#    %td.repositories-and-branches
@@ -67,21 +67,21 @@
 -#
 -#             
 -#
--#    %td.executions
+-#    %td.jobs
 -#      %ul.list-unstyled
--#        - commit.executions.each do |execution|
+-#        - commit.jobs.each do |job|
 -#          %li 
 -#            %span.nowrap
 -#              %span<>
--#                =link_to workspace_execution_path(execution), class: "label #{label_class_for_state(execution.state)}" do
--#                  %i{class: icon_class_for_state(execution.state)}<>
--#              = link_to workspace_execution_path(execution)  do
--#                %span{style: "margin-left: 0.5em"}=execution.name.truncate(12)
+-#                =link_to workspace_job_path(job), class: "label #{label_class_for_state(job.state)}" do
+-#                  %i{class: icon_class_for_state(job.state)}<>
+-#              = link_to workspace_job_path(job)  do
+-#                %span{style: "margin-left: 0.5em"}=job.name.truncate(12)
 -#              
 -#    %td.actions
 -#      %ul.actions.list-inline
 -#        - if commit.branches.count > 0
 -#          %li
--#            =link_to new_workspace_execution_path(commit_id: commit.id), class: "btn btn-xs btn-primary"  do
--#              %i.icon-execution
+-#            =link_to new_workspace_job_path(commit_id: commit.id), class: "btn btn-xs btn-primary"  do
+-#              %i.icon-job
 -#              %span Execute

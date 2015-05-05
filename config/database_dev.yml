@@ -5,16 +5,17 @@ default: &default
   pool: 3
   username: cider-ci
   password: cider-ci
- 
+  database: cider-ci_v3_development
+
 development:
   <<: *default
-  database: cider-ci_development
 
 test: &test
   <<: *default
-  database: cider-ci_test
+  database: cider-ci_v3_test
 
 production:
-  database: cider-ci_production
   <<: *default
+  #database: cider-ci_v3_production
+
 

@@ -24,7 +24,7 @@ class Public::SummaryController < ApplicationController
 
     summary_properties = build_summary_properties(
       params[:repository_name], params[:branch_name],
-      params[:execution_names], options)
+      params[:job_names], options)
 
     @svg = render_summary_svg summary_properties
 

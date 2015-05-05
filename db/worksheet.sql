@@ -3,7 +3,7 @@
 SELECT trials.*
 FROM trials
 INNER JOIN tasks ON tasks.id = trials.task_id
-INNER JOIN executions ON executions.id = tasks.execution_id
+INNER JOIN jobs ON jobs.id = tasks.job_id
 WHERE ((trials.state = 'pending'
         AND exists(
                      (SELECT 1
@@ -18,8 +18,8 @@ WHERE ((trials.state = 'pending'
                          INNER JOIN tasks active_tasks ON active_tasks.id = active_trials.task_id
                          WHERE ((active_trials.state IN ('executing', 'dispatching'))
                                 AND active_tasks.exclusive_global_resources && tasks.exclusive_global_resources))))
-ORDER BY executions.priority DESC,
-         executions.created_at ASC,
+ORDER BY jobs.priority DESC,
+         jobs.created_at ASC,
          tasks.priority DESC,
          tasks.created_at ASC,
          trials.created_at ASC LIMIT 1
@@ -69,11 +69,11 @@ ALTER TABLE trials DROP CONSTRAINT valid_state;
 explain analyze SELECT commits.id AS commit_id,
        count(branches.id)::text || ' - ' ||  max(branches.updated_at)::text as branches_signature,
        md5(string_agg(DISTINCT repositories.updated_at::text,', 'ORDER BY repositories.updated_at::text)) AS repositories_signature,
-       md5(string_agg(DISTINCT executions.updated_at::text,', 'ORDER BY executions.updated_at::text)) AS executions_signature
+       md5(string_agg(DISTINCT jobs.updated_at::text,', 'ORDER BY jobs.updated_at::text)) AS jobs_signature
 FROM commits
 LEFT OUTER JOIN branches_commits ON branches_commits.commit_id = commits.id
 LEFT OUTER JOIN branches ON branches_commits.branch_id= branches.id
-LEFT OUTER JOIN executions ON executions.tree_id = commits.tree_id
+LEFT OUTER JOIN jobs ON jobs.tree_id = commits.tree_id
 LEFT OUTER JOIN repositories ON branches.repository_id= repositories.id
 WHERE commits.id = '9525afe09976766eb5d8c881d173f7269675f24b'
 GROUP BY commits.id;
@@ -110,18 +110,18 @@ OFFSET 0
 
 
 OFFSET 0
--- TODO test/add (tasks.execution_id, tasks.updated_at) index 
--- TODO test/add (tasks.execution_id, tasks.state ) index 
+-- TODO test/add (tasks.job_id, tasks.updated_at) index 
+-- TODO test/add (tasks.job_id, tasks.state ) index 
 -- TODO add tasks.updated_at index 
 -- TODO add tasks.state index
 
 
-explain analyze SELECT * FROM execution_stats 
-where execution_id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'; 
+explain analyze SELECT * FROM job_stats 
+where job_id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'; 
 
-explain analyze SELECT "execution_cache_signatures".*
-FROM "execution_cache_signatures"
-WHERE (execution_id IN ('78d5fca7-2b45-47b6-be4e-e1d43cdb4b12',
+explain analyze SELECT "job_cache_signatures".*
+FROM "job_cache_signatures"
+WHERE (job_id IN ('78d5fca7-2b45-47b6-be4e-e1d43cdb4b12',
                         '9083e49f-20df-4f7d-ada7-403e6477b879',
                         '73909e12-02b3-47ae-a4bc-cab93e3ba071',
                         'ded35229-12dc-4471-9b9d-288fc33fc67d',
@@ -135,68 +135,68 @@ WHERE (execution_id IN ('78d5fca7-2b45-47b6-be4e-e1d43cdb4b12',
                         'a95f4bd6-afb4-4abc-879b-a5c3eaa7d8f2'))
                     ;
 
-explain analyze SELECT executions.id as execution_id,
+explain analyze SELECT jobs.id as job_id,
 md5(string_agg(DISTINCT branches.updated_at::text,', 'ORDER BY branches.updated_at::text)) AS branches_signature,
 md5(string_agg(DISTINCT commits.updated_at::text,', 'ORDER BY commits.updated_at::text)) AS commits_signature,
 md5(string_agg(DISTINCT repositories.updated_at::text,', 'ORDER BY repositories.updated_at::text)) AS repositories_signature,
 md5(string_agg(DISTINCT tags.updated_at::text,', 'ORDER BY tags.updated_at::text)) AS tags_signature,
 count(DISTINCT tasks.id)::text || ' - ' ||  max(tasks.updated_at)::text as tasks_signature
-FROM executions
-LEFT OUTER JOIN commits ON executions.tree_id = commits.tree_id
+FROM jobs
+LEFT OUTER JOIN commits ON jobs.tree_id = commits.tree_id
 LEFT OUTER JOIN branches_commits ON branches_commits.commit_id = commits.id
 LEFT OUTER JOIN branches ON branches_commits.branch_id= branches.id
 LEFT OUTER JOIN repositories ON branches.repository_id= repositories.id
-LEFT OUTER JOIN tasks ON tasks.execution_id = executions.id
-LEFT OUTER JOIN executions_tags ON executions_tags.execution_id = executions.id
-LEFT OUTER JOIN tags ON executions_tags.tag_id = tags.id
-WHERE executions.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
-GROUP BY executions.id;
+LEFT OUTER JOIN tasks ON tasks.job_id = jobs.id
+LEFT OUTER JOIN jobs_tags ON jobs_tags.job_id = jobs.id
+LEFT OUTER JOIN tags ON jobs_tags.tag_id = tags.id
+WHERE jobs.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
+GROUP BY jobs.id;
 
-explain analyze SELECT executions.id as execution_id,
+explain analyze SELECT jobs.id as job_id,
 md5(string_agg(DISTINCT branches.updated_at::text,', 'ORDER BY branches.updated_at::text)) AS branches_signature,
 md5(string_agg(DISTINCT commits.updated_at::text,', 'ORDER BY commits.updated_at::text)) AS commits_signature,
 md5(string_agg(DISTINCT repositories.updated_at::text,', 'ORDER BY repositories.updated_at::text)) AS repositories_signature,
-(SELECT (md5(string_agg(executions_tags.tag_id::text,',' ORDER BY tag_id))) FROM executions_tags WHERE executions_tags.execution_id = executions.id) AS tags_signature,
-(SELECT (count(DISTINCT tasks.id)::text || ' - ' || max(tasks.updated_at)::text ) FROM tasks WHERE tasks.execution_id = executions.id) as tasks_signature,
-(SELECT ( count(trials.id)::text || ' - ' ||  max(trials.updated_at)::text ) FROM tasks JOIN trials ON trials.task_id = tasks.id WHERE tasks.execution_id = executions.id) AS trials_signature,
-(SELECT concat_ws(':', total,failed,executing,pending,success) FROM execution_stats WHERE execution_id = executions.id) as stats_signature
-FROM executions
-LEFT OUTER JOIN commits ON executions.tree_id = commits.tree_id
+(SELECT (md5(string_agg(jobs_tags.tag_id::text,',' ORDER BY tag_id))) FROM jobs_tags WHERE jobs_tags.job_id = jobs.id) AS tags_signature,
+(SELECT (count(DISTINCT tasks.id)::text || ' - ' || max(tasks.updated_at)::text ) FROM tasks WHERE tasks.job_id = jobs.id) as tasks_signature,
+(SELECT ( count(trials.id)::text || ' - ' ||  max(trials.updated_at)::text ) FROM tasks JOIN trials ON trials.task_id = tasks.id WHERE tasks.job_id = jobs.id) AS trials_signature,
+(SELECT concat_ws(':', total,failed,executing,pending,success) FROM job_stats WHERE job_id = jobs.id) as stats_signature
+FROM jobs
+LEFT OUTER JOIN commits ON jobs.tree_id = commits.tree_id
 LEFT OUTER JOIN branches_commits ON branches_commits.commit_id = commits.id
 LEFT OUTER JOIN branches ON branches_commits.branch_id= branches.id
 LEFT OUTER JOIN repositories ON branches.repository_id= repositories.id
-WHERE executions.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
-GROUP BY executions.id;
+WHERE jobs.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
+GROUP BY jobs.id;
 
 
-explain analyze SELECT concat_ws(':', total,failed,executing,pending,success)  FROM execution_stats
-WHERE execution_id = 'ded35229-12dc-4471-9b9d-288fc33fc67d' ;
+explain analyze SELECT concat_ws(':', total,failed,executing,pending,success)  FROM job_stats
+WHERE job_id = 'ded35229-12dc-4471-9b9d-288fc33fc67d' ;
 
 
 explain analyze SELECT (
   SELECT ( count(trials.id)::text || ' - ' ||  max(trials.updated_at)::text ) FROM tasks 
   JOIN trials ON trials.task_id = tasks.id 
-  WHERE tasks.execution_id = executions.id)   FROM executions
-WHERE executions.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d' ;
+  WHERE tasks.job_id = jobs.id)   FROM jobs
+WHERE jobs.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d' ;
 
 
 
-explain analyze SELECT executions.id, 
-(select count(*) from tasks where tasks.execution_id = executions.id) as total
-FROM executions
-WHERE executions.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
+explain analyze SELECT jobs.id, 
+(select count(*) from tasks where tasks.job_id = jobs.id) as total
+FROM jobs
+WHERE jobs.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
 ;
 
 
-explain analyze SELECT executions.id, 
-(select count(*) from tasks where tasks.execution_id = executions.id and state = 'success') as success
-FROM executions
-WHERE executions.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
+explain analyze SELECT jobs.id, 
+(select count(*) from tasks where tasks.job_id = jobs.id and state = 'success') as success
+FROM jobs
+WHERE jobs.id = 'ded35229-12dc-4471-9b9d-288fc33fc67d'
 ;
 
 explain analyze SELECT tags_signature
-FROM "execution_cache_signatures"
-WHERE (execution_id IN ('2727b796-9054-4e39-a450-527e856efede',
+FROM "job_cache_signatures"
+WHERE (job_id IN ('2727b796-9054-4e39-a450-527e856efede',
                         '0336a2b5-2ba7-41bb-92d3-c01b21904102',
                         '3c0766a1-94a4-407e-a64d-7ca5458f65aa',
                         'c11a98be-326f-4531-9f97-3b6b39a67608',
@@ -229,7 +229,7 @@ AND trials.created_at <
       * interval '1 Minute') ;
 
 
-trial_execution_timeout_minutes
+trial_job_timeout_minutes
 
 -- ######################################
 
@@ -263,27 +263,27 @@ SELECT * from array_to_string(commit_branches('799c9d036cc0691e7c4503ef531c4fb34
 
 
 
-SELECT DISTINCT "executions".*
-FROM "executions"
-INNER JOIN "trees" ON "trees"."id" = "executions"."tree_id"
+SELECT DISTINCT "jobs".*
+FROM "jobs"
+INNER JOIN "trees" ON "trees"."id" = "jobs"."tree_id"
 INNER JOIN "commits" ON "commits"."tree_id" = "trees"."id"
 INNER JOIN "branches_commits" ON "branches_commits"."commit_id" = "commits"."id"
 INNER JOIN "branches" ON "branches"."id" = "branches_commits"."branch_id"
 INNER JOIN "repositories" ON "repositories"."id" = "branches"."repository_id"
 WHERE "repositories"."name" IN ('Domina CI Executor')
-ORDER BY "executions"."created_at" DESC LIMIT 10
+ORDER BY "jobs"."created_at" DESC LIMIT 10
 OFFSET 0;
 
 
-SELECT DISTINCT "executions".*
-FROM "executions"
-INNER JOIN "trees" ON "trees"."id" = "executions"."tree_id"
+SELECT DISTINCT "jobs".*
+FROM "jobs"
+INNER JOIN "trees" ON "trees"."id" = "jobs"."tree_id"
 INNER JOIN "commits" ON "commits"."tree_id" = "trees"."id"
 INNER JOIN "branches_commits" ON "branches_commits"."commit_id" = "commits"."id"
 INNER JOIN "branches" ON "branches"."id" = "branches_commits"."branch_id"
 INNER JOIN "repositories" ON "repositories"."id" = "branches"."repository_id"
 WHERE (repositories.name = 'Domina CI Server')
-ORDER BY "executions"."created_at" DESC LIMIT 10
+ORDER BY "jobs"."created_at" DESC LIMIT 10
 OFFSET 0
 ;
 
@@ -292,32 +292,32 @@ WHERE (repositories.name = 'Domina CI Server')
 ;
 
 
-SELECT execution_id,
+SELECT job_id,
        stats_signature,
        commits_signature,
        branches_signature
-FROM "execution_cache_signatures"
-WHERE (execution_id IN (NULL));
+FROM "job_cache_signatures"
+WHERE (job_id IN (NULL));
 
-SELECT "executions".*
-FROM "executions"
-INNER JOIN "executions_tags" ON "executions_tags"."execution_id" = "executions"."id"
-INNER JOIN "tags" ON "tags"."id" = "executions_tags"."tag_id"
+SELECT "jobs".*
+FROM "jobs"
+INNER JOIN "jobs_tags" ON "jobs_tags"."job_id" = "jobs"."id"
+INNER JOIN "tags" ON "tags"."id" = "jobs_tags"."tag_id"
 WHERE TRUE 
 -- AND (tags.tag = 'rails4')
 AND (tags.tag = 'ts')
-ORDER BY "executions"."created_at" DESC LIMIT 10
+ORDER BY "jobs"."created_at" DESC LIMIT 10
 OFFSET 0 ;
 
 
 SELECT commits.id AS commit_id,
        md5(string_agg(DISTINCT branches.updated_at::text,', 'ORDER BY branches.updated_at::text)) AS branches_signature,
        md5(string_agg(DISTINCT repositories.updated_at::text,', 'ORDER BY repositories.updated_at::text)) AS repositories_signature,
-       md5(string_agg(DISTINCT executions.updated_at::text,', 'ORDER BY executions.updated_at::text)) AS executions_signature
+       md5(string_agg(DISTINCT jobs.updated_at::text,', 'ORDER BY jobs.updated_at::text)) AS jobs_signature
 FROM commits
 LEFT OUTER JOIN branches_commits ON branches_commits.commit_id = commits.id
 LEFT OUTER JOIN branches ON branches_commits.branch_id= branches.id
-LEFT OUTER JOIN executions ON executions.tree_id = commits.tree_id
+LEFT OUTER JOIN jobs ON jobs.tree_id = commits.tree_id
 LEFT OUTER JOIN repositories ON branches.repository_id= repositories.id
 GROUP BY commits.id
 ;
@@ -325,22 +325,22 @@ GROUP BY commits.id
 
 
 
-SELECT executions.id, 
-(select count(*) from tasks where tasks.execution_id = executions.id) as total,
-(select count(*) from tasks where tasks.execution_id = executions.id and state = 'pending') as pending,
-(select count(*) from tasks where tasks.execution_id = executions.id and state = 'executing') as executing,
-(select count(*) from tasks where tasks.execution_id = executions.id and state = 'failed') as failed,
-(select count(*) from tasks where tasks.execution_id = executions.id and state = 'success') as success
-FROM executions
---WHERE executions.id = '4948b8ed-3021-49d2-a685-9d2815961980'
+SELECT jobs.id, 
+(select count(*) from tasks where tasks.job_id = jobs.id) as total,
+(select count(*) from tasks where tasks.job_id = jobs.id and state = 'pending') as pending,
+(select count(*) from tasks where tasks.job_id = jobs.id and state = 'executing') as executing,
+(select count(*) from tasks where tasks.job_id = jobs.id and state = 'failed') as failed,
+(select count(*) from tasks where tasks.job_id = jobs.id and state = 'success') as success
+FROM jobs
+--WHERE jobs.id = '4948b8ed-3021-49d2-a685-9d2815961980'
 ;
 
-SELECT DISTINCT executions.id, trials.state
+SELECT DISTINCT jobs.id, trials.state
 , count(trials.state) OVER (PARTITION BY trials.state)
-FROM executions
-LEFT OUTER JOIN tasks ON tasks.execution_id = executions.id
+FROM jobs
+LEFT OUTER JOIN tasks ON tasks.job_id = jobs.id
 LEFT OUTER JOIN trials ON trials.task_id = tasks.id
-WHERE executions.id = '4948b8ed-3021-49d2-a685-9d2815961980'
+WHERE jobs.id = '4948b8ed-3021-49d2-a685-9d2815961980'
 ;
 
 
@@ -374,30 +374,30 @@ AND _stats.id = '84140ed4-d9d8-4c21-9504-e5accfe52091' ;
 
 
 CREATE OR REPLACE VIEW  _stats AS 
-SELECT executions.id, trials.state, count(trials.*)
-FROM executions
-LEFT OUTER JOIN tasks ON tasks.execution_id = executions.id
+SELECT jobs.id, trials.state, count(trials.*)
+FROM jobs
+LEFT OUTER JOIN tasks ON tasks.job_id = jobs.id
 LEFT OUTER JOIN trials ON trials.task_id = tasks.id
-GROUP BY executions.id, trials.state;
+GROUP BY jobs.id, trials.state;
 
-SELECT executions.id as execution_id,
+SELECT jobs.id as job_id,
        md5(string_agg(DISTINCT branches.updated_at::text,', 'ORDER BY branches.updated_at::text)) AS branches_signature,
        md5(string_agg(DISTINCT commits.updated_at::text,', 'ORDER BY commits.updated_at::text)) AS commits_signature,
        md5(string_agg(DISTINCT repositories.updated_at::text,', 'ORDER BY repositories.updated_at::text)) AS repositories_signature,
        md5(string_agg(DISTINCT tasks.updated_at::text,', 'ORDER BY tasks.updated_at::text)) AS tasks_signature,
        md5(string_agg(DISTINCT trials.updated_at::text,', 'ORDER BY trials.updated_at::text)) AS trials_signature
-FROM executions
-LEFT OUTER JOIN commits ON executions.tree_id = commits.tree_id
+FROM jobs
+LEFT OUTER JOIN commits ON jobs.tree_id = commits.tree_id
 LEFT OUTER JOIN branches_commits ON branches_commits.commit_id = commits.id
 LEFT OUTER JOIN branches ON branches_commits.branch_id= branches.id
 LEFT OUTER JOIN repositories ON branches.repository_id= repositories.id
-LEFT OUTER JOIN tasks ON tasks.execution_id = executions.id
+LEFT OUTER JOIN tasks ON tasks.job_id = jobs.id
 LEFT OUTER JOIN trials ON trials.task_id = tasks.id
-GROUP BY executions.id;
+GROUP BY jobs.id;
 
-SELECT executions.id,
-FROM executions
-GROUP BY executions.id;
+SELECT jobs.id,
+FROM jobs
+GROUP BY jobs.id;
  ;
 
 
@@ -422,15 +422,15 @@ WHERE "trials"."state" = 'pending'
   AND (trials.created_at < (now() - interval '60 Minutes'))
 ;
 
--- uuid pkey for execution 
-ALTER TABLE executions ADD id uuid;
-UPDATE executions SET id = uuid_generate_v4();
-ALTER TABLE tasks ADD execution_id uuid;
+-- uuid pkey for job 
+ALTER TABLE jobs ADD id uuid;
+UPDATE jobs SET id = uuid_generate_v4();
+ALTER TABLE tasks ADD job_id uuid;
 UPDATE tasks 
-  SET execution_id = executions.id
-  FROM executions
-  WHERE tasks.tree_id = executions.tree_id
-  AND tasks.specification_id = executions.specification_id;
+  SET job_id = jobs.id
+  FROM jobs
+  WHERE tasks.tree_id = jobs.tree_id
+  AND tasks.specification_id = jobs.specification_id;
 ALTER TABLE tasks DROP tree_id;
 ALTER TABLE tasks DROP specification_id;
 
@@ -554,13 +554,13 @@ ORDER BY "commits"."created_at" DESC,
 SELECT date_part('epoch', SUM(finished_at - started_at)) AS total_duration
 FROM "trials"
 INNER JOIN "tasks" ON "tasks"."id" = "trials"."task_id"
-INNER JOIN "executions" ON "executions"."specification_id" = "tasks"."specification_id"
-AND "executions"."tree_id" = "tasks"."tree_id"
-WHERE (executions.tree_id = 'a0c367830344212ef0878d2dfb2b419fd4248a6c')
-  AND (executions.specification_id = 'a019b15a-2609-5a56-af25-e80bdbf9c2c0')
+INNER JOIN "jobs" ON "jobs"."specification_id" = "tasks"."specification_id"
+AND "jobs"."tree_id" = "tasks"."tree_id"
+WHERE (jobs.tree_id = 'a0c367830344212ef0878d2dfb2b419fd4248a6c')
+  AND (jobs.specification_id = 'a019b15a-2609-5a56-af25-e80bdbf9c2c0')
   AND ("trials"."started_at" IS NOT NULL)
   AND ("trials"."finished_at" IS NOT NULL)
-GROUP BY executions.tree_id
+GROUP BY jobs.tree_id
 ;
 
 SELECT "executors_with_load".*

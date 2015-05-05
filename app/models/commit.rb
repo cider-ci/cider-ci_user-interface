@@ -17,7 +17,7 @@ class Commit < ActiveRecord::Base
   has_one :commit_cache_signature
   has_many :head_of_branches, class_name: 'Branch',
                               foreign_key: 'current_commit_id'
-  has_many :executions, primary_key: 'tree_id', foreign_key: 'tree_id'
+  has_many :jobs, primary_key: 'tree_id', foreign_key: 'tree_id'
 
   default_scope { order(committer_date: :desc, created_at: :desc, id: :asc) }
 

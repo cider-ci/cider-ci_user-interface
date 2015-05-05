@@ -4,12 +4,12 @@
 
 class Task < ActiveRecord::Base
   self.primary_key = 'id'
-  serialize :result, JSON
+  # serialize :result, JSON
   before_create { self.id ||= SecureRandom.uuid }
-  belongs_to :execution
+  belongs_to :job
   has_many :trials
 
-  belongs_to :task_spec
+  belongs_to :task_specification
 
   validates :state, inclusion: { in: Constants::TASK_STATES }
 

@@ -1,0 +1,18 @@
+{
+  "name": "compile-js-files",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "npm install && ./node_modules/.bin/browserify -t coffeeify vendor.js.coffee -o vendor/assets/javascripts/bundle.js"
+  },
+  "dependencies": {
+    "moment": "^2.10.0",
+    "underscore": "^1.8.3"
+  },
+  "devDependencies": {
+    "browserify": "^6.2.0",
+    "coffeeify": "^1.0.0",
+    "watchify": "^2.1.1"
+  }
+}

@@ -5,11 +5,10 @@ source 'https://rubygems.org'
 ####################################################################
 
 # RAILS
-gem 'rails', '4.1.9'
+gem 'rails', '~> 4.2.1'
 
 # DATABASE
 gem 'activerecord-jdbcpostgresql-adapter',  platform: :jruby
-gem 'foreigner'
 gem 'jdbc-postgres', platform: :jruby
 gem 'pg', platform: 'mri'
 gem 'pg_tasks', '>= 1.3.0', '< 2.0.0'
@@ -34,15 +33,17 @@ gem 'sass-rails'
 gem 'bcrypt-ruby'
 gem 'bootswatch-rails'
 gem 'bunny', '>= 1.3'
+gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
 gem 'kaminari'
 gem 'newrelic_rpm'
 gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
 gem 'puma'
-gem 'rack-mini-profiler'
+#gem 'rack-mini-profiler'
 gem 'rails_config', git: 'https://github.com/DrTom/rails_config.git', ref: 'master'  
 gem 'rest-client'
+gem 'faraday'
 gem 'therubyrhino', platform: :jruby
-gem 'uglifier', '~> 1.3'
+gem 'uglifier'
 gem 'uuidtools'
 
 ####################################################################

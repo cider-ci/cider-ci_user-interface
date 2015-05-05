@@ -1,16 +1,13 @@
+require Rails.root.join("db","migrate","migration_helper.rb")
 require 'active_record/connection_adapters/abstract/schema_definitions'
 
 
 class CreateCommits < ActiveRecord::Migration
+  include MigrationHelper
 
-  def create_text_index t,c
-    execute "CREATE INDEX ON #{t.to_s} USING gin(to_tsvector('english',#{c.to_s}));"
-  end
+  def change
 
-  def up
-
-    create_table :commits, id: false do |t|
-      t.string :id, limit: 40
+    create_table :commits, id: :string, limit: 40 do |t|
 
       t.string :tree_id, limit: 40
       t.index :tree_id
@@ -30,9 +27,11 @@ class CreateCommits < ActiveRecord::Migration
       t.text :subject
       t.text :body
 
-      t.timestamps
-      t.index :created_at
     end
+
+    add_auto_timestamps :commits
+
+    add_index :commits, :updated_at
 
     create_text_index :commits, :body
     create_text_index :commits, :author_name
@@ -42,14 +41,6 @@ class CreateCommits < ActiveRecord::Migration
     create_text_index :commits, :subject
     create_text_index :commits, :body
 
-    execute 'ALTER TABLE commits ADD PRIMARY KEY (id);'
-    execute %[ALTER TABLE commits ALTER COLUMN created_at SET DEFAULT current_timestamp ]
-    execute %[ALTER TABLE commits ALTER COLUMN updated_at SET DEFAULT current_timestamp ]
-
-    execute %[
-     CREATE TRIGGER update_updated_at_column_of_commits BEFORE UPDATE
-        ON commits FOR EACH ROW EXECUTE PROCEDURE 
-        update_updated_at_column(); ]
 
     create_table :commit_arcs, id: false do |t|
       t.string :parent_id, limit: 40, null: false
@@ -57,13 +48,10 @@ class CreateCommits < ActiveRecord::Migration
     end
     add_index :commit_arcs, [:parent_id,:child_id], unique: true
     add_index :commit_arcs, [:child_id,:parent_id]
-    add_foreign_key :commit_arcs, :commits, column: :parent_id, dependent: :delete
-    add_foreign_key :commit_arcs, :commits, column: :child_id, dependent: :delete
+    add_foreign_key :commit_arcs, :commits, column: :parent_id, on_delete: :cascade
+    add_foreign_key :commit_arcs, :commits, column: :child_id, on_delete: :cascade
+
+
   end
 
-  def down
-    drop_table :commit_arcs
-    execute %[DROP TRIGGER  update_updated_at_column_of_commits ON commits ]
-    drop_table :commits
-  end
 end

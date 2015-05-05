@@ -14,20 +14,20 @@ class Public::BadgesController < PublicController
 
   def small
     build_find_by_args
-    set_execution
+    set_job
 
-    @view_params = build_small_badge_params(@execution, *@find_by_args)
+    @view_params = build_small_badge_params(@job, *@find_by_args)
 
-    if @execution and (not @execution.public_view_permission?)
+    if @job and (not @job.public_view_permission?)
       @view_params = build_small_badge_params_403(@view_params,
-                                                  params[:execution_name])
+                                                  params[:job_name])
       if params.key?(:respond_with_200)
         render
       else
         render status: 403
       end
     else
-      if @execution or params.key?(:respond_with_200)
+      if @job or params.key?(:respond_with_200)
         render
       else
         render status: 404
@@ -37,11 +37,11 @@ class Public::BadgesController < PublicController
 
   def build_find_by_args
     @find_by_args = params[:repository_name],
-                    params[:branch_name], params[:execution_name]
+                    params[:branch_name], params[:job_name]
   end
 
-  def set_execution
-    @execution = Execution.find_by_repo_branch_name(*@find_by_args)
+  def set_job
+    @job = Job.find_by_repo_branch_name(*@find_by_args)
   end
 
 end

@@ -16,8 +16,12 @@ class Workspace::CommitsController < WorkspaceController
     @commits_cache_signatures_array =
       @commits_cache_signatures.map do |cs|
       [cs.commit_id, cs.branches_signature,
-       cs.repositories_signature, cs.executions_signature]
+       cs.repositories_signature, cs.jobs_signature]
       end
+  end
+
+  def show
+    @commit = Commit.find(params[:id])
   end
 
 end

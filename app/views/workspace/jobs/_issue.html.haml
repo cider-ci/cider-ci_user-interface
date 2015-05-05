@@ -1,0 +1,20 @@
+%li 
+  .panel{class: "panel-#{issue.bootstrap_type} issue"}
+    .panel-heading
+      .pull-right 
+        = link_to issue_workspace_job_path(id: @job,issue_id: issue.id), method: 'DELETE', class: "btn btn-default btn-xs" do
+          %i.fa.fa-remove
+          Dismiss
+
+      %h2.panel-title
+        = issue.type.camelize
+        %small
+          %span<>(
+          %span<>= render 'humanized_time_from_now', at: issue.created_at
+          %span<>)
+
+    .panel-body
+      %p= issue.title
+      %pre.message!= issue.description
+
+

@@ -1,0 +1,49 @@
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Licensed under the terms of the GNU Affero General Public License v3.
+-#  See the LICENSE.txt file provided with this software.
+
+- commits = @commits
+
+%h1 Run a Job 
+
+#commits
+  %h2 For #{ commits.count > 1 ? "Commits" : "Commit"}
+  %table.commits.table.table-striped
+    %thead
+      %tbody
+        != render partial: "commit_tr", collection: commits, as: :commit
+
+
+- @runnable_jobs.map{|attrs| Job.new(attrs)}.each do |job| 
+
+  .well.well-sm.runnable-job{data: {name: job.name}}
+
+    %h4= job.name
+
+    - if job.description.present? 
+      = markdown(job.description)
+
+    = form_for job, url: workspace_jobs_path,  
+      method: 'POST', html: {class: "form-inline", role: "form" } do |f|
+
+      = f.hidden_field :tree_id
+      = f.hidden_field :description
+      = f.hidden_field :name
+      = f.hidden_field :job_specification_id
+
+      .form-group
+        %label Tags: 
+        = text_field_tag :tags, "", 
+          placeholder: "tag 1, tag 2, ...", 
+          data:{autocomplete_path: workspace_tags_path}, 
+          class: "form-control"
+
+      .form-group
+        %label Priority:
+        = f.text_field :priority, type: :number, class: "form-control" 
+
+      .form-group
+        =button_tag type: 'submit', class: "btn btn-primary" do
+          %i.icon-job
+          Run 
+

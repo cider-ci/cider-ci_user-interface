@@ -1,11 +1,10 @@
 @import jquery.ui.all
-@import codemirror
 
 // asset path helpers (sprockets) - must be loaded first!
 @import bootstrap-sprockets
-@import font-awesome-sprockets
 
 // icons (not themeable atm)
+@import font-awesome-sprockets
 @import font-awesome
 
 // select 1 bootstrap theme
@@ -26,7 +25,7 @@
 
 @import lib/svg_summary_embedded_colors
 
-@import lib/executions_table
+@import lib/jobs_table
 
 @import lib/dropdown_form_with_button 
 
@@ -43,7 +42,7 @@ i
     + li:before
       content: "○"
 
-.execution-stats-badge
+.job-stats-badge
   @each $state in $ci-states
     $i: index($ci-states,$state)
     &.#{$state}

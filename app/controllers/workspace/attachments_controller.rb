@@ -20,10 +20,10 @@ class Workspace::AttachmentsController < WorkspaceController
   def public_view_permission?(attachment)
     case attachment
     when TreeAttachment
-      Execution.where(tree_id: @attachment.tree_id) \
+      Job.where(tree_id: @attachment.tree_id) \
         .limit(1).first.public_view_permission?
     when TrialAttachment
-      Execution.joins(tasks: :trials) \
+      Job.joins(tasks: :trials) \
         .where('trials.id = ? ', @attachment.trial_id) \
         .limit(1).first.public_view_permission?
     end

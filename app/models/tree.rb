@@ -5,7 +5,7 @@
 class Tree < ActiveRecord::Base
   self.primary_key = 'id'
   has_many :commits
-  has_many :executions
+  has_many :jobs
 
   default_scope { order(:id) }
 

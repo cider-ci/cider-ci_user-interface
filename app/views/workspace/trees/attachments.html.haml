@@ -1,0 +1,27 @@
+- tree_id ||= params[:tree_id]
+
+.attachments.tree_attachments 
+
+  .row
+    .col-md-6
+      %ol.breadcrumb.pull-left
+        = render "breadcrumbs/home"
+        %li.active Tree-Attachments
+    .col-md-6
+      %ol.breadcrumb.with-circle-separator.pull-right
+        %li
+          = link_to workspace_jobs_path({tree_id: tree_id}) do
+            Related jobs
+
+
+  %h2 
+    Tree-Attachments
+
+
+
+  %table.table.table-striped
+    %thead
+    %tbody
+      =render partial: 'attachment', collection: @tree_attachments, as: :attachment
+
+  = paginate @tree_attachments, theme: 'default'

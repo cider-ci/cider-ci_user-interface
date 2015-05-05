@@ -31,17 +31,19 @@ class PublicController < ApplicationController
       render_summary_svg(
         build_summary_properties(
           item[:repository_name], item[:branch_name],
-          item[:execution_name], orientation: :vertical))
+          item[:job_name], orientation: :vertical))
     end
   end
 
   def find_user_by_login
     login = params.require(:sign_in)[:login].downcase
+    error_msg = 'Neither login nor email address found!'
     begin
-      User.find_by(login_downcased: login) \
-        || EmailAddress.find_by!(email_address: login).user
+      User.where('lower(login) = lower(?)', login).first \
+        || EmailAddress.where('lower(email_address) = lower(?)', login).first.user \
+        || raise(error_msg)
     rescue
-      raise 'Neither login nor email address found!'
+      raise error_msg
     end
   end
 
@@ -75,35 +77,35 @@ class PublicController < ApplicationController
                 flash: { successes: ['You have been signed out!'] }
   end
 
-  def redirect_to_execution
-    if @execution = Execution.find_by_repo_branch_name(params[:repository_name],
-                                                       params[:branch_name],
-                                                       params[:execution_name])
-      redirect_to workspace_execution_path(@execution)
+  def redirect_to_job
+    if @job = Job.find_by_repo_branch_name(params[:repository_name],
+                                           params[:branch_name],
+                                           params[:job_name])
+      redirect_to workspace_job_path(@job)
     else
-      render_404_execution_not_found
+      render_404_job_not_found
     end
   end
 
   def redirect_to_tree_attachment_content
-    if @execution = Execution.find_by_repo_branch_name(params[:repository_name],
-                                                       params[:branch_name],
-                                                       params[:execution_name])
+    if @job = Job.find_by_repo_branch_name(params[:repository_name],
+                                           params[:branch_name],
+                                           params[:job_name])
       if  tree_attachment = TreeAttachment \
-        .find_by(path: "/#{@execution.tree_id}/#{params[:path]}")
+        .find_by(path: "/#{@job.tree_id}/#{params[:path]}")
         redirect_to workspace_attachment_path('tree_attachment', tree_attachment.path)
       else
         render_404 "You are looking for the attchment `#{params[:path]}`
-           with the tree-id `#{truncate(@execution.tree_id, length: 10)}`.
+           with the tree-id `#{truncate(@job.tree_id, length: 10)}`.
            It doesn't exist at this time. You can try again later.".squish
       end
     else
-      render_404_execution_not_found
+      render_404_job_not_found
     end
   end
 
-  def render_404_execution_not_found
-    render_404 "You are looking for the execution #{params[:execution_name]}
+  def render_404_job_not_found
+    render_404 "You are looking for the job #{params[:job_name]}
           of the branch #{params[:branch_name]}
           and the repository #{params[:repository_name]}
           It doesn't exist at this time. You can try again later.".squish

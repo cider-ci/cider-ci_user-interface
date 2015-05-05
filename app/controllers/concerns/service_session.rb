@@ -1,42 +1,49 @@
+require 'cider_ci/open_session/encryptor'
+require 'cider_ci/open_session/signature'
+
 module Concerns
   module ServiceSession
     extend ActiveSupport::Concern
 
     def create_services_session_cookie(user)
-      message = Base64.encode64(user.id).strip
-      signature = compute_signature(message, user.password_digest)
-      cookie_value = [message, signature].join('-')
-      cookies.permanent['cider-ci_services-session'] = cookie_value
+      cookies.permanent['cider-ci_services-session'] =
+        CiderCi::OpenSession::Encryptor.encrypt(
+          secret, user_id: user.id,
+                  signature: create_user_signature(user),
+                  issued_at: Time.now.iso8601)
     end
 
     def validate_services_session_cookie_and_get_user
-      unless session_cookie = cookies['cider-ci_services-session']
+      begin
+        session_object = CiderCi::OpenSession::Encryptor.decrypt(
+          secret, session_cookie).deep_symbolize_keys
+        user = User.find session_object[:user_id]
+        validate_user_signature!(user, session_object[:signature])
+        user
+      rescue Exception => e
+        Rails.logger.warn e
+        reset_session
+        cookies.delete 'cider-ci_services-session'
         nil
-      else
-        begin
-          message, challenge = session_cookie.split('-')
-          user_id = Base64.decode64(message)
-          user = User.find user_id
-          signature = compute_signature(message, user.password_digest)
-          if signature == challenge
-            user
-          else
-            raise 'Signature is invalid' if signature != cookie_sig
-          end
-        rescue Exception => e
-          Rails.logger.warn e
-          reset_session
-          cookies.delete 'cider-ci_services-session'
-          nil
-        end
       end
     end
 
-    def compute_signature(message, secret1,
-                          secret2 = Rails.application.secrets.secret_key_base)
-      digest = OpenSSL::Digest.new('sha1')
-      intermediate = OpenSSL::HMAC.hexdigest(digest, secret1, message)
-      OpenSSL::HMAC.hexdigest(digest, secret2, intermediate)
+    def session_cookie
+      cookies['cider-ci_services-session'] || raise('Service cookie not found.')
+    end
+
+    def secret
+      Rails.application.secrets.secret_key_base
+    end
+
+    def create_user_signature(user)
+      CiderCi::OpenSession::Signature.create \
+        secret, user.password_digest
+    end
+
+    def validate_user_signature!(user, signature)
+      CiderCi::OpenSession::Signature.validate! \
+        signature, secret, user.password_digest
     end
 
   end

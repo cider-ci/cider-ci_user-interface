@@ -1,0 +1,15 @@
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Licensed under the terms of the GNU Affero General Public License v3.
+-#  See the LICENSE.txt file provided with this software.
+
+- jobs ||= @jobs
+- link_params ||= @link_params
+
+
+%table#jobs-table.table.jobs-table.reload{data: {cache_tag: jobs.map(&:id)}}
+  %thead
+  %tbody
+    -# not particular rails like; but it is much faster for now 
+    - jobs.each do |job|
+      = render partial: 'job_tr', locals: {job: job}
+

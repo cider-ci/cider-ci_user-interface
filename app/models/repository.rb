@@ -14,7 +14,7 @@ class Repository < ActiveRecord::Base
 
   ######################## Scopes and methods returning AR ####################
 
-  default_scope { reorder(name: :asc) }
+  default_scope { reorder(name: :asc, id: :asc) }
 
   ######################## Other stuff ########################################
 

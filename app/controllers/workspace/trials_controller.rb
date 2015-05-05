@@ -9,13 +9,15 @@ class Workspace::TrialsController < WorkspaceController
 
   def show
     @trial = Trial.find params[:id]
-    require_sign_in unless @trial.task.execution.public_view_permission?
-    @scripts = @trial.scripts
+    require_sign_in unless @trial.task.job.public_view_permission?
+    @scripts = @trial.scripts.sort_by do |s|
+      Time.iso8601(s['started_at'] || Time.now.iso8601)
+    end
   end
 
   def attachments
     @trial = Trial.find params[:id]
-    require_sign_in unless @trial.task.execution.public_view_permission?
+    require_sign_in unless @trial.task.job.public_view_permission?
     @trial_attachments = @trial.trial_attachments.page(params[:page])
   end
 

@@ -24,6 +24,20 @@ COMMENT ON EXTENSION plpgsql IS 'PL/pgSQL procedural language';
 
 
 --
+-- Name: pg_trgm; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS pg_trgm WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION pg_trgm; Type: COMMENT; Schema: -; Owner: -
+--
+
+COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching based on trigrams';
+
+
+--
 -- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
 --
 
@@ -139,11 +153,11 @@ CREATE FUNCTION update_branches_commits(branch_id uuid, new_commit_id character 
 CREATE FUNCTION update_updated_at_column() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
-      BEGIN
-         NEW.updated_at = now(); 
-         RETURN NEW;
-      END;
-      $$;
+          BEGIN
+             NEW.updated_at = now(); 
+             RETURN NEW;
+          END;
+          $$;
 
 
 --
@@ -183,26 +197,16 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: branch_update_triggers_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE branch_update_triggers_tags (
-    branch_update_trigger_id uuid,
-    tag_id uuid
-);
-
-
---
 -- Name: branches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE TABLE branches (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     repository_id uuid NOT NULL,
-    name character varying(255) NOT NULL,
+    name character varying NOT NULL,
     current_commit_id character varying(40) NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -234,36 +238,35 @@ CREATE TABLE commits (
     id character varying(40) NOT NULL,
     tree_id character varying(40),
     depth integer,
-    author_name character varying(255),
-    author_email character varying(255),
+    author_name character varying,
+    author_email character varying,
     author_date timestamp without time zone,
-    committer_name character varying(255),
-    committer_email character varying(255),
+    committer_name character varying,
+    committer_email character varying,
     committer_date timestamp without time zone,
     subject text,
     body text,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
 --
--- Name: executions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE executions (
+CREATE TABLE jobs (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    tree_id character varying(40) NOT NULL,
-    name character varying(255) NOT NULL,
-    priority integer DEFAULT 0,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
-    specification_id uuid,
-    expanded_specification_id uuid,
-    result jsonb,
+    state character varying DEFAULT 'pending'::character varying NOT NULL,
+    name text NOT NULL,
     description text,
-    CONSTRAINT check_executions_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
+    result jsonb,
+    tree_id character varying(40) NOT NULL,
+    job_specification_id uuid NOT NULL,
+    priority integer DEFAULT 0 NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'skipped'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 
@@ -272,14 +275,14 @@ CREATE TABLE executions (
 --
 
 CREATE TABLE repositories (
-    id uuid NOT NULL,
-    origin_uri character varying(255),
-    name character varying(255),
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    origin_uri text,
+    name character varying,
     git_fetch_and_update_interval integer DEFAULT 60,
     git_update_interval integer,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
-    public_view_permission boolean DEFAULT false NOT NULL
+    public_view_permission boolean DEFAULT false,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -291,25 +294,13 @@ CREATE VIEW commit_cache_signatures AS
  SELECT commits.id AS commit_id,
     md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
     md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
-    md5(string_agg(DISTINCT (executions.updated_at)::text, ', '::text ORDER BY (executions.updated_at)::text)) AS executions_signature
+    md5(string_agg(DISTINCT (jobs.updated_at)::text, ', '::text ORDER BY (jobs.updated_at)::text)) AS jobs_signature
    FROM ((((commits
      LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
      LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
-     LEFT JOIN executions ON (((executions.tree_id)::text = (commits.tree_id)::text)))
+     LEFT JOIN jobs ON (((jobs.tree_id)::text = (commits.tree_id)::text)))
      LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
   GROUP BY commits.id;
-
-
---
--- Name: definitions; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE definitions (
-    name character varying(255) NOT NULL,
-    description character varying(255),
-    specification_id uuid,
-    is_default boolean DEFAULT false NOT NULL
-);
 
 
 --
@@ -355,110 +346,9 @@ CREATE VIEW depths AS
 
 CREATE TABLE email_addresses (
     user_id uuid,
-    email_address character varying(255) NOT NULL,
-    searchable character varying(255),
+    email_address character varying NOT NULL,
     "primary" boolean DEFAULT false NOT NULL
 );
-
-
---
--- Name: execution_issues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE execution_issues (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    title text,
-    description text,
-    type character varying(255) DEFAULT 'error'::character varying NOT NULL,
-    execution_id uuid NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
-    CONSTRAINT valid_type CHECK (((type)::text = ANY ((ARRAY['error'::character varying, 'warning'::character varying])::text[])))
-);
-
-
---
--- Name: executions_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE executions_tags (
-    execution_id uuid,
-    tag_id uuid
-);
-
-
---
--- Name: tasks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE tasks (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    execution_id uuid NOT NULL,
-    state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    priority integer DEFAULT 0 NOT NULL,
-    traits character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
-    name text,
-    error text DEFAULT ''::text NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
-    task_spec_id uuid,
-    result jsonb,
-    exclusive_resources character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
-    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
-);
-
-
---
--- Name: execution_cache_signatures; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW execution_cache_signatures AS
- SELECT executions.id AS execution_id,
-    md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
-    md5(string_agg(DISTINCT (commits.updated_at)::text, ', '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
-    md5(string_agg(DISTINCT (execution_issues.updated_at)::text, ', '::text ORDER BY (execution_issues.updated_at)::text)) AS execution_issues_signature,
-    count(DISTINCT execution_issues.*) AS execution_issues_count,
-    md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
-    ( SELECT md5(string_agg((executions_tags.tag_id)::text, ','::text ORDER BY executions_tags.tag_id)) AS md5
-           FROM executions_tags
-          WHERE (executions_tags.execution_id = executions.id)) AS tags_signature,
-    ( SELECT (((count(DISTINCT tasks.id))::text || ' - '::text) || (max(tasks.updated_at))::text)
-           FROM tasks
-          WHERE (tasks.execution_id = executions.id)) AS tasks_signature
-   FROM (((((executions
-     LEFT JOIN execution_issues ON ((executions.id = execution_issues.execution_id)))
-     LEFT JOIN commits ON (((executions.tree_id)::text = (commits.tree_id)::text)))
-     LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
-     LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
-     LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
-  GROUP BY executions.id;
-
-
---
--- Name: execution_stats; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW execution_stats AS
- SELECT executions.id AS execution_id,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE (tasks.execution_id = executions.id)) AS total,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'aborted'::text))) AS aborted,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'executing'::text))) AS executing,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'failed'::text))) AS failed,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'passed'::text))) AS passed,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.execution_id = executions.id) AND ((tasks.state)::text = 'pending'::text))) AS pending
-   FROM executions;
 
 
 --
@@ -467,14 +357,14 @@ CREATE VIEW execution_stats AS
 
 CREATE TABLE executors (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    name character varying(255),
-    max_load integer DEFAULT 4 NOT NULL,
+    name character varying,
+    max_load integer DEFAULT 1 NOT NULL,
     enabled boolean DEFAULT true NOT NULL,
-    traits character varying(255)[] DEFAULT '{}'::character varying[] NOT NULL,
+    traits character varying[] DEFAULT '{}'::character varying[],
+    base_url text,
     last_ping_at timestamp without time zone,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
-    base_url character varying(255),
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT executors_name_constraints CHECK (((name)::text ~* '^[A-Za-z0-9\-\_]+$'::text))
 );
 
@@ -485,14 +375,14 @@ CREATE TABLE executors (
 
 CREATE TABLE executors_with_load (
     id uuid,
-    name character varying(255),
+    name character varying,
     max_load integer,
     enabled boolean,
-    traits character varying(255)[],
+    traits character varying[],
+    base_url text,
     last_ping_at timestamp without time zone,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
-    base_url character varying(255),
     current_load bigint,
     relative_load double precision
 );
@@ -501,21 +391,134 @@ ALTER TABLE ONLY executors_with_load REPLICA IDENTITY NOTHING;
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: job_issues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE schema_migrations (
-    version character varying(255) NOT NULL
+CREATE TABLE job_issues (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    title text,
+    description text,
+    type character varying DEFAULT 'error'::character varying NOT NULL,
+    job_id uuid NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
 --
--- Name: specifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobs_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE specifications (
-    id uuid NOT NULL,
+CREATE TABLE jobs_tags (
+    job_id uuid,
+    tag_id uuid
+);
+
+
+--
+-- Name: tasks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE tasks (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    job_id uuid NOT NULL,
+    state character varying DEFAULT 'pending'::character varying NOT NULL,
+    name text NOT NULL,
+    result jsonb,
+    task_specification_id uuid NOT NULL,
+    priority integer DEFAULT 0 NOT NULL,
+    traits character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    error text DEFAULT ''::text NOT NULL,
+    exclusive_resources character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'skipped'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
+);
+
+
+--
+-- Name: job_cache_signatures; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW job_cache_signatures AS
+ SELECT jobs.id AS job_id,
+    md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
+    md5(string_agg(DISTINCT (commits.updated_at)::text, ', '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
+    md5(string_agg(DISTINCT (job_issues.updated_at)::text, ', '::text ORDER BY (job_issues.updated_at)::text)) AS job_issues_signature,
+    count(DISTINCT job_issues.*) AS job_issues_count,
+    md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
+    ( SELECT md5(string_agg((jobs_tags.tag_id)::text, ','::text ORDER BY jobs_tags.tag_id)) AS md5
+           FROM jobs_tags
+          WHERE (jobs_tags.job_id = jobs.id)) AS tags_signature,
+    ( SELECT (((count(DISTINCT tasks.id))::text || ' - '::text) || (max(tasks.updated_at))::text)
+           FROM tasks
+          WHERE (tasks.job_id = jobs.id)) AS tasks_signature
+   FROM (((((jobs
+     LEFT JOIN job_issues ON ((jobs.id = job_issues.job_id)))
+     LEFT JOIN commits ON (((jobs.tree_id)::text = (commits.tree_id)::text)))
+     LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
+     LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
+     LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
+  GROUP BY jobs.id;
+
+
+--
+-- Name: job_specifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE job_specifications (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     data jsonb
+);
+
+
+--
+-- Name: job_stats; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW job_stats AS
+ SELECT jobs.id AS job_id,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE (tasks.job_id = jobs.id)) AS total,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'aborted'::text))) AS aborted,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'skipped'::text))) AS skipped,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'executing'::text))) AS executing,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'failed'::text))) AS failed,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'passed'::text))) AS passed,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'pending'::text))) AS pending
+   FROM jobs;
+
+
+--
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE schema_migrations (
+    version character varying NOT NULL
+);
+
+
+--
+-- Name: submodules; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE submodules (
+    submodule_commit_id character varying NOT NULL,
+    path text NOT NULL,
+    commit_id character varying NOT NULL
 );
 
 
@@ -525,17 +528,17 @@ CREATE TABLE specifications (
 
 CREATE TABLE tags (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    tag character varying(255),
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    tag character varying,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
 --
--- Name: task_specs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: task_specifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE task_specs (
+CREATE TABLE task_specifications (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     data jsonb
 );
@@ -549,14 +552,14 @@ CREATE TABLE timeout_settings (
     id integer NOT NULL,
     trial_dispatch_timeout_minutes integer DEFAULT 60 NOT NULL,
     trial_end_state_timeout_minutes integer DEFAULT 180 NOT NULL,
-    trial_execution_timeout_minutes integer DEFAULT 5 NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
+    trial_job_timeout_minutes integer DEFAULT 5 NOT NULL,
     trial_scripts_retention_time_days integer DEFAULT 10 NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT one_and_only_one CHECK ((id = 0)),
     CONSTRAINT trial_dispatch_timeout_minutes_positive CHECK ((trial_dispatch_timeout_minutes > 0)),
     CONSTRAINT trial_end_state_timeout_minutes_positive CHECK ((trial_end_state_timeout_minutes > 0)),
-    CONSTRAINT trial_execution_timeout_minutes_positive CHECK ((trial_execution_timeout_minutes > 0))
+    CONSTRAINT trial_job_timeout_minutes_positive CHECK ((trial_job_timeout_minutes > 0))
 );
 
 
@@ -598,11 +601,10 @@ CREATE TABLE trial_issues (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     title text,
     description text,
-    type character varying(255) DEFAULT 'error'::character varying NOT NULL,
+    type character varying DEFAULT 'error'::character varying NOT NULL,
     trial_id uuid NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
-    CONSTRAINT valid_type CHECK (((type)::text = ANY ((ARRAY['error'::character varying, 'warning'::character varying])::text[])))
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -615,14 +617,14 @@ CREATE TABLE trials (
     task_id uuid NOT NULL,
     executor_id uuid,
     error text,
-    state character varying(255) DEFAULT 'pending'::character varying NOT NULL,
-    started_at timestamp without time zone,
-    finished_at timestamp without time zone,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
+    state character varying DEFAULT 'pending'::character varying NOT NULL,
     scripts jsonb,
     result jsonb,
-    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
+    started_at timestamp without time zone,
+    finished_at timestamp without time zone,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'skipped'::character varying, 'pending'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 
@@ -632,14 +634,13 @@ CREATE TABLE trials (
 
 CREATE TABLE users (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    password_digest character varying(255),
-    login character varying(255) NOT NULL,
-    login_downcased character varying(255) NOT NULL,
-    last_name character varying(255) DEFAULT ''::character varying NOT NULL,
-    first_name character varying(255) DEFAULT ''::character varying NOT NULL,
+    password_digest character varying,
+    login character varying NOT NULL,
+    last_name character varying DEFAULT ''::character varying NOT NULL,
+    first_name character varying DEFAULT ''::character varying NOT NULL,
     is_admin boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now()
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -650,9 +651,9 @@ CREATE TABLE users (
 CREATE TABLE welcome_page_settings (
     id integer NOT NULL,
     welcome_message text,
-    radiator_config json,
-    created_at timestamp without time zone DEFAULT now(),
-    updated_at timestamp without time zone DEFAULT now(),
+    radiator_config jsonb,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT one_and_only_one CHECK ((id = 0))
 );
 
@@ -682,35 +683,11 @@ ALTER TABLE ONLY commits
 
 
 --
--- Name: definitions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY definitions
-    ADD CONSTRAINT definitions_pkey PRIMARY KEY (name);
-
-
---
 -- Name: email_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
 ALTER TABLE ONLY email_addresses
     ADD CONSTRAINT email_addresses_pkey PRIMARY KEY (email_address);
-
-
---
--- Name: execution_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY execution_issues
-    ADD CONSTRAINT execution_issues_pkey PRIMARY KEY (id);
-
-
---
--- Name: executions_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY executions
-    ADD CONSTRAINT executions_pkey PRIMARY KEY (id);
 
 
 --
@@ -722,6 +699,30 @@ ALTER TABLE ONLY executors
 
 
 --
+-- Name: job_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY job_issues
+    ADD CONSTRAINT job_issues_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: job_specifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY job_specifications
+    ADD CONSTRAINT job_specifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT jobs_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: repositories_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -730,11 +731,11 @@ ALTER TABLE ONLY repositories
 
 
 --
--- Name: specifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: submodules_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY specifications
-    ADD CONSTRAINT specifications_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY submodules
+    ADD CONSTRAINT submodules_pkey PRIMARY KEY (commit_id, path);
 
 
 --
@@ -746,11 +747,11 @@ ALTER TABLE ONLY tags
 
 
 --
--- Name: task_specs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: task_specifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
 --
 
-ALTER TABLE ONLY task_specs
-    ADD CONSTRAINT task_specs_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY task_specifications
+    ADD CONSTRAINT task_specifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -874,45 +875,17 @@ CREATE INDEX commits_to_tsvector_idx6 ON commits USING gin (to_tsvector('english
 
 
 --
--- Name: email_addresses_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_jobs_tree-id_job-specification-id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX email_addresses_to_tsvector_idx ON email_addresses USING gin (to_tsvector('english'::regconfig, (email_address)::text));
-
-
---
--- Name: email_addresses_to_tsvector_idx1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX email_addresses_to_tsvector_idx1 ON email_addresses USING gin (to_tsvector('english'::regconfig, (searchable)::text));
+CREATE UNIQUE INDEX "idx_jobs_tree-id_job-specification-id" ON jobs USING btree (tree_id, job_specification_id);
 
 
 --
--- Name: exectutions_lower_name_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_jobs_tree-id_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX exectutions_lower_name_idx ON executions USING btree (lower((name)::text));
-
-
---
--- Name: exectutions_tree_id_lower_name_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX exectutions_tree_id_lower_name_idx ON executions USING btree (tree_id, lower((name)::text));
-
-
---
--- Name: executors_on_lower_name_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX executors_on_lower_name_idx ON executors USING btree (lower((name)::text));
-
-
---
--- Name: index_branches_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_branches_on_created_at ON branches USING btree (created_at);
+CREATE UNIQUE INDEX "idx_jobs_tree-id_name" ON jobs USING btree (tree_id, name);
 
 
 --
@@ -927,13 +900,6 @@ CREATE INDEX index_branches_on_name ON branches USING btree (name);
 --
 
 CREATE UNIQUE INDEX index_branches_on_repository_id_and_name ON branches USING btree (repository_id, name);
-
-
---
--- Name: index_branches_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_branches_on_updated_at ON branches USING btree (updated_at);
 
 
 --
@@ -965,17 +931,17 @@ CREATE INDEX index_commits_on_committer_date ON commits USING btree (committer_d
 
 
 --
--- Name: index_commits_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_commits_on_created_at ON commits USING btree (created_at);
-
-
---
 -- Name: index_commits_on_tree_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE INDEX index_commits_on_tree_id ON commits USING btree (tree_id);
+
+
+--
+-- Name: index_commits_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_commits_on_updated_at ON commits USING btree (updated_at);
 
 
 --
@@ -986,48 +952,6 @@ CREATE INDEX index_email_addresses_on_user_id ON email_addresses USING btree (us
 
 
 --
--- Name: index_execution_issues_on_execution_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_execution_issues_on_execution_id ON execution_issues USING btree (execution_id);
-
-
---
--- Name: index_executions_on_column_and_tree_id_and_specification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_executions_on_column_and_tree_id_and_specification_id ON executions USING btree (tree_id, specification_id);
-
-
---
--- Name: index_executions_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_executions_on_created_at ON executions USING btree (created_at);
-
-
---
--- Name: index_executions_on_tree_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_executions_on_tree_id ON executions USING btree (tree_id);
-
-
---
--- Name: index_executions_tags_on_execution_id_and_tag_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_executions_tags_on_execution_id_and_tag_id ON executions_tags USING btree (execution_id, tag_id);
-
-
---
--- Name: index_executions_tags_on_tag_id_and_execution_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_executions_tags_on_tag_id_and_execution_id ON executions_tags USING btree (tag_id, execution_id);
-
-
---
 -- Name: index_executors_on_traits; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1035,17 +959,52 @@ CREATE INDEX index_executors_on_traits ON executors USING btree (traits);
 
 
 --
--- Name: index_repositories_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_job_issues_on_job_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_repositories_on_created_at ON repositories USING btree (created_at);
+CREATE INDEX index_job_issues_on_job_id ON job_issues USING btree (job_id);
 
 
 --
--- Name: index_repositories_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_jobs_on_job_specification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_repositories_on_name ON repositories USING btree (name);
+CREATE INDEX index_jobs_on_job_specification_id ON jobs USING btree (job_specification_id);
+
+
+--
+-- Name: index_jobs_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_jobs_on_name ON jobs USING btree (name);
+
+
+--
+-- Name: index_jobs_on_tree_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_jobs_on_tree_id ON jobs USING btree (tree_id);
+
+
+--
+-- Name: index_jobs_tags_on_job_id_and_tag_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_jobs_tags_on_job_id_and_tag_id ON jobs_tags USING btree (job_id, tag_id);
+
+
+--
+-- Name: index_jobs_tags_on_tag_id_and_job_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_jobs_tags_on_tag_id_and_job_id ON jobs_tags USING btree (tag_id, job_id);
+
+
+--
+-- Name: index_submodules_on_commit_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_submodules_on_commit_id ON submodules USING btree (commit_id);
 
 
 --
@@ -1056,13 +1015,6 @@ CREATE INDEX index_tags_on_tag ON tags USING btree (tag);
 
 
 --
--- Name: index_tasks_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_tasks_on_created_at ON tasks USING btree (created_at);
-
-
---
 -- Name: index_tasks_on_exclusive_resources; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1070,24 +1022,24 @@ CREATE INDEX index_tasks_on_exclusive_resources ON tasks USING btree (exclusive_
 
 
 --
--- Name: index_tasks_on_execution_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tasks_on_job_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_tasks_on_execution_id ON tasks USING btree (execution_id);
-
-
---
--- Name: index_tasks_on_execution_id_and_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_tasks_on_execution_id_and_state ON tasks USING btree (execution_id, state);
+CREATE INDEX index_tasks_on_job_id ON tasks USING btree (job_id);
 
 
 --
--- Name: index_tasks_on_execution_id_and_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tasks_on_job_id_and_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_tasks_on_execution_id_and_updated_at ON tasks USING btree (execution_id, updated_at);
+CREATE UNIQUE INDEX index_tasks_on_job_id_and_name ON tasks USING btree (job_id, name);
+
+
+--
+-- Name: index_tasks_on_task_specification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tasks_on_task_specification_id ON tasks USING btree (task_specification_id);
 
 
 --
@@ -1119,13 +1071,6 @@ CREATE INDEX index_trial_issues_on_trial_id ON trial_issues USING btree (trial_i
 
 
 --
--- Name: index_trials_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_trials_on_created_at ON trials USING btree (created_at);
-
-
---
 -- Name: index_trials_on_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1140,31 +1085,10 @@ CREATE INDEX index_trials_on_task_id ON trials USING btree (task_id);
 
 
 --
--- Name: index_users_on_login; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: tags_tag_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_users_on_login ON users USING btree (login);
-
-
---
--- Name: index_users_on_login_downcased; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_users_on_login_downcased ON users USING btree (login_downcased);
-
-
---
--- Name: repositories_lower_name_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX repositories_lower_name_idx ON repositories USING btree (lower((name)::text));
-
-
---
--- Name: tag_trigger_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX tag_trigger_idx ON branch_update_triggers_tags USING btree (tag_id, branch_update_trigger_id);
+CREATE INDEX tags_tag_idx ON tags USING gin (tag gin_trgm_ops);
 
 
 --
@@ -1175,13 +1099,6 @@ CREATE INDEX tags_to_tsvector_idx ON tags USING gin (to_tsvector('english'::regc
 
 
 --
--- Name: trigger_tag_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX trigger_tag_idx ON branch_update_triggers_tags USING btree (branch_update_trigger_id, tag_id);
-
-
---
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1189,31 +1106,10 @@ CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (v
 
 
 --
--- Name: users_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: user_lower_login_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX users_to_tsvector_idx ON users USING gin (to_tsvector('english'::regconfig, (login)::text));
-
-
---
--- Name: users_to_tsvector_idx1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX users_to_tsvector_idx1 ON users USING gin (to_tsvector('english'::regconfig, (login_downcased)::text));
-
-
---
--- Name: users_to_tsvector_idx2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX users_to_tsvector_idx2 ON users USING gin (to_tsvector('english'::regconfig, (first_name)::text));
-
-
---
--- Name: users_to_tsvector_idx3; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX users_to_tsvector_idx3 ON users USING gin (to_tsvector('english'::regconfig, (last_name)::text));
+CREATE INDEX user_lower_login_idx ON users USING btree (lower((login)::text));
 
 
 --
@@ -1226,10 +1122,10 @@ CREATE RULE "_RETURN" AS
     executors.max_load,
     executors.enabled,
     executors.traits,
+    executors.base_url,
     executors.last_ping_at,
     executors.created_at,
     executors.updated_at,
-    executors.base_url,
     count(trials.executor_id) AS current_load,
     ((count(trials.executor_id))::double precision / (executors.max_load)::double precision) AS relative_load
    FROM (executors
@@ -1252,24 +1148,24 @@ CREATE TRIGGER update_updated_at_column_of_commits BEFORE UPDATE ON commits FOR 
 
 
 --
--- Name: update_updated_at_column_of_execution_issues; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_execution_issues BEFORE UPDATE ON execution_issues FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
-
-
---
--- Name: update_updated_at_column_of_executions; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_executions BEFORE UPDATE ON executions FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
-
-
---
 -- Name: update_updated_at_column_of_executors; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER update_updated_at_column_of_executors BEFORE UPDATE ON executors FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_job_issues; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_job_issues BEFORE UPDATE ON job_issues FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_jobs; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_jobs BEFORE UPDATE ON jobs FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1290,14 +1186,14 @@ CREATE TRIGGER update_updated_at_column_of_tags BEFORE UPDATE ON tags FOR EACH R
 -- Name: update_updated_at_column_of_tasks; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_tasks BEFORE UPDATE ON tasks FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_tasks BEFORE UPDATE ON tasks FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
 -- Name: update_updated_at_column_of_timeout_settings; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_timeout_settings BEFORE UPDATE ON timeout_settings FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_timeout_settings BEFORE UPDATE ON timeout_settings FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1318,7 +1214,7 @@ CREATE TRIGGER update_updated_at_column_of_trial_attachments BEFORE UPDATE ON tr
 -- Name: update_updated_at_column_of_trial_issues; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_trial_issues BEFORE UPDATE ON trial_issues FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_trial_issues BEFORE UPDATE ON trial_issues FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1339,143 +1235,127 @@ CREATE TRIGGER update_updated_at_column_of_users BEFORE UPDATE ON users FOR EACH
 -- Name: update_updated_at_column_of_welcome_page_settings; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE ON welcome_page_settings FOR EACH ROW EXECUTE PROCEDURE update_updated_at_column();
+CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE ON welcome_page_settings FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
--- Name: branch_update_triggers_tags_tag_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY branch_update_triggers_tags
-    ADD CONSTRAINT branch_update_triggers_tags_tag_id_fk FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE;
-
-
---
--- Name: branches_commits_branch_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY branches_commits
-    ADD CONSTRAINT branches_commits_branch_id_fk FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE CASCADE;
-
-
---
--- Name: branches_commits_commit_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY branches_commits
-    ADD CONSTRAINT branches_commits_commit_id_fk FOREIGN KEY (commit_id) REFERENCES commits(id) ON DELETE CASCADE;
-
-
---
--- Name: branches_current_commit_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY branches
-    ADD CONSTRAINT branches_current_commit_id_fk FOREIGN KEY (current_commit_id) REFERENCES commits(id) ON DELETE CASCADE;
-
-
---
--- Name: branches_repository_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY branches
-    ADD CONSTRAINT branches_repository_id_fk FOREIGN KEY (repository_id) REFERENCES repositories(id);
-
-
---
--- Name: commit_arcs_child_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_637f302c5b; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY commit_arcs
-    ADD CONSTRAINT commit_arcs_child_id_fk FOREIGN KEY (child_id) REFERENCES commits(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_rails_637f302c5b FOREIGN KEY (parent_id) REFERENCES commits(id) ON DELETE CASCADE;
 
 
 --
--- Name: commit_arcs_parent_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_73565c5700; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY commit_arcs
-    ADD CONSTRAINT commit_arcs_parent_id_fk FOREIGN KEY (parent_id) REFERENCES commits(id) ON DELETE CASCADE;
+ALTER TABLE ONLY submodules
+    ADD CONSTRAINT fk_rails_73565c5700 FOREIGN KEY (commit_id) REFERENCES commits(id) ON DELETE CASCADE;
 
 
 --
--- Name: email_addresses_user_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_741467517e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branches
+    ADD CONSTRAINT fk_rails_741467517e FOREIGN KEY (current_commit_id) REFERENCES commits(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_ce2b80387a; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branches_commits
+    ADD CONSTRAINT fk_rails_ce2b80387a FOREIGN KEY (commit_id) REFERENCES commits(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_ce3c7008c0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branches
+    ADD CONSTRAINT fk_rails_ce3c7008c0 FOREIGN KEY (repository_id) REFERENCES repositories(id);
+
+
+--
+-- Name: fk_rails_de643267e7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY email_addresses
-    ADD CONSTRAINT email_addresses_user_id_fk FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+    ADD CONSTRAINT fk_rails_de643267e7 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
 
 
 --
--- Name: execution_issues_execution_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_f1b0bc6b0c; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY execution_issues
-    ADD CONSTRAINT execution_issues_execution_id_fk FOREIGN KEY (execution_id) REFERENCES executions(id) ON DELETE CASCADE;
-
-
---
--- Name: executions_expanded_specification_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY executions
-    ADD CONSTRAINT executions_expanded_specification_id_fk FOREIGN KEY (expanded_specification_id) REFERENCES specifications(id);
+ALTER TABLE ONLY branches_commits
+    ADD CONSTRAINT fk_rails_f1b0bc6b0c FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE CASCADE;
 
 
 --
--- Name: executions_specification_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: fk_rails_fe00cc3459; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY executions
-    ADD CONSTRAINT executions_specification_id_fk FOREIGN KEY (specification_id) REFERENCES specifications(id);
-
-
---
--- Name: executions_tags_execution_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY executions_tags
-    ADD CONSTRAINT executions_tags_execution_id_fk FOREIGN KEY (execution_id) REFERENCES executions(id) ON DELETE CASCADE;
+ALTER TABLE ONLY commit_arcs
+    ADD CONSTRAINT fk_rails_fe00cc3459 FOREIGN KEY (child_id) REFERENCES commits(id) ON DELETE CASCADE;
 
 
 --
--- Name: executions_tags_tag_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: job_issues_jobs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY executions_tags
-    ADD CONSTRAINT executions_tags_tag_id_fk FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE;
+ALTER TABLE ONLY job_issues
+    ADD CONSTRAINT job_issues_jobs_fkey FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE;
 
 
 --
--- Name: tasks_execution_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: jobs-tags_jobs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY jobs_tags
+    ADD CONSTRAINT "jobs-tags_jobs_fkey" FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE;
+
+
+--
+-- Name: jobs-tags_tags_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY jobs_tags
+    ADD CONSTRAINT "jobs-tags_tags_fkey" FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE;
+
+
+--
+-- Name: jobs_job-specifications_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT "jobs_job-specifications_fkey" FOREIGN KEY (job_specification_id) REFERENCES job_specifications(id);
+
+
+--
+-- Name: tasks_jobs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tasks
-    ADD CONSTRAINT tasks_execution_id_fk FOREIGN KEY (execution_id) REFERENCES executions(id) ON DELETE CASCADE;
+    ADD CONSTRAINT tasks_jobs_fkey FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE;
 
 
 --
--- Name: tasks_task_spec_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY tasks
-    ADD CONSTRAINT tasks_task_spec_id_fk FOREIGN KEY (task_spec_id) REFERENCES task_specs(id) ON DELETE SET NULL;
-
-
---
--- Name: trial_issues_trial_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: trial_issues_trials_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY trial_issues
-    ADD CONSTRAINT trial_issues_trial_id_fk FOREIGN KEY (trial_id) REFERENCES trials(id) ON DELETE CASCADE;
+    ADD CONSTRAINT trial_issues_trials_fkey FOREIGN KEY (trial_id) REFERENCES trials(id) ON DELETE CASCADE;
 
 
 --
--- Name: trials_task_id_fk; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: trials_tasks_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY trials
-    ADD CONSTRAINT trials_task_id_fk FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE;
+    ADD CONSTRAINT trials_tasks_fkey FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE;
 
 
 --
@@ -1484,115 +1364,41 @@ ALTER TABLE ONLY trials
 
 SET search_path TO "$user",public;
 
+INSERT INTO schema_migrations (version) VALUES ('0');
+
 INSERT INTO schema_migrations (version) VALUES ('1');
 
 INSERT INTO schema_migrations (version) VALUES ('10');
 
-INSERT INTO schema_migrations (version) VALUES ('100');
-
-INSERT INTO schema_migrations (version) VALUES ('102');
-
-INSERT INTO schema_migrations (version) VALUES ('103');
-
-INSERT INTO schema_migrations (version) VALUES ('104');
-
-INSERT INTO schema_migrations (version) VALUES ('105');
-
-INSERT INTO schema_migrations (version) VALUES ('106');
-
-INSERT INTO schema_migrations (version) VALUES ('107');
-
-INSERT INTO schema_migrations (version) VALUES ('108');
-
-INSERT INTO schema_migrations (version) VALUES ('109');
-
-INSERT INTO schema_migrations (version) VALUES ('110');
-
-INSERT INTO schema_migrations (version) VALUES ('111');
-
-INSERT INTO schema_migrations (version) VALUES ('112');
-
-INSERT INTO schema_migrations (version) VALUES ('113');
-
-INSERT INTO schema_migrations (version) VALUES ('114');
-
-INSERT INTO schema_migrations (version) VALUES ('115');
-
-INSERT INTO schema_migrations (version) VALUES ('116');
-
-INSERT INTO schema_migrations (version) VALUES ('117');
-
-INSERT INTO schema_migrations (version) VALUES ('118');
-
-INSERT INTO schema_migrations (version) VALUES ('119');
+INSERT INTO schema_migrations (version) VALUES ('11');
 
 INSERT INTO schema_migrations (version) VALUES ('12');
 
-INSERT INTO schema_migrations (version) VALUES ('120');
-
-INSERT INTO schema_migrations (version) VALUES ('121');
-
-INSERT INTO schema_migrations (version) VALUES ('122');
-
-INSERT INTO schema_migrations (version) VALUES ('123');
-
-INSERT INTO schema_migrations (version) VALUES ('124');
-
-INSERT INTO schema_migrations (version) VALUES ('125');
+INSERT INTO schema_migrations (version) VALUES ('13');
 
 INSERT INTO schema_migrations (version) VALUES ('15');
 
-INSERT INTO schema_migrations (version) VALUES ('18');
+INSERT INTO schema_migrations (version) VALUES ('16');
+
+INSERT INTO schema_migrations (version) VALUES ('17');
 
 INSERT INTO schema_migrations (version) VALUES ('2');
 
 INSERT INTO schema_migrations (version) VALUES ('20');
 
+INSERT INTO schema_migrations (version) VALUES ('22');
+
+INSERT INTO schema_migrations (version) VALUES ('25');
+
+INSERT INTO schema_migrations (version) VALUES ('26');
+
+INSERT INTO schema_migrations (version) VALUES ('27');
+
 INSERT INTO schema_migrations (version) VALUES ('3');
-
-INSERT INTO schema_migrations (version) VALUES ('30');
-
-INSERT INTO schema_migrations (version) VALUES ('37');
-
-INSERT INTO schema_migrations (version) VALUES ('38');
-
-INSERT INTO schema_migrations (version) VALUES ('40');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 
-INSERT INTO schema_migrations (version) VALUES ('50');
-
 INSERT INTO schema_migrations (version) VALUES ('6');
 
-INSERT INTO schema_migrations (version) VALUES ('60');
-
-INSERT INTO schema_migrations (version) VALUES ('65');
-
 INSERT INTO schema_migrations (version) VALUES ('7');
-
-INSERT INTO schema_migrations (version) VALUES ('70');
-
-INSERT INTO schema_migrations (version) VALUES ('71');
-
-INSERT INTO schema_migrations (version) VALUES ('74');
-
-INSERT INTO schema_migrations (version) VALUES ('80');
-
-INSERT INTO schema_migrations (version) VALUES ('81');
-
-INSERT INTO schema_migrations (version) VALUES ('82');
-
-INSERT INTO schema_migrations (version) VALUES ('84');
-
-INSERT INTO schema_migrations (version) VALUES ('85');
-
-INSERT INTO schema_migrations (version) VALUES ('86');
-
-INSERT INTO schema_migrations (version) VALUES ('87');
-
-INSERT INTO schema_migrations (version) VALUES ('88');
-
-INSERT INTO schema_migrations (version) VALUES ('89');
-
-INSERT INTO schema_migrations (version) VALUES ('90');
 

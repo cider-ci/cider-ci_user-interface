@@ -12,7 +12,7 @@ module ServiceCheck
     def check_rabbitmq
       connection = Settings.messaging.connection
       url = 'http://localhost:15672/api/vhosts/'
-      http_get url, connection.username, connection.password
+      check_resource(url, connection)
     end
 
     def check_api
@@ -37,7 +37,28 @@ module ServiceCheck
 
     def check_service(http_opts, basic_auth)
       url = service_base_url(http_opts) + '/status'
-      http_get(url, basic_auth.username, basic_auth.password)
+      check_resource url, basic_auth
+    end
+
+    def check_resource url, basic_auth
+      begin 
+        response= http_get(url, basic_auth.username, basic_auth.password)
+        res= OpenStruct.new
+        if response.status.between?(200,299)
+          res.is_success = true
+          res.content = JSON.parse(response.body)
+        else
+          res.is_success = false
+          res.content = {message: response.body}
+        end
+        res
+      rescue StandardError => e
+        Rails.logger.warn Formatter.exception_to_log_s(e)
+        res= OpenStruct.new
+        res.is_success = false
+        res.content = {error: e.to_s}
+        res
+      end
     end
 
   end

@@ -1,0 +1,14 @@
+table.table.jobs-table
+  tr
+    td
+      border: none
+    td.job
+      font-size: 125%
+    &.job
+      @each $state in $ci-states
+        $clr: nth($ci-colors-bg, index($ci-states,$state))
+        &.#{$state}
+          border: none
+          border-top: 0.2em solid $clr
+          background-color: transparentize($clr, 0.8)
+          // @include gradient-vertical(transparentize($clr, 0.8), transparentize($clr, 0.6), 95%, 100%)

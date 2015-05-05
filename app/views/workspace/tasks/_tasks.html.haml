@@ -2,13 +2,13 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- execution ||= @execution
-- cs = execution.execution_cache_signature
+- job ||= @job
+- cs = job.job_cache_signature
 - tasks ||= @tasks
 #tasks.tasks
 
   .pull-right
-    = form_tag workspace_execution_path(execution), method: 'GET', class: "form-inline well right-top-form" do
+    = form_tag workspace_job_path(job), method: 'GET', class: "form-inline well right-top-form" do
       
       %fieldset
         .pull-right
@@ -32,7 +32,7 @@
               = render 'per_page_form_group'
 
             %li
-              = link_to workspace_execution_path(execution), class: 'btn btn-sm btn-warning' do
+              = link_to workspace_job_path(job), class: 'btn btn-sm btn-warning' do
                 %i.icon-remove-sign
                 Reset
 

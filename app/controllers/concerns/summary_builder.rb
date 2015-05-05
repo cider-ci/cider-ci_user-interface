@@ -7,7 +7,7 @@ module Concerns
       embedded: true
     }
 
-    def build_summary_properties(reponame, branchname, execution_names,
+    def build_summary_properties(reponame, branchname, job_names,
                               options = {})
 
       defaults = DEFAULT_OPTIONS.merge options
@@ -23,7 +23,7 @@ module Concerns
           else
             build_200_summary_properties(
               branch,
-              find_executions_by_branch_and_names(branch, execution_names))
+              find_jobs_by_branch_and_names(branch, job_names))
           end
         end)
     end
@@ -40,25 +40,25 @@ module Concerns
         failed_info_text: "403 Forbidden: #{reponame}" }
     end
 
-    def build_200_summary_properties(branch, executions)
+    def build_200_summary_properties(branch, jobs)
       { host_info_text: "#{host_info_text}",
         git_info_text: git_info_text(branch.repository, branch),
-        executions: executions.map { |e| execution_info(e) } }
+        jobs: jobs.map { |e| job_info(e) } }
     end
 
-    def execution_info(e)
+    def job_info(e)
       case e
-      when Execution
-        { text: "#{e.name}: #{execution_info_result_summary(e)}",
+      when Job
+        { text: "#{e.name}: #{job_info_result_summary(e)}",
           class: e.state,
-          href: workspace_execution_url(e) }
+          href: workspace_job_url(e) }
       else
         { text: "#{e}: Not available",
           class: 'unavailable' }
       end
     end
 
-    def execution_info_result_summary(e)
+    def job_info_result_summary(e)
       e.result['summary'] rescue "#{e.stats_summary} #{e.state}"
     end
 
@@ -77,19 +77,19 @@ module Concerns
       .first
     end
 
-    def find_executions_by_branch_and_names(branch, names)
-      canonicalize_execution_names(names).map do |name|
-        branch.executions \
-        .where('lower(executions.name) = ?', name.downcase).first or name
+    def find_jobs_by_branch_and_names(branch, names)
+      canonicalize_job_names(names).map do |name|
+        branch.jobs \
+        .where('lower(jobs.name) = ?', name.downcase).first or name
       end
     end
 
-    def canonicalize_execution_names(execution_names)
-      case execution_names
+    def canonicalize_job_names(job_names)
+      case job_names
       when String
-        execution_names.split(/,|;/).map(&:squish)
+        job_names.split(/,|;/).map(&:squish)
       when Array
-        execution_names.map(&:squish)
+        job_names.map(&:squish)
       end
     end
 

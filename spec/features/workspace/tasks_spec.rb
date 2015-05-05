@@ -7,13 +7,13 @@ feature 'Tasks' do
     all('.task').map { |e| e['data-state'] }.uniq.sort
   end
 
-  scenario 'Filter tasks from execution show action by state' do
+  scenario 'Filter tasks from job show action by state' do
 
-    Execution.destroy_all
-    FactoryGirl.create :failed_execution
+    Job.destroy_all
+    FactoryGirl.create :failed_job
 
     sign_in_as 'normin'
-    visit workspace_execution_path(Execution.first)
+    visit workspace_job_path(Job.first)
 
     find('select#tasks_select_condition').select('All')
     click_on('Filter')
@@ -33,10 +33,10 @@ feature 'Tasks' do
 
   end
 
-  scenario 'Filter tasks from execution show action by name' do
+  scenario 'Filter tasks from job show action by name' do
 
     sign_in_as 'normin'
-    visit workspace_execution_path(Execution.find_by(name: 'All'))
+    visit workspace_job_path(Job.find_by(name: 'All'))
 
     find('select#tasks_select_condition').select('All')
     click_on('Filter')

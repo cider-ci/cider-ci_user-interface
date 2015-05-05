@@ -3,7 +3,7 @@ require 'spec_helper_feature_shared'
 
 feature 'Managing time and timeout settings ', browser: :firefox  do
 
-  scenario 'Browsing to the execution definition page' do
+  scenario 'Setting timeouts' do
     sign_in_as 'adam'
     click_on 'Administration'
     click_on 'Time'

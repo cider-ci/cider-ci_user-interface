@@ -3,7 +3,7 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Tag < ActiveRecord::Base
-  has_and_belongs_to_many :executions
+  has_and_belongs_to_many :jobs
 
   def self.tagify(s)
     s.downcase.gsub(/[^0-9a-z\-\.]/i, '-').gsub(/-+/, '-')

@@ -1,0 +1,11 @@
+%svg.job-info(x=xoffset y=yoffset width=width height=height){id: "job-info-#{i}"}
+  %rect.job-info(x=0 y=0 width=width height=height){class: job[:class]}
+  %g 
+    %text(x="50%" y=yfont )
+      -if job[:href]
+        %a(xlink:href="#{job[:href]}" xlink:show='replace')
+          %tspan
+            = text
+      - else
+        %tspan
+          = text

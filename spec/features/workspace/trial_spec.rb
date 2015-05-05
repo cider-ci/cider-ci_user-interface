@@ -6,7 +6,7 @@ feature 'Trial' do
   scenario 'view trial as public user and signed-in user' do
 
     trial = Trial.first
-    repos = trial.task.execution.repositories
+    repos = trial.task.job.repositories
     repos.each { |r| r.update_attributes! public_view_permission: false }
 
     visit workspace_trial_path(trial)
@@ -32,7 +32,7 @@ feature 'Trial' do
     attachment = TrialAttachment.first
     trial_id = attachment.path.split('/').second
     trial = Trial.find(trial_id)
-    repos = trial.task.execution.repositories
+    repos = trial.task.job.repositories
     repos.each { |r| r.update_attributes! public_view_permission: false }
 
     sign_in_as 'normin'
@@ -52,10 +52,10 @@ feature 'Trial' do
   end
 
   scenario 'View and dismiss a trial issue' do
-    Execution.destroy_all
-    FactoryGirl.create :execution_with_issue
+    Job.destroy_all
+    FactoryGirl.create :job_with_issue
     sign_in_as 'normin'
-    visit workspace_execution_path(Execution.first)
+    visit workspace_job_path(Job.first)
 
   end
 

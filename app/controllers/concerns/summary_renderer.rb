@@ -16,7 +16,7 @@ module Concerns
       @yoffset = 0
 
       info_boxes = render_info_boxes summary_properties
-      execution_boxes = render_execution_boxes summary_properties
+      job_boxes = render_job_boxes summary_properties
 
       total_width = @horizontal ? @xoffset : 300
       total_height = @horizontal ? @base_height : @yoffset
@@ -24,7 +24,7 @@ module Concerns
       render_to_string partial: '/public/summary/summary_svg', locals: {
         embedded: embedded, font_size: @font_size, width: total_width,
         height: total_height,
-        boxes: [info_boxes, execution_boxes].flatten.compact
+        boxes: [info_boxes, job_boxes].flatten.compact
       }
     end
 
@@ -48,19 +48,19 @@ module Concerns
       svg
     end
 
-    def render_execution_boxes(summary_properties)
-      (summary_properties[:executions] || []) \
-        .map.with_index { |e, i| render_execution_box e, i }
+    def render_job_boxes(summary_properties)
+      (summary_properties[:jobs] || []) \
+        .map.with_index { |e, i| render_job_box e, i }
     end
 
-    def render_execution_box(execution, i)
-      text = execution[:text]
+    def render_job_box(job, i)
+      text = job[:text]
       width = compute_box_width text, bold: true
       height = @horizontal ? @base_height : (@base_height * 1.5).ceil
       yfont = (14.0 / @base_height * height)
-      svg = render_to_string partial: '/public/summary/execution_svgbox', locals: {
+      svg = render_to_string partial: '/public/summary/job_svgbox', locals: {
         xoffset: @xoffset, yoffset: @yoffset, height: height,
-        width: width, text: text, execution: execution, i: i, yfont: yfont }
+        width: width, text: text, job: job, i: i, yfont: yfont }
       @xoffset += (@horizontal ? width : 0)
       @yoffset += (@horizontal ? 0 : height)
       svg

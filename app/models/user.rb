@@ -10,8 +10,6 @@ class User < ActiveRecord::Base
     "#{first_name} #{last_name} [#{login}]".squish
   end
 
-  before_save { self.login_downcased = self.login.downcase }
-
   after_save { User.check_last_admin_not_gone! }
   after_destroy { User.check_last_admin_not_gone! }
 

@@ -1,3 +1,15 @@
+.row
+  .col-md-6
+    %ol.breadcrumb.pull-left
+      - case @attachment
+      - when TreeAttachment
+        = render '/breadcrumbs/tree_attachment', tree_id: @attachment.tree_id
+      - when TrialAttachment
+        - # binding.pry
+
+  .col-md-6
+
+ 
 
 #attachment-panel.panel.panel-default.no-padding-panel
   .panel-heading.clearfix  
@@ -6,7 +18,13 @@
         %i.fa.fa-arrows-alt 
 
     .pull-left
-      Attachment 
+      %span
+        - case @attachment
+        - when TreeAttachment
+          Tree-Attachment:
+        - when TrialAttachment
+          Trial-Attachment:
+
       %span.monospaced= "/" + @attachment.path.split("/").drop(2).join("/")
 
       %p 
