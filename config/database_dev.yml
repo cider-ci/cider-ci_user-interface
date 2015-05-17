@@ -4,7 +4,7 @@ default: &default
   host: localhost
   pool: 3
   username: cider-ci
-  password: cider-ci
+  password: secret
   database: cider-ci_v3_development
 
 development:

@@ -21,7 +21,6 @@ config/database.yml
 config/environments/*.local.yml
 config/settings.local.yml
 config/settings/*.local.yml
-db/seeds.rb
 result.json
 vendor/assets
 vendor/assets
