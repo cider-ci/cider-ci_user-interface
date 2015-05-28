@@ -1,0 +1,16 @@
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Licensed under the terms of the GNU Affero General Public License v3.
+-#  See the LICENSE.txt file provided with this software.
+
+- trial ||= @trial 
+
+%h1 Raw Trial 
+
+%p.text-warning
+  This is the raw view on the data of the trial.  This indicates that something
+  went wrong. You would see a formated view if the data would conform to the
+  expected structure. 
+
+
+%pre.script= @trial.attributes.to_yaml
+

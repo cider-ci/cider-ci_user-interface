@@ -8,10 +8,14 @@ class Workspace::TrialsController < WorkspaceController
                      only: [:show, :attachments]
 
   def show
-    @trial = Trial.find params[:id]
-    require_sign_in unless @trial.task.job.public_view_permission?
-    @scripts = @trial.scripts.sort_by do |s|
-      Time.iso8601(s['started_at'] || Time.now.iso8601)
+    begin 
+      @trial = Trial.find params[:id]
+      require_sign_in unless @trial.task.job.public_view_permission?
+      @scripts = @trial.scripts.map{|k,v| v}.sort_by do |s|
+        Time.iso8601(s['started_at'] || Time.now.iso8601)
+      end
+    rescue StandardError => e
+      render 'show_raw'
     end
   end
 

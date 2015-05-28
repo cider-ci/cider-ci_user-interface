@@ -19,7 +19,7 @@ module Workspace::JobsControllerModules
     def fetch_dotfile_jobs(id)
       begin
         get_jobs(id).map(&:deep_symbolize_keys).map do |values|
-          values.slice(:name,  :description, :tree_id)
+          values.slice(:name,  :description, :tree_id, :key)
         end.sort_by { |v| v[:name] }
 
       rescue RestClient::ResourceNotFound

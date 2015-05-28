@@ -258,6 +258,7 @@ CREATE TABLE commits (
 CREATE TABLE jobs (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     state character varying DEFAULT 'pending'::character varying NOT NULL,
+    key text NOT NULL,
     name text NOT NULL,
     description text,
     result jsonb,
@@ -970,6 +971,13 @@ CREATE INDEX index_job_issues_on_job_id ON job_issues USING btree (job_id);
 --
 
 CREATE INDEX index_jobs_on_job_specification_id ON jobs USING btree (job_specification_id);
+
+
+--
+-- Name: index_jobs_on_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_jobs_on_key ON jobs USING btree (key);
 
 
 --

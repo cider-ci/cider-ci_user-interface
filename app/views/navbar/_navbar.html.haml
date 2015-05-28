@@ -10,7 +10,7 @@
         Cider-CI&nbsp;
         %span{class:  Settings.releases[0].version_pre.present? ? "text-warning" : ""}<>
           = render partial: 'application/semantic_version', 
-            locals: { semver: Settings.releases[0] }
+            locals: { semver: Semver.get }
 
 
 

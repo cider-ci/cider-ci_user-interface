@@ -11,6 +11,9 @@ class CreateJobs < ActiveRecord::Migration
     create_table :jobs, id: :uuid  do |t|
       t.string :state, null: false, default: 'pending'
 
+      t.text :key, null: false
+      t.index :key
+
       t.text :name, null: false
       t.index :name
 
@@ -25,6 +28,9 @@ class CreateJobs < ActiveRecord::Migration
       t.index :job_specification_id
 
       t.integer :priority, null: false, default: 0
+
+      t.index [:tree_id,:key], unique: true,
+        name: 'idx_jobs_tree-id_key'
 
       t.index [:tree_id,:name], unique: true,
         name: 'idx_jobs_tree-id_name'
