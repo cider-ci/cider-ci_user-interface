@@ -25,12 +25,16 @@
 
 
   %ul.list-unstyled
-    - ["body","error","stderr","stdout"].reject{|att_name| script[att_name].blank?}.each do |att_name|
+    - ["body","environment-variables","error","stderr","stdout"].reject{|att_name| script[att_name].blank?}.each do |att_name|
       %li
         %h4
           =att_name.capitalize
-        %pre.script{class: att_name}= script[att_name]
+        - case script[att_name]
+        - when String
+          %pre.script{class: att_name}=script[att_name]
+        - else
+          %pre.script{class: att_name}=script[att_name].to_yaml
 
 
-  %h4 All properties
-  %pre.script= script.to_yaml
+  %h4 Internal Properties
+  %pre.script= script.except("body","environment-variables","error","stderr","stdout").to_yaml
