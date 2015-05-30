@@ -30,8 +30,8 @@ class CreateTasks < ActiveRecord::Migration
 
       t.text :error, null: false, default: ""
 
-      t.string :exclusive_resources, array: true, null: false, default: '{}'
-      t.index :exclusive_resources
+      t.string :exclusive_global_resources, array: true, null: false, default: '{}'
+      t.index :exclusive_global_resources
 
     end
 

@@ -430,7 +430,7 @@ CREATE TABLE tasks (
     priority integer DEFAULT 0 NOT NULL,
     traits character varying[] DEFAULT '{}'::character varying[] NOT NULL,
     error text DEFAULT ''::text NOT NULL,
-    exclusive_resources character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    exclusive_global_resources character varying[] DEFAULT '{}'::character varying[] NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'skipped'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
@@ -883,6 +883,13 @@ CREATE UNIQUE INDEX "idx_jobs_tree-id_job-specification-id" ON jobs USING btree 
 
 
 --
+-- Name: idx_jobs_tree-id_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX "idx_jobs_tree-id_key" ON jobs USING btree (tree_id, key);
+
+
+--
 -- Name: idx_jobs_tree-id_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1023,10 +1030,10 @@ CREATE INDEX index_tags_on_tag ON tags USING btree (tag);
 
 
 --
--- Name: index_tasks_on_exclusive_resources; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tasks_on_exclusive_global_resources; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE INDEX index_tasks_on_exclusive_resources ON tasks USING btree (exclusive_resources);
+CREATE INDEX index_tasks_on_exclusive_global_resources ON tasks USING btree (exclusive_global_resources);
 
 
 --
