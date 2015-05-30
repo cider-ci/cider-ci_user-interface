@@ -8,9 +8,15 @@ class Workspace::TasksController < WorkspaceController
 
   def retry
     set_task
-    Messaging.publish('task.create-trial', id: @task.id)
-    redirect_to workspace_job_path(@task.job),
-                flash: { successes: ['A new trial will be executed'] }
+    existing_trial_ids = get_current_trial_ids
+    Thread.new{Messaging.publish('task.create-trial', id: @task.id)}
+    loop do
+      sleep(0.1)
+      Trial.connection.clear_query_cache
+      break if existing_trial_ids != get_current_trial_ids
+    end
+    redirect_to workspace_trial_path(get_current_trial_ids.first),
+      flash: { successes: ['A new trial is being executed'] }
   end
 
   def show
@@ -26,4 +32,10 @@ class Workspace::TasksController < WorkspaceController
     @task = Task.find params[:id]
   end
 
+  def get_current_trial_ids
+    @task.reload.trials.reload.select(:id).map(&:id)
+  end
+
 end
+
+
