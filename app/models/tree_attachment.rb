@@ -2,8 +2,8 @@ class TreeAttachment < ActiveRecord::Base
   include Concerns::UrlBuilder
 
   def url
-    service_path(::Settings.services.storage.http) \
-      + '/tree-attachments' + path
+    service_path(::Settings.services.storage.http) +
+      '/tree-attachments' + path
   end
 
   def tree_id

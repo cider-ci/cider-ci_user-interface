@@ -40,23 +40,23 @@ module ServiceCheck
       check_resource url, basic_auth
     end
 
-    def check_resource url, basic_auth
-      begin 
-        response= http_get(url, basic_auth.username, basic_auth.password)
-        res= OpenStruct.new
-        if response.status.between?(200,299)
+    def check_resource(url, basic_auth)
+      begin
+        response = http_get(url, basic_auth.username, basic_auth.password)
+        res = OpenStruct.new
+        if response.status.between?(200, 299)
           res.is_success = true
           res.content = JSON.parse(response.body)
         else
           res.is_success = false
-          res.content = {message: response.body}
+          res.content = { message: response.body }
         end
         res
       rescue StandardError => e
         Rails.logger.warn Formatter.exception_to_log_s(e)
-        res= OpenStruct.new
+        res = OpenStruct.new
         res.is_success = false
-        res.content = {error: e.to_s}
+        res.content = { error: e.to_s }
         res
       end
     end

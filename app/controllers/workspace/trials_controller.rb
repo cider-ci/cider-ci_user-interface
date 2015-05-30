@@ -8,13 +8,13 @@ class Workspace::TrialsController < WorkspaceController
                      only: [:show, :attachments]
 
   def show
-    begin 
+    begin
       @trial = Trial.find params[:id]
       require_sign_in unless @trial.task.job.public_view_permission?
-      @scripts = @trial.scripts.map{|k,v| v}.sort_by do |s|
-        Time.iso8601( s['started_at'] || s['skipped_at'] || Time.now.iso8601)
+      @scripts = @trial.scripts.map { |k, v| v }.sort_by do |s|
+        Time.iso8601(s['started_at'] || s['skipped_at'] || Time.zone.now.iso8601)
       end
-    rescue StandardError => e
+    rescue StandardError
       render 'show_raw'
     end
   end

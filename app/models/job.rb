@@ -34,8 +34,7 @@ class Job < ActiveRecord::Base
     Job.joins(commits: { head_of_branches: :repository }) \
       .where('lower(jobs.name) = ?', job_name.downcase)
       .where('lower(branches.name) = ?', branch_name.downcase)
-      .where('lower(repositories.name) =? ', repo_name.downcase)
-      .first
+      .find_by('lower(repositories.name) =? ', repo_name.downcase)
   end
 
   def public_view_permission?
@@ -83,7 +82,7 @@ class Job < ActiveRecord::Base
 
   def stats_summary
     stats = job_stat
-    [(stats.failed > 0) ?  stats.failed : '',
+    [(stats.failed > 0) ? stats.failed : '',
      (stats.failed > 0) ? '/' : '',
      stats.total].join('').squish
   end

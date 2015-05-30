@@ -17,7 +17,7 @@ class Executor < ActiveRecord::Base
   scope :online, -> { where(ONLINE_SQL_CONDITION) }
 
   def online?
-    !Executor.online.where(id: self.id).first.nil?
+    !Executor.online.find_by(id: self.id).nil?
   end
 
   def to_s

@@ -35,9 +35,9 @@ class Messaging
     end
 
     def memoized_create_exchange(name, options = {})
-      ekey = name + '_'  + @conn.hash.to_s
-      @memoized_created_exchanges[ekey]  \
-        || @memoized_created_exchanges[ekey] = create_exchange(name, options)
+      ekey = name + '_' + @conn.hash.to_s
+      @memoized_created_exchanges[ekey] ||
+        @memoized_created_exchanges[ekey] = create_exchange(name, options)
     end
 
   end

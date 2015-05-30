@@ -25,7 +25,7 @@ class Workspace::TreesController < WorkspaceController
         @dotfile = JSON.parse @dotfile_response.body
       when 404
         render :dotfile_error
-      when 500 
+      when 500
         render :dotfile_error
       else
         raise "Handle for #{@dotfile_response.status} is missing"

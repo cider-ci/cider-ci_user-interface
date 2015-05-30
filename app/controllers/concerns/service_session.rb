@@ -10,7 +10,7 @@ module Concerns
         CiderCi::OpenSession::Encryptor.encrypt(
           secret, user_id: user.id,
                   signature: create_user_signature(user),
-                  issued_at: Time.now.iso8601)
+                  issued_at: Time.zone.now.iso8601)
     end
 
     def validate_services_session_cookie_and_get_user

@@ -6,16 +6,16 @@ class Admin::WelcomePageSettingsController < AdminController
 
   def edit
     @welcome_page_settings = WelcomePageSettings.find
-    @welcome_message = \
-      params[:welcome_page_settings].try(:[], 'welcome_message') \
-      || @welcome_page_settings.welcome_message
-    @radiator_config_yaml = \
-      params[:welcome_page_settings].try(:[], 'radiator_config_yaml') \
-      || @welcome_page_settings.radiator_config.to_yaml
+    @welcome_message =
+      params[:welcome_page_settings].try(:[], 'welcome_message') ||
+        @welcome_page_settings.welcome_message
+    @radiator_config_yaml =
+      params[:welcome_page_settings].try(:[], 'radiator_config_yaml') ||
+        @welcome_page_settings.radiator_config.to_yaml
   end
 
   def update
-    rescue_path =       edit_admin_welcome_page_settings_path(
+    rescue_path = edit_admin_welcome_page_settings_path(
       params[:welcome_page_settings])
 
     Fun.wrap_exception_with_redirect self, rescue_path do

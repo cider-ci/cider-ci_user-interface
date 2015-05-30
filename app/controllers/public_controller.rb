@@ -20,7 +20,7 @@ class PublicController < ApplicationController
       rescue Exception => e
         Rails.logger.warn \
           ['Failed to parse radiator config', Formatter.exception_to_log_s(e)]
-        @alerts[:errors] <<  'Failed to build the radiator,
+        @alerts[:errors] << 'Failed to build the radiator,
         see the logs for details.'.squish
         []
       end
@@ -39,9 +39,9 @@ class PublicController < ApplicationController
     login = params.require(:sign_in)[:login].downcase
     error_msg = 'Neither login nor email address found!'
     begin
-      User.where('lower(login) = lower(?)', login).first \
-        || EmailAddress.where('lower(email_address) = lower(?)', login).first.user \
-        || raise(error_msg)
+      User.where('lower(login) = lower(?)', login).first ||
+        EmailAddress.where('lower(email_address) = lower(?)', login).first.user ||
+        raise(error_msg)
     rescue
       raise error_msg
     end

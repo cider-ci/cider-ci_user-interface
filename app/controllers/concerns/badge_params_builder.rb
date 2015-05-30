@@ -24,7 +24,7 @@ module Concerns
                                  branch_name, job_name)
 
       host_info_text = ('Cider-CI @ ' + ::Settings[:hostname]).squish
-      git_info_text = (repository_name + ' / '  + branch_name).squish
+      git_info_text = (repository_name + ' / ' + branch_name).squish
       job_info_text = if job
                              job.name + ' ' + job.state
                       else

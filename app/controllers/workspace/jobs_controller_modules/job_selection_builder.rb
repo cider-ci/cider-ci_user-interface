@@ -23,7 +23,7 @@ module Workspace::JobsControllerModules
         end.sort_by { |v| v[:name] }
 
       rescue RestClient::ResourceNotFound
-        @alerts[:errors] <<  'There exists no cider-ci dot-file ' \
+        @alerts[:errors] << 'There exists no cider-ci dot-file ' \
           ' `.cider-ci.yml` for the given tree-id.'
         nil
       rescue RestClient::UnprocessableEntity => e
@@ -31,7 +31,7 @@ module Workspace::JobsControllerModules
         nil
       end
       rescue RestClient::InternalServerError
-        @alerts[:errors] <<  'An unspecified error occurred when '\
+        @alerts[:errors] << 'An unspecified error occurred when '\
           'fetching the available jobs. See the logfiles '\
           'for details.'
         nil

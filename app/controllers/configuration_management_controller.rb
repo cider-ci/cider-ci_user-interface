@@ -31,9 +31,9 @@ class ConfigurationManagementController < ApplicationController
   def invoke
     begin
       case request.content_type.try(:downcase)
-      when /application\/ruby/
+      when %r{application/ruby}
         invoke_ruby
-      when /application\/sql/
+      when %r{application/sql}
         invoke_sql
       else
         render status: 422,
