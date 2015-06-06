@@ -38,7 +38,7 @@
     %td.jobs
       %ul.list-unstyled
         - commit.jobs.each do |job|
-          %li.job{data: {name: job.name, state: job.state}}
+          %li.job{data: {key: job.key, name: job.name, state: job.state}}
             %span.nowrap
               %span<>
                 =link_to workspace_job_path(job), class: "label #{label_class_for_state(job.state)}" do

@@ -7,7 +7,7 @@ module Concerns
 
       http_request = Faraday.new(url: url) do |f|
         f.basic_auth username, password
-        # f.use Faraday::Response::RaiseError
+        f.use Faraday::Response::RaiseError
         f.request :retry
         f.adapter Faraday.default_adapter
         f.ssl.verify = false

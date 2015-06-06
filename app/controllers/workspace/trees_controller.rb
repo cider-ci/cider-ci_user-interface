@@ -19,8 +19,13 @@ class Workspace::TreesController < WorkspaceController
     end
 
     def dotfile
-      @dotfile_response = get_dotfile(params[:tree_id])
-      case @dotfile_response.status
+      @dotfile_response = 
+        begin 
+          get_dotfile(params[:tree_id])
+        rescue Faraday::ClientError => e
+          e.response
+        end
+      case @dotfile_response[:status].presence || @dotfile_response.status
       when 200..299
         @dotfile = JSON.parse @dotfile_response.body
       when 404

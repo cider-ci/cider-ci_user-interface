@@ -76,7 +76,7 @@ class Workspace::JobsController < WorkspaceController
       end
     rescue Exception => e
       @alerts[:errors] << Formatter.exception_to_s(e)
-      render 'public/error', status: 500
+      render 'available_jobs_error', status: 500
     end
   end
 

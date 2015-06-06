@@ -1,0 +1,8 @@
+%h1.text-danger Error 
+
+%p.text-danger An unexpected error occurred. 
+
+%p  
+  Please have a look at the corresponding 
+  = link_to workspace_tree_dotfile_path(params[:tree_id]) do
+    Cider-CI dotfile.

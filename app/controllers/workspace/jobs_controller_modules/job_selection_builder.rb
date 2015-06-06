@@ -6,8 +6,7 @@ module Workspace::JobsControllerModules
     include Concerns::HTTP
 
     def set_runnable_jobs(id)
-      @runnable_jobs =
-        fetch_dotfile_jobs(id) || formatted_db_definitions
+      @runnable_jobs = fetch_dotfile_jobs(id) 
     end
 
     def get_jobs(id)
@@ -29,22 +28,17 @@ module Workspace::JobsControllerModules
       rescue RestClient::UnprocessableEntity => e
         @alerts[:errors] << e.response
         nil
-      end
       rescue RestClient::InternalServerError
         @alerts[:errors] << 'An unspecified error occurred when '\
           'fetching the available jobs. See the logfiles '\
           'for details.'
         nil
-    end
 
-    def formatted_db_definitions
-      Definition.all.map do |defi|
-        Array[defi.name,
-              { name: defi.name,
-                default: defi.is_default,
-                description: defi.description,
-                job_specification_id: defi.job_specification_id }]
-      end.instance_eval { Hash[self] }.deep_symbolize_keys
+      rescue Faraday::ResourceNotFound => e
+        @alerts[:errors] << 'The dotfile or an included resource was not found. ' 
+        @alerts[:errors] << e.to_s + " " + e.response.to_s
+        nil
+      end
     end
 
   end
