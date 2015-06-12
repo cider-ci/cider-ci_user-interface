@@ -8,7 +8,7 @@ $ci-states: 'executing', 'failed', 'passed', 'pending', 'unavailable'
 $ci-colors: $ci-executing, $ci-failed, $ci-passed, $ci-pending, $ci-unavailable
 $ci-colors-bg: $ci-executing-bg, $ci-failed-bg, $ci-passed-bg, $ci-pending-bg, $ci-unavailable-bg
 
-@mixin striped-executing() 
+@mixin striped-executing()
   //background-image: -webkit-linear-gradient($angle, $color 25%, transparent 25%, transparent 50%, $color 50%, $color 75%, transparent 75%, transparent)
   //background-image: -o-linear-gradient($angle, $color 25%, transparent 25%, transparent 50%, $color 50%, $color 75%, transparent 75%, transparent)
   background-image:  repeating-linear-gradient(45deg,$ci-passed,$ci-failed 3px, $ci-passed 6px)

@@ -2,7 +2,7 @@
 @mixin badge_box()
   g
     font-size: 12px
-    text  
+    text
       text-anchor: middle
     text, tspan
       font-family: DejaVu Sans, Verdana, Geneva, sans-serif
@@ -13,7 +13,7 @@ svg.cider-ci
 
   line
     stroke: $ci-border-color
-  
+
   rect
     fill: $body-bg
     stroke: $ci-border-color
@@ -22,7 +22,7 @@ svg.cider-ci
 
   a
     text, tspan
-      fill: $link-color  
+      fill: $link-color
 
   svg
     &.state
@@ -39,17 +39,17 @@ svg.cider-ci
 
     svg.repo
       @include badge_box
-      g 
+      g
         font-size: 14px
         text, tspan
-          font-weight: bold 
+          font-weight: bold
 
     svg.job
       @include badge_box
       g
         font-size: 16px
         text, tspan
-          font-weight: bold 
+          font-weight: bold
 
 
 
@@ -58,4 +58,4 @@ svg.cider-ci
       fill: green
       stroke-width: 0
 
-      
+

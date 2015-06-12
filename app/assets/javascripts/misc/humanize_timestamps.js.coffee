@@ -4,7 +4,7 @@
 
 $ ->
 
-  $("body").on "replaced", (event) -> 
+  $("body").on "replaced", (event) ->
     humanizeTimestamps($(event.target))
     humanizeDuration($(event.target))
 
@@ -27,7 +27,7 @@ $ ->
 
       # add "on" if not today
       if at.format("YYYY MM DD") isnt moment().format("YYYY MM DD")
-        html += " on #{at.format('dddd')}" 
+        html += " on #{at.format('dddd')}"
         # add day of month if not same week and month
         if at.format("YYYY MM W") isnt moment().format("YYYY MM W")
           html += ", #{at.format('Do')}"

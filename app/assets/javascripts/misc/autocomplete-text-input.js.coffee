@@ -3,14 +3,14 @@
 #  See the LICENSE.txt file provided with this software.
 
 
-$ -> 
+$ ->
 
-  split= (val)-> val.split /,\s*/ 
+  split= (val)-> val.split /,\s*/
   extractLast= (term)-> split(term).pop()
 
   $("input[data-autocomplete-path]").toArray().map((e)->$(e)).forEach ($input)->
 
-    $input.bind "keydown", (event) -> 
+    $input.bind "keydown", (event) ->
       if event.keyCode == $.ui.keyCode.TAB and $input.data("ui-autocomplete").menu.active
         event.preventDefault()
 
@@ -19,11 +19,11 @@ $ ->
       delay: 200
       source: (request,response) ->
         $.getJSON( $input.attr("data-autocomplete-path"), { term: extractLast(request.term) }, response )
-      search: -> extractLast @value 
-      focus: -> false         
+      search: -> extractLast @value
+      focus: -> false
       select: (event,ui) ->
-        terms = split @value 
+        terms = split @value
         terms.pop();
         terms.push( ui.item.value );
         @value = terms.join( ", " )
-        false 
+        false

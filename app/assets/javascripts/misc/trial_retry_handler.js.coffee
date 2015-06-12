@@ -5,9 +5,9 @@
 # takes care of the retry button in a task row shown in the job page
 # * disable button before sending request, i.e. right away
 # * submit the row for immediate reloading on complete (either success of failure)
-# * have the summary be scheduled for reloading 
+# * have the summary be scheduled for reloading
 
-$ -> 
+$ ->
 
   $(document).on "ajax:beforeSend", (e)->
     $target = $(e.target)
