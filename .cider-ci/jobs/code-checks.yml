@@ -1,0 +1,55 @@
+jobs: 
+
+  code-checks: 
+
+    name: Code Checks
+
+    description: |
+      Run static checks and metrics: complexity, duplicaiont, code format. 
+
+    start-on: 
+    - type: branch.updated
+      include-match: ^.*$
+
+    context:
+
+      task-defaults:
+        
+        eager-trials: 1
+        max-auto-trials: 2
+        traits:
+          linux: true
+          rbenv: true
+          ruby: true
+
+        environment_variables:
+          RAILS_ENV: test
+          LANG: "en_US.UTF-8"
+
+        scripts:
+          bundle-mri:
+            exclusive-executor-resource: bundler_2.1
+            body: bundle
+          test: 
+            start-when:
+            - script: bundle-mri
+
+      tasks:
+
+        code_complexity: 
+          name: Code complexity with flog
+          scripts: 
+            test: 
+              body: bundle exec cider-ci_flog -l 33 app/
+
+        code_similarity:
+          name: Code similarity with flay 
+          scripts: 
+            test: 
+              body: bundle exec cider-ci_flay -m 18 app/
+
+        lint_ruby:
+          name: Lint/Stylecheck with Rubocop
+          scripts:
+            test:
+              body: bundle exec rubocop

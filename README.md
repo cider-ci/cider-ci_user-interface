@@ -7,14 +7,9 @@ implemented component serves all of the user interface.
 
 ## Status
 
-[![Summary master](http://ci2.zhdk.ch/cider-ci/ui/public/Cider-CI%20User-Interface/master/tests,code-checks,coverage/summary.svg?respond_with_200&orientation=vertical =250x)](http://ci2.zhdk.ch/cider-ci/ui/public/Cider-CI%20User-Interface/master/tests,code-checks,coverage/summary.html)
-[![Summary next](http://ci2.zhdk.ch/cider-ci/ui/public/Cider-CI%20User-Interface/next/tests,code-checks,coverage/summary.svg?respond_with_200&orientation=vertical)](http://ci2.zhdk.ch/cider-ci/ui/public/Cider-CI%20User-Interface/next/tests,code-checks,coverage/summary.html)
+[![Summary master](http://ci3.zhdk.ch/cider-ci/ui/public/Cider-CI%20User-Interface/master/Tests,Code%20Checks/summary.svg?respond_with_200&orientation=vertical =250x)](http://ci3.zhdk.ch/cider-ci/ui/public/Cider-CI%20User-Interface/master/Tests,Code%20Checks/summary.html)
 
 [![Code Climate](https://codeclimate.com/github/cider-ci/cider-ci_user-interface/badges/gpa.svg)](https://codeclimate.com/github/cider-ci/cider-ci_user-interface)
-
-## Development Guide
-
-See [`./doc/development`](./doc/development.mkd).
 
 ## License
 

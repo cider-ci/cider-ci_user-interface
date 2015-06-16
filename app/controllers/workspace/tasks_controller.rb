@@ -9,14 +9,14 @@ class Workspace::TasksController < WorkspaceController
   def retry
     set_task
     existing_trial_ids = get_current_trial_ids
-    Thread.new{Messaging.publish('task.create-trial', id: @task.id)}
+    Thread.new { Messaging.publish('task.create-trial', id: @task.id) }
     loop do
       sleep(0.1)
       Trial.connection.clear_query_cache
       break if existing_trial_ids != get_current_trial_ids
     end
     redirect_to workspace_trial_path(get_current_trial_ids.first),
-      flash: { successes: ['A new trial is being executed'] }
+                flash: { successes: ['A new trial is being executed'] }
   end
 
   def show
@@ -37,5 +37,3 @@ class Workspace::TasksController < WorkspaceController
   end
 
 end
-
-

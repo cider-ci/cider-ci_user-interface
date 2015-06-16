@@ -19,8 +19,8 @@ class Workspace::TreesController < WorkspaceController
     end
 
     def dotfile
-      @dotfile_response = 
-        begin 
+      @dotfile_response =
+        begin
           get_dotfile(params[:tree_id])
         rescue Faraday::ClientError => e
           e.response
