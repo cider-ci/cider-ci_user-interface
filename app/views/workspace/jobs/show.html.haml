@@ -56,7 +56,7 @@
     #job.job{data: {id: job.id, name: job.name, state: job.state}}
 
       %ul.list-inline.actions.pull-right
-        %li.for-admin
+        %li.for-admin.hidden
           = form_tag workspace_job_path(job), method: 'DELETE' do
             = hidden_field_tag :authenticity_token, form_authenticity_token
             = button_tag type: :submit, class: "btn btn-danger" do
