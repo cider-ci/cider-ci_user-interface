@@ -11,10 +11,11 @@ class Workspace::TrialsController < WorkspaceController
     begin
       @trial = Trial.find params[:id]
       require_sign_in unless @trial.task.job.public_view_permission?
-      @scripts = @trial.scripts.map { |k, v| v }.sort_by do |s|
-        Time.iso8601(s['started_at'] || s['skipped_at'] || Time.zone.now.iso8601)
+      @scripts = @trial.scripts.map { |k, v| { 'name' => k }.merge(v) }.sort_by do |s|
+        Time.iso8601(s['started_at'] || s['skipped_at']) rescue  s['name'] || '0'
       end
-    rescue StandardError
+    rescue StandardError => e
+      Rails.logger.warn(e)
       render 'show_raw'
     end
   end

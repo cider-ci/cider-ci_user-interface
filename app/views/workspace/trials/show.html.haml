@@ -56,8 +56,6 @@
 
       %p
 
-        Executed 
-
         -if trial.started_at
           %b #{render 'humanized_time_from_now', at: trial.started_at}
         - if trial.finished_at and trial.started_at
