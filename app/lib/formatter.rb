@@ -16,7 +16,7 @@ module Formatter
 
     def exception_to_log_s(e, *more)
       rest = more.map(&:to_s).join(',')
-      [e.message, application_trace(e).join(','), rest].join(' ### ')
+      [e.class, e.message, application_trace(e).join(','), rest].join(' ### ')
     end
 
     def application_trace(e)

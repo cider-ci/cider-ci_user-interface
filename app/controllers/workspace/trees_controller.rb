@@ -23,6 +23,7 @@ class Workspace::TreesController < WorkspaceController
         begin
           get_dotfile(params[:tree_id])
         rescue Faraday::ClientError => e
+          Rails.logger.warn(Formatter.exception_to_log_s(e))
           e.response
         end
       case @dotfile_response[:status].presence || @dotfile_response.status
