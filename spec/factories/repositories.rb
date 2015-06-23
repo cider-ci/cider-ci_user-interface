@@ -3,6 +3,6 @@
 FactoryGirl.define do
   factory :repository do
     name { Faker::Lorem.word }
-    origin_uri { Faker::Internet.url }
+    git_url { Faker::Internet.url }
   end
 end

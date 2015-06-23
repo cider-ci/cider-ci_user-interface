@@ -5,8 +5,8 @@ User.find_or_initialize_by(login: 'admin')  \
 
 Repository.find_or_initialize_by(name: 'Demo Project') \
   .update_attributes!(
-    origin_uri: 'http://localhost:8888/cider-ci/demo-project-bash/',
-    git_fetch_and_update_interval: 5, 
+    git_url: 'http://localhost:8888/cider-ci/demo-project-bash/',
+    git_fetch_and_update_interval: 5,
     public_view_permission: true)
 
 

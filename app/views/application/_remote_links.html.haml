@@ -2,12 +2,12 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- repositories.each do |repository| 
-  - if res=(/(github\.com)\W*([^\.]+)/.match repository.origin_uri)
+- repositories.each do |repository|
+  - if res=(/(github\.com)\W*([^\.]+)/.match repository.git_url)
     - link= "https://github.com/#{res[2]}/commit/#{commit.id}"
     =link_to link do
       %i.icon-github
-  - if res=(/(bitbucket\.org)\W*([^\.]+)/.match repository.origin_uri)
+  - if res=(/(bitbucket\.org)\W*([^\.]+)/.match repository.git_url)
     - link= "https://bitbucket.org/#{res[2]}/commits/#{commit.id}"
     =link_to link do
       %i.icon-bitbucket

@@ -277,7 +277,7 @@ CREATE TABLE jobs (
 
 CREATE TABLE repositories (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    origin_uri text,
+    git_url text,
     name character varying,
     git_fetch_and_update_interval integer DEFAULT 60,
     git_update_interval integer,
@@ -366,6 +366,7 @@ CREATE TABLE executors (
     last_ping_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    accepted_repositories character varying[] DEFAULT '{}'::character varying[],
     CONSTRAINT executors_name_constraints CHECK (((name)::text ~* '^[A-Za-z0-9\-\_]+$'::text))
 );
 
@@ -384,6 +385,7 @@ CREATE TABLE executors_with_load (
     last_ping_at timestamp without time zone,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
+    accepted_repositories character varying[],
     current_load bigint,
     relative_load double precision
 );
@@ -960,6 +962,13 @@ CREATE INDEX index_email_addresses_on_user_id ON email_addresses USING btree (us
 
 
 --
+-- Name: index_executors_on_accepted_repositories; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_executors_on_accepted_repositories ON executors USING btree (accepted_repositories);
+
+
+--
 -- Name: index_executors_on_traits; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1013,6 +1022,13 @@ CREATE UNIQUE INDEX index_jobs_tags_on_job_id_and_tag_id ON jobs_tags USING btre
 --
 
 CREATE INDEX index_jobs_tags_on_tag_id_and_job_id ON jobs_tags USING btree (tag_id, job_id);
+
+
+--
+-- Name: index_repositories_on_git_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_repositories_on_git_url ON repositories USING btree (git_url);
 
 
 --
@@ -1141,6 +1157,7 @@ CREATE RULE "_RETURN" AS
     executors.last_ping_at,
     executors.created_at,
     executors.updated_at,
+    executors.accepted_repositories,
     count(trials.executor_id) AS current_load,
     ((count(trials.executor_id))::double precision / (executors.max_load)::double precision) AS relative_load
    FROM (executors
@@ -1408,6 +1425,8 @@ INSERT INTO schema_migrations (version) VALUES ('25');
 INSERT INTO schema_migrations (version) VALUES ('26');
 
 INSERT INTO schema_migrations (version) VALUES ('27');
+
+INSERT INTO schema_migrations (version) VALUES ('28');
 
 INSERT INTO schema_migrations (version) VALUES ('3');
 

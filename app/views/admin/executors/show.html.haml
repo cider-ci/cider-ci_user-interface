@@ -1,6 +1,6 @@
 - executor ||= @executor
 
-%ol.breadcrumb 
+%ol.breadcrumb
   = render "/breadcrumbs/admin/executor"
 
 .btn-group.actions.pull-right
@@ -21,20 +21,20 @@
 %table.table.table-striped
   %thead
   %tbody
-    %tr 
+    %tr
       %td Enabled
       %td.enabled
-        - if @executor.enabled 
+        - if @executor.enabled
           %i.success.fa.fa-check
-        - else 
+        - else
           %i.icon-unchecked
     %tr
       %td Online
       %td.online
-        - unless executor.enabled 
+        - unless executor.enabled
           %i.icon-offline
         - else
-          - if executor.online? 
+          - if executor.online?
             %i.success.icon-online.fa.fa-heart
           - else
             %i.warning.fa.fa-heart-o
@@ -44,7 +44,7 @@
       %td.last-ping-at
         =render 'humanized_time_from_now', at: executor.last_ping_at
 
-    %tr 
+    %tr
       %td Load
       %td
         .load.badge
@@ -56,13 +56,13 @@
 %table.table.table-striped
   %thead
   %tbody
-    %tr 
+    %tr
       %td Base URL
       %td= @executor.base_url
-    %tr 
+    %tr
       %td Basic Auth. User Name
       %td= @executor.name
-    %tr 
+    %tr
       %td Basic Auth. Password
       %td= OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'),Settings.secret,@executor.name)
 
@@ -71,8 +71,14 @@
 
 %h2 Traits
 
-- @executor.traits.each do |trait| 
+- @executor.traits.each do |trait|
   %span.label.label-default= trait
+
+%h2 Accepted-Repositories
+
+- @executor['accepted-repositories'].each do |ar|
+  %span.label.label-default= ar
+
 
 
 
