@@ -7,13 +7,14 @@ class Workspace::TrialsController < WorkspaceController
   skip_before_action :require_sign_in,
                      only: [:show, :attachments]
 
+
+
   def show
     begin
       @trial = Trial.find params[:id]
       require_sign_in unless @trial.task.job.public_view_permission?
-      @scripts = @trial.scripts.map { |k, v| { 'name' => k }.merge(v) }.sort_by do |s|
-        Time.iso8601(s['started_at'] || s['skipped_at']) rescue  s['name'] || '0'
-      end
+      @scripts = @trial.scripts.map { |k, v| { 'name' => k }.merge(v) } \
+        .sort_by{|s| script_order(s)}
     rescue StandardError => e
       Rails.logger.warn(e)
       render 'show_raw'
@@ -38,6 +39,16 @@ class Workspace::TrialsController < WorkspaceController
   def delete_issue
     TrialIssue.find(params[:issue_id]).destroy
     redirect_to issues_workspace_trial_path(params[:id])
+  end
+
+  private
+
+  def script_order s
+    begin
+      Time.iso8601(s['started_at'] || s['skipped_at']).iso8601
+    rescue Exception => e
+      s['name'] || '0'
+    end
   end
 
 end
