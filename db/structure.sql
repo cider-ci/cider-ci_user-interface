@@ -283,7 +283,8 @@ CREATE TABLE repositories (
     git_update_interval integer,
     public_view_permission boolean DEFAULT false,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    update_notification_token uuid DEFAULT uuid_generate_v4()
 );
 
 
@@ -1032,6 +1033,13 @@ CREATE UNIQUE INDEX index_repositories_on_git_url ON repositories USING btree (g
 
 
 --
+-- Name: index_repositories_on_update_notification_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_repositories_on_update_notification_token ON repositories USING btree (update_notification_token);
+
+
+--
 -- Name: index_submodules_on_commit_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1427,6 +1435,8 @@ INSERT INTO schema_migrations (version) VALUES ('26');
 INSERT INTO schema_migrations (version) VALUES ('27');
 
 INSERT INTO schema_migrations (version) VALUES ('28');
+
+INSERT INTO schema_migrations (version) VALUES ('29');
 
 INSERT INTO schema_migrations (version) VALUES ('3');
 
