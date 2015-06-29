@@ -4,7 +4,7 @@
 
 - repository = @repository
 
-%ol.breadcrumb 
+%ol.breadcrumb
   = render '/breadcrumbs/admin/repository', repository: repository
 
 
@@ -31,10 +31,10 @@
     - @repository.branches.reorder(updated_at: :desc).each do |branch|
       %tr.branch-row
         %td
-          =link_to workspace_commits_path({ repository: {names: @repository.name}, 
+          =link_to workspace_commits_path({ repository: {names: @repository.name},
             branch:{names: branch.name}}) do
             =branch.name
-        %td 
+        %td
           updated
           =render 'humanized_time_from_now', at:  branch.updated_at
         %td
@@ -50,7 +50,10 @@
       - attributes = @repository.attributes.deep_symbolize_keys
       - attributes.keys.sort.reject{|k| k == :transient_id}.each do |k|
         %tr
-          %td= k 
+          %td= k
           %td{style: "font-family: monospace;"}= attributes[k]
 
+
+%h3 Update Notification URL
+%code= update_notification_url(@repository)
 

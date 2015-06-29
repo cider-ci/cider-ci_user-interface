@@ -4,6 +4,9 @@
 
 class Admin::RepositoriesController < AdminController
   include Concerns::CRUD
+  include Concerns::UrlBuilder
+
+  helper_method :update_notification_url
 
   def permited_repository_params(params)
     if params[:repository]
@@ -48,6 +51,11 @@ class Admin::RepositoriesController < AdminController
 
   def show
     @repository = Repository.find(params[:id])
+  end
+
+  def update_notification_url(repository)
+    service_base_url(Settings.services.repository.http) +
+      '/update-notification/' + repository.update_notification_token
   end
 
 end
