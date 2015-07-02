@@ -18,6 +18,15 @@
   = f.text_field :git_fetch_and_update_interval, type: 'number', class: "form-control"
   %span.help-block
     It is recommended to Use webhooks to trigger fetch and updates if
-    available. In this case a value of 300 or higher is recommended.  For pull
+    available. In this case a value of 300 or higher is recommended. For pull
     only operation sensible values range from 5 to 60.
 
+=form_group "Github Authentication Token", control_id: "github_authtoken" do
+  = f.text_field 'github_authtoken', class: "form-control"
+  %span.help-block
+    :markdown
+      If the repository is hosted on GitHub (or a GitHub API compatible
+      service) providing an authentication token will enable status pushes.
+      See also ["Creating an access
+      token"](https://help.github.com/articles/creating-an-access-token-for-command-line-use/)
+      in the GitHub Help.

@@ -30,18 +30,19 @@ gem 'sass-rails'
 
 
 # The rest
+#gem 'rack-mini-profiler'
+gem "nilify_blanks"
 gem 'bcrypt-ruby'
 gem 'bootswatch-rails'
 gem 'bunny', '>= 1.3'
 gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
+gem 'faraday'
 gem 'kaminari'
 gem 'newrelic_rpm'
 gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
 gem 'puma'
-#gem 'rack-mini-profiler'
-gem 'rails_config', git: 'https://github.com/DrTom/rails_config.git', ref: 'master'  
+gem 'rails_config', git: 'https://github.com/DrTom/rails_config.git', ref: 'master'
 gem 'rest-client'
-gem 'faraday'
 gem 'therubyrhino', platform: :jruby
 gem 'uglifier'
 gem 'uuidtools'

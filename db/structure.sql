@@ -284,7 +284,8 @@ CREATE TABLE repositories (
     public_view_permission boolean DEFAULT false,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    update_notification_token uuid DEFAULT uuid_generate_v4()
+    update_notification_token uuid DEFAULT uuid_generate_v4(),
+    github_authtoken text
 );
 
 
@@ -1439,6 +1440,8 @@ INSERT INTO schema_migrations (version) VALUES ('28');
 INSERT INTO schema_migrations (version) VALUES ('29');
 
 INSERT INTO schema_migrations (version) VALUES ('3');
+
+INSERT INTO schema_migrations (version) VALUES ('30');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 

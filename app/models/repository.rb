@@ -3,6 +3,7 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Repository < ActiveRecord::Base
+  nilify_blanks
   has_many :branches, dependent: :destroy
 
   before_validation on: :create do

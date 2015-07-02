@@ -27,6 +27,10 @@ module ServiceCheck
       check_service Settings.services.dispatcher.http,  Settings.basic_auth
     end
 
+    def check_notifier
+      check_service Settings.services.notifier.http,  Settings.basic_auth
+    end
+
     def check_repository
       check_service Settings.services.repository.http,  Settings.basic_auth
     end
