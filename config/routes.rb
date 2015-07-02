@@ -1,8 +1,10 @@
 CiderCI::Application.routes.draw do
 
-  get '/workspace/dashboard', controller: 'workspace', action: 'dashboard'
+  get '/workspace/dashboard',
+      controller: 'workspace', action: 'dashboard'
 
-  post '/configuration_management/invoke', controller: 'configuration_management', action: 'invoke'
+  post '/configuration_management/invoke',
+       controller: 'configuration_management', action: 'invoke'
 
   namespace 'workspace' do
 
@@ -14,8 +16,12 @@ CiderCI::Application.routes.draw do
 
     resource :account, only: [:edit, :update] do
       post :email_addresses, to: 'accounts#add_email_address'
-      delete '/email_address/:email_address', email_address: /[^\/]+/, to: 'accounts#delete_email_address', as: 'delete_email_address'
-      post '/email_address/:email_address/as_primary', email_address: /[^\/]+/, to: 'accounts#as_primary_email_address', as: 'primary_email_address'
+      delete '/email_address/:email_address',
+             email_address: /[^\/]+/, to: 'accounts#delete_email_address',
+             as: 'delete_email_address'
+      post '/email_address/:email_address/as_primary',
+           email_address: /[^\/]+/, to: 'accounts#as_primary_email_address',
+           as: 'primary_email_address'
     end
 
     resource :session, only: [:edit, :update]
@@ -58,7 +64,7 @@ CiderCI::Application.routes.draw do
       end
     end
 
-    resources :trees, only: [] do 
+    resources :trees, only: [] do
       get :attachments
       get :dotfile
     end
@@ -104,10 +110,15 @@ CiderCI::Application.routes.draw do
         # resources :email_addreses
         get '/email_addresses', action: 'email_addressses'
         post '/email_addresses', action: 'add_email_address'
-        put '/email_address/:email_address', email_address: /[^\/]+/, action: :put_email_address, as: :email_address
-        post '/email_address/:email_address/as_primary', email_address: /[^\/]+/, action: :as_primary_email_address, as: :primary_email_address
-        delete '/email_address/:email_address', email_address: /[^\/]+/, action: :delete_email_address, as: :delete_email_address
-        # delete '/email_address/:email_address', email_address: /[^\/]+/, action: 'delete_email_address', as: :email_address
+        put '/email_address/:email_address',
+            email_address: /[^\/]+/, action: :put_email_address,
+            as: :email_address
+        post '/email_address/:email_address/as_primary',
+             email_address: /[^\/]+/, action: :as_primary_email_address,
+             as: :primary_email_address
+        delete '/email_address/:email_address',
+               email_address: /[^\/]+/, action: :delete_email_address,
+               as: :delete_email_address
       end
     end
     resources :executors do
@@ -129,8 +140,6 @@ CiderCI::Application.routes.draw do
     post 'sign_in'
     post 'sign_out'
 
-    # ħttp://localhost:8880/cider-ci/ui/public/attachments/Cider-CI%20Bash%20Demo%20Project/master/Tests/log/hello.txt
-    #
     get 'attachments/:repository_name/:branch_name/:job_name/*path',
         action: :redirect_to_tree_attachment_content,
         constraints: { path: /.*/ }
@@ -139,7 +148,9 @@ CiderCI::Application.routes.draw do
         action: :redirect_to_job
 
     get '/:repository_name/:branch_name/:job_names/summary',
-        controller: 'summary', action: 'show', as: 'summary'
+        controller: 'summary', action: 'show', as: 'summary',
+        constraints: { repository_name: /[^\/]+/, branch_name: /[^\/]+/,
+                       job_names: /[^\/]+/ }
 
     resources :badges, only: [] do
       collection do

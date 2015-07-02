@@ -4,7 +4,7 @@ AllCops:
     - 'config/application.rb'
     - 'config/environments/**/*'
     - 'config/initializers/backtrace_silencers.rb'
-    - 'config/routes.rb'
+      #    - 'config/routes.rb'
     - 'db/**/*'
   RunRailsCops: true
 
@@ -140,6 +140,9 @@ Style/RedundantBegin:
 
 # Cop supports --auto-correct.
 Style/RedundantSelf:
+  Enabled: false
+
+Style/RegexpLiteral:
   Enabled: false
 
 Style/RescueModifier:
