@@ -21,12 +21,27 @@
     available. In this case a value of 300 or higher is recommended. For pull
     only operation sensible values range from 5 to 60.
 
+=form_group "Use the Default Github Authentication Token", control_id: "repository_user_default_github_authtoken" do
+  .checkbox
+    %label<
+      = f.check_box :use_default_github_authtoken, disabled: (! Settings.github_authtoken), class: ""
+  %span.help-block
+    :markdown
+      If the repository is hosted on GitHub (or on a GitHub API compatible
+      service) an authentication token will enable status pushes.
+      See also ["Creating an access
+      token"](https://help.github.com/articles/creating-an-access-token-for-command-line-use/)
+      in the GitHub Help.
+
+      This option will use the default token configured for your server. If
+      you can not select this option no token has been configured.
+
+
 =form_group "Github Authentication Token", control_id: "github_authtoken" do
   = f.text_field 'github_authtoken', class: "form-control"
   %span.help-block
     :markdown
-      If the repository is hosted on GitHub (or a GitHub API compatible
-      service) providing an authentication token will enable status pushes.
-      See also ["Creating an access
-      token"](https://help.github.com/articles/creating-an-access-token-for-command-line-use/)
-      in the GitHub Help.
+      This will use a custom token for this repository.
+      The previous option will be ignored if this field has a value.
+
+

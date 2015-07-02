@@ -285,7 +285,8 @@ CREATE TABLE repositories (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     update_notification_token uuid DEFAULT uuid_generate_v4(),
-    github_authtoken text
+    github_authtoken text,
+    use_default_github_authtoken boolean DEFAULT false NOT NULL
 );
 
 
