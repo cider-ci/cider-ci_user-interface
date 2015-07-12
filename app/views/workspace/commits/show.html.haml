@@ -9,12 +9,12 @@
     .col-md-6
       %ol.breadcrumb.with-circle-separator.pull-right
         %li
-          =link_to workspace_tree_dotfile_path(tree_id: @commit.tree_id), class: ""  do
-            %span Dotfile
-        %li 
+          =link_to workspace_tree_configfile_path(tree_id: @commit.tree_id), class: ""  do
+            %span Config-File
+        %li
           = link_to workspace_jobs_path(tree_id: commit.tree_id) do
-            Jobs 
-        %li 
+            Jobs
+        %li
           = link_to workspace_tree_attachments_path(commit.tree_id) do
             Tree-Attachments
 
@@ -28,20 +28,20 @@
 
   %h1 Commit "#{commit.subject}"
 
-  Commit-id: 
-  %span.to-clipboard #{commit.id}, tree-id: 
-  %span.to-clipboard #{commit.tree_id}. 
+  Commit-id:
+  %span.to-clipboard #{commit.id}, tree-id:
+  %span.to-clipboard #{commit.tree_id}.
 
 
   %p
     Authored
     -if commit.committer_name == commit.author_name
-      and committed 
-    by 
+      and committed
+    by
     %em #{commit.author_name}
     -if commit.committer_name != commit.author_name
       and committed by
-      %em #{commit.commitor_name} 
+      %em #{commit.commitor_name}
     %span<=render 'humanized_time_from_now', at: commit.author_date
     %span<>.
 

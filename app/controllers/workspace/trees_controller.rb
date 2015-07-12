@@ -12,29 +12,29 @@ class Workspace::TreesController < WorkspaceController
         .page(params[:page])
     end
 
-    def get_dotfile(tree_id)
+    def get_configfile(tree_id)
       url = service_base_url(::Settings.services.builder.http) +
-        "/dotfile/#{tree_id}"
+        "/configfile/#{tree_id}"
       http_get(url)
     end
 
-    def dotfile
-      @dotfile_response =
+    def configfile
+      @configfile_response =
         begin
-          get_dotfile(params[:tree_id])
+          get_configfile(params[:tree_id])
         rescue Faraday::ClientError => e
           Rails.logger.warn(Formatter.exception_to_log_s(e))
           e.response
         end
-      case @dotfile_response[:status].presence || @dotfile_response.status
+      case @configfile_response[:status].presence || @configfile_response.status
       when 200..299
-        @dotfile = JSON.parse @dotfile_response.body
+        @configfile = JSON.parse @configfile_response.body
       when 404
-        render :dotfile_error
+        render :configfile_error
       when 500
-        render :dotfile_error
+        render :configfile_error
       else
-        raise "Handle for #{@dotfile_response.status} is missing"
+        raise "Handle for #{@configfile_response.status} is missing"
       end
     end
 

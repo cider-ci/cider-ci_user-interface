@@ -6,7 +6,7 @@ module Workspace::JobsControllerModules
     include Concerns::HTTP
 
     def set_runnable_jobs(id)
-      @runnable_jobs = fetch_dotfile_jobs(id)
+      @runnable_jobs = fetch_configfile_jobs(id)
     end
 
     def get_jobs(id)
@@ -15,7 +15,7 @@ module Workspace::JobsControllerModules
       JSON.parse(http_get(url).body)
     end
 
-    def fetch_dotfile_jobs(id)
+    def fetch_configfile_jobs(id)
       begin
         get_jobs(id).map(&:deep_symbolize_keys).map do |values|
           values.slice(:name,  :description, :tree_id, :key)
@@ -35,7 +35,7 @@ module Workspace::JobsControllerModules
         nil
 
       rescue Faraday::ResourceNotFound => e
-        @alerts[:errors] << 'The dotfile or an included resource was not found. '
+        @alerts[:errors] << 'The configfile or an included resource was not found. '
         @alerts[:errors] << e.to_s + ' ' + e.response.to_s
         nil
       end

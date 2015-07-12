@@ -66,7 +66,7 @@ CiderCI::Application.routes.draw do
 
     resources :trees, only: [] do
       get :attachments
-      get :dotfile
+      get :configfile
     end
 
     resources :executors
