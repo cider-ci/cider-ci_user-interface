@@ -13,8 +13,8 @@ class Workspace::TreesController < WorkspaceController
     end
 
     def get_configfile(tree_id)
-      url = service_base_url(::Settings.services.builder.http) +
-        "/configfile/#{tree_id}"
+      url = service_base_url(::Settings.services.repository.http) +
+        "/project-configuration/#{tree_id}"
       http_get(url)
     end
 
@@ -31,10 +31,12 @@ class Workspace::TreesController < WorkspaceController
         @configfile = JSON.parse @configfile_response.body
       when 404
         render :configfile_error
+      when 422
+        render :configfile_error
       when 500
         render :configfile_error
       else
-        raise "Handle for #{@configfile_response.status} is missing"
+        raise "Handle for #{@configfile_response[:status].presence} is missing"
       end
     end
 
