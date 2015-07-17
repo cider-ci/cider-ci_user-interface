@@ -1,14 +1,14 @@
 jobs:
 
-  tests: 
+  tests:
 
     name: Tests
 
     description: |
       Run specs under MRI.
 
-    start-on: 
-    - type: branch.updated
+    run-on:
+    - type: branch
       include-match: ^.*$
 
     context:
@@ -26,18 +26,18 @@ jobs:
         rbenv: true
         ruby: true
 
-      tasks: 
+      tasks:
 
         specs:
 
           scripts:
 
-            configure-database: 
+            configure-database:
               body: |
                 #!/usr/bin/env ruby
                 require 'yaml'
                 config = \
-                  { 'test' => 
+                  { 'test' =>
                     { 'adapter' => 'postgresql',
                       'encoding' => 'unicode',
                       'host' => 'localhost',
@@ -57,16 +57,16 @@ jobs:
               - script: bundle-mri
               - script: configure-database
 
-            test: 
+            test:
               start-when:
               - script: bundle-mri
               - script: create-database
               body: bundle exec rspec spec/
 
-            delete-database: 
+            delete-database:
               body:  bundle exec rake db:pg:terminate_connections db:drop
               ignore-state: true
-              start-when: 
+              start-when:
               - script: test
                 states: [aborted, passed, failed, skipped]
 
