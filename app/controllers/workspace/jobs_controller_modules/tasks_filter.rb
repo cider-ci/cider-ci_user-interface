@@ -7,8 +7,16 @@ module Workspace::JobsControllerModules::TasksFilter
 
   def set_and_filter_tasks(params)
     @tasks = filter_tasks_by_substring_search \
-      filter_tasks_by_condition \
+      filter_tasks_by_condition set_per_page \
         @job.tasks.reorder(:name).page(params[:page])
+  end
+
+  def set_per_page(jobs)
+    if params[:per_page].present?
+      jobs.per(Integer(params[:per_page]))
+    else
+      jobs
+    end
   end
 
   def filter_tasks_by_substring_search(tasks)
