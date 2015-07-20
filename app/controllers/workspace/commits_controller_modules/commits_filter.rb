@@ -6,7 +6,7 @@ module Workspace::CommitsControllerModules::CommitsFilter
       filter_by_text \
         filter_by_respository \
           filter_by_branches \
-            filter_by_show_orphans \
+            filter_by_depth \
               filter_per_page \
                 commits_initial_scope
   end
@@ -26,11 +26,27 @@ module Workspace::CommitsControllerModules::CommitsFilter
     end
   end
 
-  def filter_by_show_orphans(commits)
-    unless params[:show_orphans].present?
-      commits.joins(:branches)
-    else
+  def filter_by_depth(commits)
+    depth = Integer(params[:depth]) rescue 0
+    case depth
+    when -1
       commits
+    when 0
+      commits.joins(:head_of_branches)
+    else
+      commits.joins(:branches) \
+        .joins('JOIN commits AS heads ON branches.current_commit_id = heads.id') \
+        .where("commits.id IN (
+                  WITH RECURSIVE close_commits(id,depth) AS (
+                    SELECT c0.id, 0 FROM commits c0 WHERE id = heads.id
+                  UNION
+                    SELECT c0.id, close_commits.depth + 1 FROM commits c0, close_commits
+                    JOIN commit_arcs ON commit_arcs.child_id = close_commits.id
+                    WHERE c0.id = commit_arcs.parent_id
+                    AND close_commits.depth < ?
+               )
+               SELECT close_commits.id FROM close_commits
+               )", depth)
     end
   end
 

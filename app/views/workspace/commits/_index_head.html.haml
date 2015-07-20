@@ -7,41 +7,46 @@
   .pull-right
 
     = form_tag workspace_commits_path, method: 'GET', class: "form-inline well right-top-form", role: 'form' do
-      %fieldset 
+      %fieldset
         .pull-left
           %ul.list-inline
             %li
               .form-group
                 %label.sr-only{for: "repository_names"}
                 = text_field :repository, :names, placeholder: "Repository name 1, ...",
-                  value: repository_names_filter.join(", "), 
+                  value: repository_names_filter.join(", "),
                   autofocus: true,
-                  data: {autocomplete_path: names_workspace_repositories_path}, 
+                  data: {autocomplete_path: names_workspace_repositories_path},
                   class: "input-medium form-control input-sm"
             %li
               .form-group
                 %label.sr-only{for: "branch_names"}
                 = text_field :branch, :names, placeholder: "Branch name 1, ...",
-                  value: branch_names_filter.join(", "), 
-                  data:{autocomplete_path: names_workspace_branches_path}, 
+                  value: branch_names_filter.join(", "),
+                  data:{autocomplete_path: names_workspace_branches_path},
                   class: "input-medium form-control input-sm"
             %li
               .form-group
                 %label.sr-only{for: "commit_text"}
                 =text_field :commit, :text, placeholder: "Commits text search",
-                  value: commit_text_search_filter, 
+                  value: commit_text_search_filter,
                   class: "search-query form-control input-sm"
 
 
-      %fieldset 
+      %fieldset
         .pull-right
           %ul.list-inline
 
             %li
-              .checkbox
-                %label
-                  = check_box_tag :show_orphans , "1", params[:show_orphans].present?
-                  Show orphans
+
+              .form-group
+                %label.sr-only{for: "depth"}
+                = select_tag :depth,
+                  options_for_select([["Branch heads only ⚓  ",0],
+                    ["Up to depth 2",2], ["Up to depth 5",5],
+                    ["Any depth and orphans",-1]],
+                    params[:depth] || 0),
+                  class: "form-control input-sm"
 
             %li
               = render 'per_page_form_group'
@@ -58,7 +63,7 @@
                 Filter
 
 
-  %h1 
+  %h1
     Commits
 
     -case
