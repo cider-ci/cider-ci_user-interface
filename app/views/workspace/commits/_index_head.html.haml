@@ -15,7 +15,6 @@
                 %label.sr-only{for: "repository_names"}
                 = text_field :repository, :names, placeholder: "Repository name 1, ...",
                   value: repository_names_filter.join(", "),
-                  autofocus: true,
                   data: {autocomplete_path: names_workspace_repositories_path},
                   class: "input-medium form-control input-sm"
             %li
