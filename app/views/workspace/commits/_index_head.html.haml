@@ -42,7 +42,7 @@
               .form-group
                 %label.sr-only{for: "depth"}
                 = select_tag :depth,
-                  options_for_select([["Branch heads only ⚓  ",0],
+                  options_for_select([["Branch heads only ⚓ ",0],
                     ["Up to depth 2",2], ["Up to depth 5",5],
                     ["Any depth and orphans",-1]],
                     params[:depth] || 0),

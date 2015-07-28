@@ -1049,6 +1049,13 @@ CREATE INDEX index_submodules_on_commit_id ON submodules USING btree (commit_id)
 
 
 --
+-- Name: index_submodules_on_submodule_commit_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_submodules_on_submodule_commit_id ON submodules USING btree (submodule_commit_id);
+
+
+--
 -- Name: index_tags_on_tag; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1443,6 +1450,8 @@ INSERT INTO schema_migrations (version) VALUES ('29');
 INSERT INTO schema_migrations (version) VALUES ('3');
 
 INSERT INTO schema_migrations (version) VALUES ('30');
+
+INSERT INTO schema_migrations (version) VALUES ('32');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 
