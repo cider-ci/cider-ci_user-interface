@@ -280,7 +280,6 @@ CREATE TABLE repositories (
     git_url text,
     name character varying,
     git_fetch_and_update_interval integer DEFAULT 60,
-    git_update_interval integer,
     public_view_permission boolean DEFAULT false,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
@@ -1452,6 +1451,8 @@ INSERT INTO schema_migrations (version) VALUES ('3');
 INSERT INTO schema_migrations (version) VALUES ('30');
 
 INSERT INTO schema_migrations (version) VALUES ('32');
+
+INSERT INTO schema_migrations (version) VALUES ('33');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 

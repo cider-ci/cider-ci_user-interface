@@ -14,7 +14,7 @@
     %label<
       = f.check_box :public_view_permission, class: ""
 
-=form_group "Fetch and update interval (seconds) ", control_id: "repository_git_update_interval", cols_control: 4 do
+=form_group "Fetch and update interval (seconds) ", control_id: "repository_git_fetch_and_update_interval", cols_control: 4 do
   = f.text_field :git_fetch_and_update_interval, type: 'number', class: "form-control"
   %span.help-block
     It is recommended to Use webhooks to trigger fetch and updates if
