@@ -277,7 +277,7 @@ CREATE TABLE jobs (
 
 CREATE TABLE repositories (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    git_url text,
+    git_url text NOT NULL,
     name character varying,
     git_fetch_and_update_interval integer DEFAULT 60,
     public_view_permission boolean DEFAULT false,
