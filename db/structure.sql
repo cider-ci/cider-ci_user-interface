@@ -906,6 +906,13 @@ CREATE INDEX index_commits_on_committer_date ON commits USING btree (committer_d
 
 
 --
+-- Name: index_commits_on_depth; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_commits_on_depth ON commits USING btree (depth);
+
+
+--
 -- Name: index_commits_on_tree_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1418,6 +1425,8 @@ INSERT INTO schema_migrations (version) VALUES ('32');
 INSERT INTO schema_migrations (version) VALUES ('33');
 
 INSERT INTO schema_migrations (version) VALUES ('34');
+
+INSERT INTO schema_migrations (version) VALUES ('35');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 
