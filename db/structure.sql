@@ -307,43 +307,6 @@ CREATE VIEW commit_cache_signatures AS
 
 
 --
--- Name: depths; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW depths AS
- SELECT cd.id AS commit_id,
-    cd.depth
-   FROM ( WITH RECURSIVE ancestors(id, depth) AS (
-                 SELECT commits.id,
-                    0 AS depth
-                   FROM commits
-                  WHERE ((NOT (EXISTS ( SELECT 1
-                           FROM commit_arcs
-                          WHERE ((commits.id)::text = (commit_arcs.child_id)::text)))) AND (commits.depth IS NULL))
-                UNION
-                 SELECT parents.id,
-                    parents.depth
-                   FROM commits parents
-                  WHERE ((parents.depth IS NOT NULL) AND (EXISTS ( SELECT 1
-                           FROM commits children,
-                            commit_arcs
-                          WHERE (((children.depth IS NULL) AND ((commit_arcs.child_id)::text = (children.id)::text)) AND ((commit_arcs.parent_id)::text = (parents.id)::text)))))
-                UNION
-                 SELECT commits.id,
-                    (ancestors_1.depth + 1)
-                   FROM commits,
-                    ancestors ancestors_1,
-                    commit_arcs
-                  WHERE ((((commits.id)::text = (commit_arcs.child_id)::text) AND ((ancestors_1.id)::text = (commit_arcs.parent_id)::text)) AND (commits.depth IS NULL))
-                )
-         SELECT ancestors.id,
-            max(ancestors.depth) AS depth
-           FROM ancestors
-          GROUP BY ancestors.id
-          ORDER BY max(ancestors.depth)) cd;
-
-
---
 -- Name: email_addresses; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1453,6 +1416,8 @@ INSERT INTO schema_migrations (version) VALUES ('30');
 INSERT INTO schema_migrations (version) VALUES ('32');
 
 INSERT INTO schema_migrations (version) VALUES ('33');
+
+INSERT INTO schema_migrations (version) VALUES ('34');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 
