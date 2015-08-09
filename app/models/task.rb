@@ -11,8 +11,6 @@ class Task < ActiveRecord::Base
 
   belongs_to :task_specification
 
-  validates :state, inclusion: { in: Constants::TASK_STATES }
-
   default_scope { order(created_at: :desc, id: :asc) }
 
   scope :with_failed_trials, lambda{

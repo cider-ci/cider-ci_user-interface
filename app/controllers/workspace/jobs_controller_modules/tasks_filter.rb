@@ -46,7 +46,7 @@ module Workspace::JobsControllerModules::TasksFilter
       tasks.with_failed_trials
     when :passed
       tasks.where(state: 'passed')
-    when
+    else
       tasks
     end
   end

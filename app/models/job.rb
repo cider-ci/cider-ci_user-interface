@@ -24,8 +24,6 @@ class Job < ActiveRecord::Base
 
   has_many :trials, through: :tasks
 
-  validates :state, inclusion: { in: Constants::JOB_STATES }
-
   default_scope { order(created_at: :desc, id: :asc) }
 
   serialize :substituted_job_specification_data

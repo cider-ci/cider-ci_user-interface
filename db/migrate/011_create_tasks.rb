@@ -5,7 +5,7 @@ class CreateTasks < ActiveRecord::Migration
   def change
 
     create_table :task_specifications, id: :uuid do |t|
-      t.jsonb :data   
+      t.jsonb :data
     end
 
     create_table :tasks, id: :uuid  do |t|
@@ -26,7 +26,7 @@ class CreateTasks < ActiveRecord::Migration
       t.integer :priority, null: false, default: 0
 
       t.string :traits, array: true, null: false, default: '{}'
-      t.index :traits 
+      t.index :traits
 
       t.text :error, null: false, default: ""
 
@@ -41,8 +41,8 @@ class CreateTasks < ActiveRecord::Migration
 
     reversible  do |dir|
       dir.up do
-        execute %[ALTER TABLE tasks ADD CONSTRAINT check_tasks_valid_state CHECK 
-          (state IN (#{Constants::TASK_STATES.map{|s|"'#{s}'"}.join(', ')}));]
+        execute %[ALTER TABLE tasks ADD CONSTRAINT check_tasks_valid_state CHECK
+          (state IN (#{Settings.constants.STATES.TASK.map{|s|"'#{s}'"}.join(', ')}));]
       end
     end
 

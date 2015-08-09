@@ -16,7 +16,7 @@ class CreateTrials < ActiveRecord::Migration
       t.string :state, null: false, default: 'pending'
       t.index :state
 
-      t.jsonb :scripts 
+      t.jsonb :scripts
 
       t.jsonb :result
 
@@ -29,8 +29,8 @@ class CreateTrials < ActiveRecord::Migration
 
     add_foreign_key :trials, :tasks, name: "trials_tasks_fkey", on_delete: :cascade
 
-    execute %[ALTER TABLE trials ADD CONSTRAINT valid_state CHECK 
-      ( state IN (#{Constants::TRIAL_STATES.map{|s|"'#{s}'"}.join(', ')}));]
+    execute %[ALTER TABLE trials ADD CONSTRAINT valid_state CHECK
+      ( state IN (#{Settings.constants.STATES.TRIAL.map{|s|"'#{s}'"}.join(', ')}));]
 
   end
 

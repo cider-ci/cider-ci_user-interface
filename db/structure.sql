@@ -267,7 +267,7 @@ CREATE TABLE jobs (
     priority integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'skipped'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
+    CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 
@@ -323,7 +323,7 @@ CREATE TABLE email_addresses (
 
 CREATE TABLE executors (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    name character varying,
+    name character varying NOT NULL,
     max_load integer DEFAULT 1 NOT NULL,
     enabled boolean DEFAULT true NOT NULL,
     traits character varying[] DEFAULT '{}'::character varying[],
@@ -400,7 +400,7 @@ CREATE TABLE tasks (
     exclusive_global_resources character varying[] DEFAULT '{}'::character varying[] NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'skipped'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
+    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 
@@ -451,22 +451,22 @@ CREATE VIEW job_stats AS
           WHERE (tasks.job_id = jobs.id)) AS total,
     ( SELECT count(*) AS count
            FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'failed'::text))) AS failed,
+    ( SELECT count(*) AS count
+           FROM tasks
           WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'aborted'::text))) AS aborted,
     ( SELECT count(*) AS count
            FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'skipped'::text))) AS skipped,
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'aborting'::text))) AS aborting,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'pending'::text))) AS pending,
     ( SELECT count(*) AS count
            FROM tasks
           WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'executing'::text))) AS executing,
     ( SELECT count(*) AS count
            FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'failed'::text))) AS failed,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'passed'::text))) AS passed,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'pending'::text))) AS pending
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'passed'::text))) AS passed
    FROM jobs;
 
 
@@ -592,7 +592,7 @@ CREATE TABLE trials (
     finished_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'skipped'::character varying, 'pending'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
+    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 
@@ -938,6 +938,13 @@ CREATE INDEX index_email_addresses_on_user_id ON email_addresses USING btree (us
 --
 
 CREATE INDEX index_executors_on_accepted_repositories ON executors USING btree (accepted_repositories);
+
+
+--
+-- Name: index_executors_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_executors_on_name ON executors USING btree (name);
 
 
 --
@@ -1427,6 +1434,10 @@ INSERT INTO schema_migrations (version) VALUES ('33');
 INSERT INTO schema_migrations (version) VALUES ('34');
 
 INSERT INTO schema_migrations (version) VALUES ('35');
+
+INSERT INTO schema_migrations (version) VALUES ('36');
+
+INSERT INTO schema_migrations (version) VALUES ('37');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 

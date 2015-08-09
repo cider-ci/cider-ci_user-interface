@@ -5,7 +5,7 @@ class CreateJobs < ActiveRecord::Migration
   def change
 
     create_table :job_specifications, id: :uuid do |t|
-      t.jsonb :data   
+      t.jsonb :data
     end
 
     create_table :jobs, id: :uuid  do |t|
@@ -45,8 +45,8 @@ class CreateJobs < ActiveRecord::Migration
 
     reversible  do |dir|
       dir.up do
-        execute %[ALTER TABLE jobs ADD CONSTRAINT check_jobs_valid_state CHECK 
-          (state IN (#{Constants::JOB_STATES.map{|s|"'#{s}'"}.join(', ')}));]
+        execute %[ALTER TABLE jobs ADD CONSTRAINT check_jobs_valid_state CHECK
+          (state IN (#{Settings.constants.STATES.JOB.map{|s|"'#{s}'"}.join(', ')}));]
       end
     end
 

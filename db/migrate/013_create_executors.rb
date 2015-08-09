@@ -5,13 +5,13 @@ class CreateExecutors < ActiveRecord::Migration
   def change
     create_table :executors, id: :uuid do |t|
 
-    t.string :name  
+    t.string :name
 
     t.integer :max_load, null: false, default: 1
     t.boolean :enabled, null: false, default: true
 
     t.string :traits, array: true, default: '{}'
-    t.index :traits 
+    t.index :traits
 
     t.text :base_url
 
@@ -26,7 +26,7 @@ class CreateExecutors < ActiveRecord::Migration
     execute <<-SQL
 
       CREATE OR REPLACE VIEW executors_with_load AS
-        SELECT executors.*, 
+        SELECT executors.*,
             count(trials.executor_id) AS current_load,
             count(trials.executor_id)::float/executors.max_load::float AS relative_load
           FROM executors

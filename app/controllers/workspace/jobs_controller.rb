@@ -8,6 +8,9 @@ class Workspace::JobsController < WorkspaceController
   include ::Workspace::JobsControllerModules::JobsFilter
   include ::Workspace::JobsControllerModules::JobSelectionBuilder
 
+  include ::Concerns::HTTP
+  include ::Concerns::UrlBuilder
+
   skip_before_action :require_sign_in,
                      only: [:show, :tree_attachments, :job_specification, :result]
 
@@ -45,13 +48,20 @@ class Workspace::JobsController < WorkspaceController
     end
   end
 
-  def destroy
-    @job = Job.find params[:id]
-    ActiveRecord::Base.transaction do
-      @job.delete
+  def abort
+    set_filter_params params
+    job = Job.find(params[:id])
+    url = service_base_url(Settings.services.dispatcher.http) + "/jobs/#{job.id}/abort"
+    response = http_do(:post, url)
+    case response.status
+    when 300..600
+      redirect_to workspace_job_path(job.id, @filter_params),
+                  flash: { errors: [" #{response.status} Abort failed! #{response.body}"] }
+    else
+      redirect_to workspace_job_path(job.id, @filter_params),
+                  flash: { successes:
+                           ["#{response.status} Aborting this job. #{response.body}"] }
     end
-    redirect_to workspace_commits_path,
-                flash: { successes: ["The job #{@job} has been deleted."] }
   end
 
   def edit
@@ -85,8 +95,7 @@ class Workspace::JobsController < WorkspaceController
                       :name, :tree_id, :description, :result).find(params[:id])
     require_sign_in unless @job.public_view_permission?
     @link_params = params.slice(:branch, :page, :repository, :job_tags)
-    @trials = Trial.joins(task: :job) \
-      .where('jobs.id = ?', @job.id)
+    @trials = Trial.joins(task: :job).where('jobs.id = ?', @job.id)
     set_and_filter_tasks params
     set_filter_params params
   end
@@ -114,7 +123,10 @@ class Workspace::JobsController < WorkspaceController
 
   def retry_failed
     @job = Job.find params[:id]
-    @job.tasks.where(state: 'failed').each do |task|
+    if %(aborting aborted).include?  @job.state
+      @job.update_attributes! state: 'pending'
+    end
+    @job.tasks.where("state IN ('failed','aborted','aborting')").each do |task|
       Messaging.publish('task.create-trial', id: task.id)
     end
     set_filter_params params

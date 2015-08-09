@@ -57,6 +57,7 @@ CiderCI::Application.routes.draw do
         delete 'issues/:issue_id', action: 'delete_issue', as: 'issue'
         post :add_tags
         post :retry_failed
+        post :abort
         get 'result'
       end
     end

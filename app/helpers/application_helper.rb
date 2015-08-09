@@ -12,6 +12,10 @@ module ApplicationHelper
 
   def icon_class_for_state(state)
     case state
+    when 'aborted'
+      'icon-aborted'
+    when 'aborting'
+      'icon-aborting'
     when 'executing', 'dispatching'
       'icon-executing'
     when 'failed'
@@ -22,6 +26,8 @@ module ApplicationHelper
       'icon-pending'
     when 'skipped'
       'icon-skipped'
+    else
+      'icon-unknown'
     end
   end
 
@@ -66,7 +72,7 @@ module ApplicationHelper
       'label-pending'
     when 'executing', 'dispatched'
       'label-executing'
-    when 'aborted', 'skipped'
+    when 'aborting', 'skipped', 'aborted'
       'label-warning'
     else
       'label-default'

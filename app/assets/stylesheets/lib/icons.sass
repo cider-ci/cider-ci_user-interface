@@ -10,6 +10,17 @@
 .icon-add
   @extend .fa-plus-circle
 
+.icon-aborting
+  @include spin-counter-clockwise
+  @extend .fa-power-off
+
+.icon-aborted
+  @extend .fa-power-off
+  @extend .fa-rotate-180
+
+.icon-abort
+  @extend .fa-power-off
+
 .icon-admin
   @extend .fa-user-md
 
@@ -80,7 +91,7 @@
   @extend .fa-times-circle
 
 .icon-retry
-  @extend .fa-repeat
+  @extend .fa-recycle
 
 .icon-sign-in
   @extend .fa-sign-in
@@ -108,6 +119,9 @@
 
 .icon-unchecked
   @extend .fa-minus
+
+.icon-unknown
+  @extend .fa-question-circle
 
 .icon-user
   @extend .fa-user

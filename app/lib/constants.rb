@@ -3,18 +3,5 @@
 #  See the LICENSE.txt file provided with this software.
 
 module Constants
-  # keep order (because of job stats/progress)
-  STATES = %w(
-    failed
-    aborted
-    skipped
-    pending
-    executing
-    passed
-  )
-  JOB_STATES = STATES
-  TASK_STATES = STATES
-  TRIAL_STATES = (Array.new(STATES).insert 4, 'dispatching')
-
   UPDATE_BRANCH_TOPIC_NAME = '/topics/branch_updates'
 end

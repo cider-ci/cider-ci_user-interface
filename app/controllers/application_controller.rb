@@ -21,7 +21,9 @@ class ApplicationController < ActionController::Base
   end
 
   before_action do
-    Rack::MiniProfiler.authorize_request if session[:mini_profiler_enabled]
+    if session[:mini_profiler_enabled] and defined?(Rack::MiniProfiler)
+      Rack::MiniProfiler.authorize_request
+    end
   end
 
   def redirect
