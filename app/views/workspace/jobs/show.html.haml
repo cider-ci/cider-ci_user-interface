@@ -63,7 +63,7 @@
               %i.icon-abort
               Abort
         %li.for-signed-in-user
-          = form_tag retry_failed_workspace_job_path(job,@filter_params), method: 'POST', remote: false do
+          = form_tag retry_and_resume_workspace_job_path(job,@filter_params), method: 'POST', remote: false do
             = hidden_field_tag :authenticity_token, form_authenticity_token
             = button_tag type: :submit, class: "btn btn-primary" do
               %i.icon-retry
@@ -72,7 +72,6 @@
           =link_to edit_workspace_job_path(job), class: "btn btn-default" do
             %i.icon-edit
             Edit
-
 
       %h1
         %span#header-label.reload.label{data: {cache_tag: job.state}, class: label_class_for_state(state)}<>

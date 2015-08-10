@@ -121,17 +121,22 @@ class Workspace::JobsController < WorkspaceController
     @tree_attachments = @job.tree_attachments.page(params[:page])
   end
 
-  def retry_failed
-    @job = Job.find params[:id]
-    if %(aborting aborted).include?  @job.state
-      @job.update_attributes! state: 'pending'
-    end
-    @job.tasks.where("state IN ('failed','aborted','aborting')").each do |task|
-      Messaging.publish('task.create-trial', id: task.id)
-    end
+  def retry_and_resume
     set_filter_params params
-    redirect_to workspace_job_path(@job, @filter_params),
-                flash: { successes: ['The failed tasks are scheduled for retry!'] }
+    job = Job.find(params[:id])
+    url = service_base_url(Settings.services.dispatcher.http) +
+      "/jobs/#{job.id}/retry-and-resume"
+    response = http_do(:post, url)
+    case response.status
+    when 200..299
+      redirect_to workspace_job_path(job.id, @filter_params),
+                  flash: { successes:
+                           ["#{response.status} Retrying and resuming this job. " \
+                            "#{response.body}"] }
+    else
+      redirect_to workspace_job_path(job.id, @filter_params),
+                  flash: { errors: [" #{response.status} Abort failed! #{response.body}"] }
+    end
   end
 
   def update

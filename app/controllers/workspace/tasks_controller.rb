@@ -9,7 +9,7 @@ class Workspace::TasksController < WorkspaceController
   def retry
     set_task
     @job = @task.job
-    if %(aborting aborted).include?  @job.state
+    if %(aborting aborted).include? @job.state
       @job.update_attributes! state: 'pending'
     end
     existing_trial_ids = get_current_trial_ids
@@ -20,7 +20,7 @@ class Workspace::TasksController < WorkspaceController
       break if existing_trial_ids != get_current_trial_ids
     end
     redirect_to workspace_trial_path(get_current_trial_ids.first),
-      flash: { successes: ['A new trial is being executed'] }
+                flash: { successes: ['A new trial is being executed'] }
   end
 
   def show
