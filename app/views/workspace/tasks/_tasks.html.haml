@@ -9,23 +9,24 @@
 
   .pull-right
     = form_tag workspace_job_path(job), method: 'GET', class: "form-inline well right-top-form" do
-      
+
       %fieldset
         .pull-right
           %ul.list-inline
             %li#tasks-select-condition-item.reload{data: {cache_tag: @tasks_select_condition}}
               .form-group
                 %label.sr-only{for: "tasks_select_condition"}
-                = select_tag :tasks_select_condition, 
-                  options_for_select([["All",:all],["Failed",:failed],["Unpassed",:unpassed],
-                  ["With failed trials",:with_failed_trials]],@tasks_select_condition), 
+                = select_tag :tasks_select_condition,
+                  options_for_select([["All",:all],["Failed or aborted",:failed_or_aborted],
+                    ["Unpassed",:unpassed], ["With failed trials",:with_failed_trials]],
+                    @tasks_select_condition),
                   class: "form-control input-sm"
 
             %li
               .form-group
                 %label.sr-only{for: "name_substring_term"}
                 =text_field_tag :name_substring_term, nil, placeholder: "substr OR substr",
-                  value: @name_substring_term, 
+                  value: @name_substring_term,
                   class: "search-query form-control input-sm"
 
             %li
@@ -42,14 +43,14 @@
                 %i.icon-filter
                 Filter
 
-  %h2 Tasks 
+  %h2 Tasks
 
   .clearfix
 
   %table#tasks-table.tasks.table.table-striped.reload{data: {cache_tag: tasks.map(&:id)}}
     %thead
     %tbody
-      - tasks.each do |task| 
+      - tasks.each do |task|
         = render 'task_tr', task: task
 
 

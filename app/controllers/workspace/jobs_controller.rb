@@ -49,18 +49,23 @@ class Workspace::JobsController < WorkspaceController
   end
 
   def abort
-    set_filter_params params
+    request_dispatcher_custom_action 'abort', 'Abort'
+  end
+
+  def request_dispatcher_custom_action(action, name = action)
     job = Job.find(params[:id])
-    url = service_base_url(Settings.services.dispatcher.http) + "/jobs/#{job.id}/abort"
+    url = service_base_url(Settings.services.dispatcher.http) + "/jobs/#{job.id}/#{action}"
     response = http_do(:post, url)
     case response.status
     when 300..600
-      redirect_to workspace_job_path(job.id, @filter_params),
-                  flash: { errors: [" #{response.status} Abort failed! #{response.body}"] }
+      redirect_to workspace_job_path(job.id),
+                  flash: { errors: [" #{response.status} #{name}" \
+                                    "request failed! #{response.body}"] }
     else
       redirect_to workspace_job_path(job.id, @filter_params),
                   flash: { successes:
-                           ["#{response.status} Aborting this job. #{response.body}"] }
+                           ["#{response.status} #{name} " \
+                            "request succeeded. #{response.body}"] }
     end
   end
 
@@ -122,21 +127,7 @@ class Workspace::JobsController < WorkspaceController
   end
 
   def retry_and_resume
-    set_filter_params params
-    job = Job.find(params[:id])
-    url = service_base_url(Settings.services.dispatcher.http) +
-      "/jobs/#{job.id}/retry-and-resume"
-    response = http_do(:post, url)
-    case response.status
-    when 200..299
-      redirect_to workspace_job_path(job.id, @filter_params),
-                  flash: { successes:
-                           ["#{response.status} Retrying and resuming this job. " \
-                            "#{response.body}"] }
-    else
-      redirect_to workspace_job_path(job.id, @filter_params),
-                  flash: { errors: [" #{response.status} Abort failed! #{response.body}"] }
-    end
+    request_dispatcher_custom_action 'retry-and-resume', 'Retry and resume'
   end
 
   def update

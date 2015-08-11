@@ -4,23 +4,25 @@
 
 class Workspace::TasksController < WorkspaceController
 
+  include ::Concerns::HTTP
+  include ::Concerns::UrlBuilder
+
   skip_before_action :require_sign_in, only: [:show]
 
   def retry
     set_task
-    @job = @task.job
-    if %(aborting aborted).include? @job.state
-      @job.update_attributes! state: 'pending'
+    url = service_base_url(Settings.services.dispatcher.http) +
+      "/tasks/#{@task.id}/retry"
+    response = http_do(:post, url)
+    case response.status
+    when 200..299
+      redirect_to workspace_trial_path(JSON.parse(response.body)['id']),
+                  flash: { successes: ['A new trial has been created.'] }
+    else
+      redirect_to workspace_task_path(@task.id),
+                  flash: { errors: [" #{response.status} " \
+                                    "Retry of task failed! #{response.body}"] }
     end
-    existing_trial_ids = get_current_trial_ids
-    Thread.new { Messaging.publish('task.create-trial', id: @task.id) }
-    loop do
-      sleep(0.1)
-      Trial.connection.clear_query_cache
-      break if existing_trial_ids != get_current_trial_ids
-    end
-    redirect_to workspace_trial_path(get_current_trial_ids.first),
-                flash: { successes: ['A new trial is being executed'] }
   end
 
   def show
