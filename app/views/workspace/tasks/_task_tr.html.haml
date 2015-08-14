@@ -17,11 +17,11 @@
         =task.name
     %td.trials
       %ul.list-inline.trials
-        - task.trials.reorder(:created_at).each do |trial| 
+        - task.trials.reorder(:created_at).each do |trial|
           - state = trial.state
-          %li.trial
+          %li.trial{data: {state: trial.state}}
             = link_to workspace_trial_path(trial), class: "label #{label_class_for_state(state)}" do
-              %i{class: icon_class_for_state(state)} 
+              %i{class: icon_class_for_state(state)}
     %td.actions.text-right.for-signed-in-user
 
       = form_tag retry_workspace_task_path(task), method: 'POST', remote: true, class: "retry-tasks"  do
