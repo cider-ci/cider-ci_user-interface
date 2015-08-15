@@ -97,7 +97,6 @@ CiderCI::Application.routes.draw do
 
     get :index
 
-    resource :timeout_settings
     resource :welcome_page_settings
 
     resource :status

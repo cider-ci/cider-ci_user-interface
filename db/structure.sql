@@ -513,25 +513,6 @@ CREATE TABLE task_specifications (
 
 
 --
--- Name: timeout_settings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE timeout_settings (
-    id integer NOT NULL,
-    trial_dispatch_timeout_minutes integer DEFAULT 60 NOT NULL,
-    trial_end_state_timeout_minutes integer DEFAULT 180 NOT NULL,
-    trial_job_timeout_minutes integer DEFAULT 5 NOT NULL,
-    trial_scripts_retention_time_days integer DEFAULT 10 NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    CONSTRAINT one_and_only_one CHECK ((id = 0)),
-    CONSTRAINT trial_dispatch_timeout_minutes_positive CHECK ((trial_dispatch_timeout_minutes > 0)),
-    CONSTRAINT trial_end_state_timeout_minutes_positive CHECK ((trial_end_state_timeout_minutes > 0)),
-    CONSTRAINT trial_job_timeout_minutes_positive CHECK ((trial_job_timeout_minutes > 0))
-);
-
-
---
 -- Name: tree_attachments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -728,14 +709,6 @@ ALTER TABLE ONLY task_specifications
 
 ALTER TABLE ONLY tasks
     ADD CONSTRAINT tasks_pkey PRIMARY KEY (id);
-
-
---
--- Name: timeout_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY timeout_settings
-    ADD CONSTRAINT timeout_settings_pkey PRIMARY KEY (id);
 
 
 --
@@ -1004,6 +977,13 @@ CREATE INDEX index_jobs_tags_on_tag_id_and_job_id ON jobs_tags USING btree (tag_
 
 
 --
+-- Name: index_repositories_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_repositories_on_created_at ON repositories USING btree (created_at);
+
+
+--
 -- Name: index_repositories_on_git_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1015,6 +995,13 @@ CREATE UNIQUE INDEX index_repositories_on_git_url ON repositories USING btree (g
 --
 
 CREATE INDEX index_repositories_on_update_notification_token ON repositories USING btree (update_notification_token);
+
+
+--
+-- Name: index_repositories_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_repositories_on_updated_at ON repositories USING btree (updated_at);
 
 
 --
@@ -1212,13 +1199,6 @@ CREATE TRIGGER update_updated_at_column_of_tags BEFORE UPDATE ON tags FOR EACH R
 --
 
 CREATE TRIGGER update_updated_at_column_of_tasks BEFORE UPDATE ON tasks FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
-
-
---
--- Name: update_updated_at_column_of_timeout_settings; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_timeout_settings BEFORE UPDATE ON timeout_settings FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1438,6 +1418,8 @@ INSERT INTO schema_migrations (version) VALUES ('35');
 INSERT INTO schema_migrations (version) VALUES ('36');
 
 INSERT INTO schema_migrations (version) VALUES ('37');
+
+INSERT INTO schema_migrations (version) VALUES ('38');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 
