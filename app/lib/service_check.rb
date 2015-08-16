@@ -9,12 +9,6 @@ module ServiceCheck
     include Concerns::HTTP
     include Concerns::UrlBuilder
 
-    def check_rabbitmq
-      connection = Settings.messaging.connection
-      url = 'http://localhost:15672/api/vhosts/'
-      check_resource(url, connection)
-    end
-
     def check_api
       check_service Settings.services.api.http,  Settings.basic_auth
     end
