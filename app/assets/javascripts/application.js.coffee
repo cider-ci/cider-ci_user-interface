@@ -24,5 +24,3 @@
 #= require_tree ./misc
 
 
-$ ->
-  $("a.show-tooltip").tooltip()
