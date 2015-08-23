@@ -3,25 +3,16 @@
 -#  See the LICENSE.txt file provided with this software.
 
 %li
-  =link_to workspace_jobs_path do
-    %i.icon-job
-    Jobs
-%li
-  =link_to workspace_commits_path do
-    %i.icon-commits
-    Commits
-
-%li.dropdown.admin-frontpage-actions
+  =link_to workspace_filter_path do
+    %i.icon-workspace
+    Workspace
 
 %li
   = link_to (api_path + "/api-browser/index.html#" + api_path)  do
     %i.icon-api
-    API Browser 
+    API Browser
 
 %li
   =link_to "/cider-ci/docs/" do
     %i.fa.fa-file-text-o
     Documentation
-    
-
-

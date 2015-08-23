@@ -34,8 +34,8 @@ class Workspace::JobsController < WorkspaceController
       password: ::Settings.basic_auth.password,
       verify_ssl: false,
       payload: data.to_json,
-      headers: { accept:  :json,
-                 content_type:  :json })
+      headers: { accept: :json,
+                 content_type: :json })
   end
 
   def create
@@ -71,13 +71,6 @@ class Workspace::JobsController < WorkspaceController
 
   def edit
     @job = Job.find params[:id]
-  end
-
-  def index
-    @link_params = params.slice(:branch, :page, :repository, :job_tags)
-    @jobs = build_jobs_for_params
-    @job_cache_signatures = JobCacheSignature \
-      .where(%[ job_id IN (?)], @jobs.map(&:id))
   end
 
   def new

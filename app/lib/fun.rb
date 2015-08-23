@@ -11,7 +11,7 @@ module Fun
       rescue Exception => e
         Rails.logger.error Formatter.exception_to_s(e)
         controller.redirect_to redirect_path,
-                               flash: { errors:  [Formatter.exception_to_s(e)] }
+                               flash: { errors: [Formatter.exception_to_s(e)] }
       end
     end
 

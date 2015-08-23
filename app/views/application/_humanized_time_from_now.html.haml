@@ -2,9 +2,11 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
+- format ||= 'normal'
+
 - if at
-  %span.humanize-timestamp{data: {at: at.iso8601}}
+  %span.humanize-timestamp{data: {at: at.iso8601, format: format }}
     =at
 - else
-  not available 
+  not available
 

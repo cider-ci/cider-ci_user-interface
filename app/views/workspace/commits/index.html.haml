@@ -7,9 +7,9 @@
 
 - cs= [@link_params,@commits_cache_signatures_array]
 
-- cache cs do |cache_tag|
+- cache cs do |cache_signature|
 
-  #reload-page.jobs-page{data: {cache_tag: cache_tag, reload_timeout: session_adjust_reload_timeout(3)}}
+  #reload-page.jobs-page{data: {cache_signature: cache_signature, reload_timeout: session_adjust_reload_timeout(3)}}
 
     = render 'index_head', params: params
 

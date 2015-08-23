@@ -4,10 +4,37 @@
 
 module ApplicationHelper
 
-  def render_summary_svgbox(view_params)
-    capture(
-      render partial: 'summary_svgbox', locals: view_params
-    )
+  def convert_anygit_to_https_url(url)
+    url \
+      .gsub(/^\w*@?((\w+\.)+\w+):/, 'https://\\1/') \
+      .gsub(/\.git$/, '') \
+      .gsub(/\/$/, '')
+  end
+
+  def gravatar_url(email)
+    hs = Digest::MD5.hexdigest email.squish.downcase
+    "http://www.gravatar.com/avatar/#{hs}?s=20&d=retro"
+  end
+
+  def form_group(label, opts = {}, &block)
+    control_id = (opts[:control_id] || SecureRandom.uuid)
+    render 'form_group', label: label,
+                         control_id: control_id,
+                         cols_label: (opts[:cols_label] || 3),
+                         label_class: (opts[:label_class] || ''),
+                         cols_control: (opts[:cols_control] || 5),
+                         block_output: capture(opts.merge(control_id: control_id), &block)
+  end
+
+  def git_icon_for_url(url)
+    case
+    when url =~ /github\.com/
+      'fa fa-github'
+    when url =~ /bitbucket\.org/
+      'fa fa-bitbucket'
+    else
+      'fa fa-git'
+    end
   end
 
   def icon_class_for_state(state)
@@ -39,29 +66,6 @@ module ApplicationHelper
     render partial: 'link_to_commit', locals: { commit: commit }
   end
 
-  def form_group(label, opts = {}, &block)
-    control_id = (opts[:control_id] || SecureRandom.uuid)
-    render 'form_group', label: label,
-                         control_id: control_id,
-                         cols_label: (opts[:cols_label] || 3),
-                         label_class: (opts[:label_class] || ''),
-                         cols_control: (opts[:cols_control] || 5),
-                         block_output: capture(opts.merge(control_id: control_id), &block)
-  end
-
-  def markdown(source)
-    begin
-      Kramdown::Document.new(source).to_html.html_safe
-    rescue Exception => e
-      Rails.logger.error Formatter.exception_to_log_s e
-      'Markdown render error!'
-    end
-  end
-
-  def render_executor_row(executor, &block)
-    render 'executor_row', executor: executor, block_output: capture(&block)
-  end
-
   def label_class_for_state(state)
     case state
     when 'failed'
@@ -77,6 +81,26 @@ module ApplicationHelper
     else
       'label-default'
     end
+  end
+
+  def markdown(source)
+    begin
+      Kramdown::Document.new(source).to_html.html_safe
+    rescue Exception => e
+      Rails.logger.error Formatter.exception_to_log_s e
+      'Markdown render error!'
+    end
+  end
+
+  def render_executor_row(executor, &block)
+    render 'executor_row', executor: executor, block_output: capture(&block)
+  end
+
+  def render_summary_svgbox(view_params)
+    # TODO: seems not to be used and should not work anyways ; delete?
+    capture(
+      render partial: 'summary_svgbox', locals: view_params
+    )
   end
 
 end

@@ -6,9 +6,9 @@
 - duration = job.duration.round rescue nil
 - time = job.accumulated_time.round rescue nil
 
-- cache [speedup,duration,time] do |cache_tag|
+- cache [speedup,duration,time] do |cache_signature|
 
-  #speed-summary.table-responsive.reload.replace-without-animation{data: {cache_tag: cache_tag}}
+  #speed-summary.table-responsive.reload.replace-without-animation{data: {cache_signature: cache_signature}}
     %table.table.summary
       %thead
       %tbody
@@ -16,10 +16,10 @@
           - if speedup
             %td Speedup: #{speedup}
           - if duration
-            %td 
-              Duration: 
+            %td
+              Duration:
               %span.humanize-duration{data: {duration: duration}} #{duration} seconds
           - if time
-            %td 
-              Processing time: 
+            %td
+              Processing time:
               %span.humanize-duration{data: {duration: time}} #{time} seconds

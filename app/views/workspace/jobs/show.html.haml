@@ -10,15 +10,15 @@
 
 - cs = [job.id, job.updated_at, ecs.repositories_signature,
     ecs.branches_signature, ecs.tasks_signature, ecs.job_issues_count,
-    params, @trials.collection_cache_tag] + relevant_ccss
+    params, @trials.collection_cache_signature] + relevant_ccss
 
-- cache cs  do |cache_tag|
+- cache cs  do |cache_signature|
 
   - tasks ||= @tasks
   - reload_timeout= session_adjust_reload_timeout(%w(failed passed).include?(job.state) ? 30 : 3)
-  #reload-page{data: { cache_tag: cache_tag, reload_timeout: reload_timeout}}
+  #reload-page{data: { cache_signature: cache_signature, reload_timeout: reload_timeout}}
 
-    .row
+    .orientation.row
 
       .col-md-6
         %ol.breadcrumb.pull-left
@@ -28,7 +28,7 @@
           %li
             = link_to workspace_tree_attachments_path(job.tree_id) do
               Tree-Attachments
-          %li#issues-link.reload{data: {cache_tag: ecs.job_issues_count}}
+          %li#issues-link.reload{data: {cache_signature: ecs.job_issues_count}}
             - if ecs.job_issues_count <= 0
               %span.text-muted Issues
             - else
@@ -39,7 +39,7 @@
             = link_to job_specification_workspace_job_path(job) do
               Job-Specification
 
-          %li#result-link.reload{data: {cache_tag: job.result_summary?.to_s}}
+          %li#result-link.reload{data: {cache_signature: job.result_summary?.to_s}}
             - if job.result
               = link_to result_workspace_job_path(job) do
                 Result
@@ -47,7 +47,7 @@
               %span.text-muted Result
 
 
-    #issues-alert.reload{data: {cache_tag: ecs.job_issues_count}}
+    #issues-alert.reload{data: {cache_signature: ecs.job_issues_count}}
       - if ecs.job_issues_count >= 1
         .alert.alert-danger
           %p This job has #{pluralize(ecs.job_issues_count,"issue")}!
@@ -74,25 +74,19 @@
             Edit
 
       %h1
-        %span#header-label.reload.label{data: {cache_tag: job.state}, class: label_class_for_state(state)}<>
+        %span#header-label.reload.label{data: {cache_signature: job.state}, class: label_class_for_state(state)}<>
           %i{class: icon_class_for_state(state)}<>
-        %span &nbsp; Job "#{job.name}"
+        %span &nbsp; #{job.name}
 
-
-      .row
-        .col-md-9
-          = render 'summary_speed', job: job, cache_tag: cache_tag
-        .col-md-3.text-right
-          = render 'tags', tags: job.tags.sort, id: "job-tags"
-
-      = render 'summary_stats', job: job, cache_tag: cache_tag
 
       - if job.description.present?
-        .job-description= markdown(job.description)
+        .job-description= markdown(job.description.squish)
+
+      = render 'summary_stats', job: job, cache_signature: cache_signature
 
       - cache relevant_ccss  do |commits_cache_signature|
 
-        #commits.commits.reload.replace-without-animation{data: {cache_tag: commits_cache_signature}}
+        #commits.commits.reload.replace-without-animation{data: {cache_signature: commits_cache_signature}}
           %h2 #{ job.commits.count > 1 ? "Commits" : "Commit"}
           %table.commits.table.table-striped
             %thead

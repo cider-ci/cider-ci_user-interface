@@ -56,7 +56,7 @@ class Admin::UsersController < AdminController
   end
 
   def user_text_search_filter
-    params.try('[]', 'user').try('[]', :text).try(:nil_or_non_blank_value)
+    params.try('[]', 'user').try('[]', :text).presence
   end
 
   def admin_filter?

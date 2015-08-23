@@ -2,12 +2,12 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- # we should not need the Commit.collection_cache_tag; it seems that 
+- # we should not need the Commit.collection_cache_signature; it seems that
 - # the updated_at on brach is not reliably updated
-- cache [@branches.collection_cache_tag, Commit.collection_cache_tag] do
+- cache [@branches.collection_cache_signature, Commit.collection_cache_signature] do
   .branch_heads
 
-    %h2 
+    %h2
       %i.icon-sitemap
       Most recent updated heads
     %small

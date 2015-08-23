@@ -521,9 +521,10 @@ CREATE TABLE tree_attachments (
     path text NOT NULL,
     content_length text,
     content_type text,
-    to_be_retained_before timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    tree_id text NOT NULL,
+    CONSTRAINT check_tree_id CHECK ((length(tree_id) = 40))
 );
 
 
@@ -536,9 +537,9 @@ CREATE TABLE trial_attachments (
     path text NOT NULL,
     content_length text,
     content_type text,
-    to_be_retained_before timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    trial_id uuid NOT NULL
 );
 
 
@@ -589,7 +590,8 @@ CREATE TABLE users (
     first_name character varying DEFAULT ''::character varying NOT NULL,
     is_admin boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    workspace_filters jsonb
 );
 
 
@@ -1068,10 +1070,24 @@ CREATE UNIQUE INDEX index_tree_attachments_on_path ON tree_attachments USING btr
 
 
 --
+-- Name: index_tree_attachments_on_tree_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_tree_attachments_on_tree_id ON tree_attachments USING btree (tree_id);
+
+
+--
 -- Name: index_trial_attachments_on_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
 CREATE UNIQUE INDEX index_trial_attachments_on_path ON trial_attachments USING btree (path);
+
+
+--
+-- Name: index_trial_attachments_on_trial_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE INDEX index_trial_attachments_on_trial_id ON trial_attachments USING btree (trial_id);
 
 
 --
@@ -1241,6 +1257,14 @@ CREATE TRIGGER update_updated_at_column_of_users BEFORE UPDATE ON users FOR EACH
 --
 
 CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE ON welcome_page_settings FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: fk_rails_2595d4f43b; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY trial_attachments
+    ADD CONSTRAINT fk_rails_2595d4f43b FOREIGN KEY (trial_id) REFERENCES trials(id) ON DELETE CASCADE;
 
 
 --
@@ -1420,6 +1444,12 @@ INSERT INTO schema_migrations (version) VALUES ('36');
 INSERT INTO schema_migrations (version) VALUES ('37');
 
 INSERT INTO schema_migrations (version) VALUES ('38');
+
+INSERT INTO schema_migrations (version) VALUES ('39');
+
+INSERT INTO schema_migrations (version) VALUES ('40');
+
+INSERT INTO schema_migrations (version) VALUES ('41');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 

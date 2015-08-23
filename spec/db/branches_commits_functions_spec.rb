@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'Functions for managing branches_commits'  do
+describe 'Functions for managing branches_commits' do
 
   before :each do
     # 1 <- 2 <- 3

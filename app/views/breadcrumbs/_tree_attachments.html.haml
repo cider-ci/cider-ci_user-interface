@@ -1,4 +1,4 @@
-= render partial: "/breadcrumbs/home" 
+= render "/breadcrumbs/tree_objects", tree_id: tree_id
 %li
   = link_to workspace_tree_attachments_path(tree_id) do
     Tree-Attachments

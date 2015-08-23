@@ -25,9 +25,7 @@ class Trial < ActiveRecord::Base
   belongs_to :executor
   has_many :trial_issues
 
-  def trial_attachments
-    TrialAttachment.where("path like '/#{id}/%'")
-  end
+  has_many :trial_attachments
 
   delegate :script, to: :task
 

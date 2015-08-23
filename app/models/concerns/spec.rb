@@ -18,7 +18,7 @@ module Concerns
     end
 
     def id_matches_data
-      errors.add(:data, 'is immutable') if  id != self.class.id_hash(self.data)
+      errors.add(:data, 'is immutable') if id != self.class.id_hash(self.data)
     end
 
     module ClassMethods

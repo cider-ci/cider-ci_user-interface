@@ -4,7 +4,7 @@
 
 - raise "id required" unless id
 
-.tags.reload{id: id, data: {cache_tag: tags.map(&:tag)}}
+.tags.reload{id: id, data: {cache_signature: tags.map(&:tag)}}
   %ul.list-inline
     =render partial: "tag_label", collection: tags, as: :tag
 

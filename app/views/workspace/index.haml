@@ -1,0 +1,97 @@
+:ruby
+  @commits_cache_signatures = CommitCacheSignature.where(
+      commit_id: @commits.map(&:id))
+
+  @job_cache_signatures = JobCacheSignature.where(
+      job_id: @jobs.map(&:id))
+
+.orientation.row
+  .col-md-6
+    %ol.breadcrumb.pull-left
+      = render partial: "/breadcrumbs/workspace"
+
+  .col-md-6
+    .pull-right
+      = paginate @commits, theme: 'efficient'
+
+- if params[:my]
+  %h1.text-center{style: 'margin-top: 5px'}
+    My Workspace
+
+
+.filters.row
+  = form_tag workspace_filter_path, method: 'POST', class: "form well workspace-filter-form", role: 'form' do
+    %fieldset.row
+      .form-group.col-sm-4
+        %label.sr-only{for: :repositories_names}
+        = text_field_tag :repositories_names, repositories_names_param.join(", "),
+          placeholder: "Repository name 1, ...",
+          data: {autocomplete_path: names_workspace_repositories_path},
+          tabindex: 1,
+          class: "form-control"
+      .form-group.col-sm-4
+        %label.sr-only{for: :branches_names}
+        = text_field_tag :branches_names, branches_names_params.join(", "),
+          placeholder: "Branch name 1, ...",
+          data:{autocomplete_path: names_workspace_branches_path},
+          tabindex: 2,
+          class: "form-control"
+      .form-group.col-sm-4
+        %label.sr-only{for: "git_ref"}
+        = text_field_tag :git_ref, git_ref_param,
+          placeholder: "Git-ref (tree-id, commit-id)",
+          data:{autocomplete_path: names_workspace_branches_path},
+          tabindex: 3,
+          class: "form-control"
+    .row
+      .form-group.col-sm-5
+        %label.sr-only{for: "commits_text_search"}
+        =text_field_tag :commits_text_search, commits_text_search_param,
+          placeholder: "Text search (subject, author, commiter, ...) ",
+          tabindex: 4,
+          class: "text-warning form-control"
+      .col-sm-7
+        .row
+          .form-group.col-sm-3
+            %label.sr-only{for: :depth}
+            = select_tag :depth,
+              options_for_select([["Heads only",0],
+                ["Up to depth 2",2], ["Up to depth 5",5],
+                ["Any depth",-1]],
+                depth_param),
+              tabindex: 5,
+              class: "form-control"
+
+          .form-group.col-sm-3
+            %label.sr-only{for: "per_page"}
+            = select_tag :per_page,
+              options_for_select([3,6,12,25].map{|pp| ["#{pp} Per page",pp]}, commits_per_page_param),
+              tabindex: 6,
+              class: "form-control"
+          .form-group.col-sm-6
+            .pull-right
+              %span.form-button-container
+                = link_to workspace_filter_path, method: 'POST',  class: 'btn btn-warning', tabindex: 7 do
+                  %i.icon-reset
+                  Reset
+              %span.form-button-container
+                = button_tag type: 'submit', class: 'btn btn-primary', tabindex: 8 do
+                  %i.icon-filter
+                  Filter
+
+
+
+- cache [@commits_cache_signatures, @job_cache_signatures] do |cache_signature|
+
+  #reload-page.jobs-page{data: {cache_signature: cache_signature, reload_timeout: session_adjust_reload_timeout(10)}}
+
+    %h2.text-center Commits
+    = render 'commits_table', commits: @commits
+
+    %h2.text-center{style: "margin-top: 5px"} Jobs
+    = render 'jobs_table', jobs: @jobs
+
+  .orientation
+    .pull-right
+      = paginate @commits, theme: 'efficient'
+

@@ -4,7 +4,7 @@
 
 - executors ||= @executors
 
-%ol.breadcrumb 
+%ol.breadcrumb
   = render "/breadcrumbs/admin/executors"
 
 
@@ -15,16 +15,16 @@
       Add a new executor
 
 
-%h1 
+%h1
   Executors
 
 #reload-page{data: {reload_timeout: session_adjust_reload_timeout(3)}}
 
 
-  %table.table.table-striped.executors.reload{data: {cache_tag:  executors.map(&:id)}}
+  %table.table.table-striped.executors.reload{data: {cache_signature:  executors.map(&:id)}}
     %thead
       %tr
-        %th Name 
+        %th Name
         %th Enabled
         %th Online
         %th Load

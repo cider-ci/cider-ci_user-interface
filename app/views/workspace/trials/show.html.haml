@@ -2,16 +2,16 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- trial ||= @trial 
+- trial ||= @trial
 - scripts ||= @scripts
 - issues = trial.trial_issues
 - cache [trial.cache_signature,
-          trial.trial_attachments.collection_cache_tag,admin?] do |cache_tag|
+          trial.trial_attachments.collection_cache_signature,admin?] do |cache_signature|
 
   - reload_timeout= session_adjust_reload_timeout(%w(aborted failed passed).include?(trial.state) ? 30 : 3)
-  #reload-page{data: { cache_tag: cache_tag, reload_timeout: reload_timeout}}
+  #reload-page{data: { cache_signature: cache_signature, reload_timeout: reload_timeout}}
 
-    #trial.reload{data: {cache_tag: cache_tag}}
+    #trial.reload{data: {cache_signature: cache_signature}}
 
       .row
         .col-md-6
@@ -19,32 +19,32 @@
             =render '/breadcrumbs/trial', trial: trial
         .col-md-6
           %ol.breadcrumb.with-circle-separator.pull-right
-            %li 
+            %li
               - if trial.trial_attachments.count > 0
                 = link_to attachments_workspace_trial_path(trial) do
                   Attachments
-              - else 
+              - else
                 %span.text-muted Attachments
 
-            %li#issues-link.reload{data: {cache_tag: issues.count}}
+            %li#issues-link.reload{data: {cache_signature: issues.count}}
               - if issues.count <= 0
                 %span.text-muted Issues
-              - else 
+              - else
                 = link_to issues_workspace_trial_path(trial) do
                   %span.text-danger= pluralize(issues.count,"Issue")
 
-            %li 
-              - if trial.result 
+            %li
+              - if trial.result
                 = link_to result_workspace_trial_path(trial) do
                   Result
-              - else 
+              - else
                 %span.text-muted Result
 
 
-      #issues-alert.reload{data: {cache_tag: issues.count}}
+      #issues-alert.reload{data: {cache_signature: issues.count}}
         - if issues.count >= 1
           .alert.alert-danger
-            %p This trial has #{pluralize(issues.count,"issue")}! 
+            %p This trial has #{pluralize(issues.count,"issue")}!
 
 
 
@@ -59,12 +59,12 @@
         -if trial.started_at
           %b #{render 'humanized_time_from_now', at: trial.started_at}
         - if trial.finished_at and trial.started_at
-          in 
-          %b= distance_of_time_in_words(trial.started_at,trial.finished_at, 
+          in
+          %b= distance_of_time_in_words(trial.started_at,trial.finished_at,
             include_seconds: true)
           (#{(trial.finished_at - trial.started_at).round(2)} seconds)
         - if executor_name = trial.executor.try(:name)
-          on 
+          on
           %b #{executor_name}.
 
       -unless trial.error.blank?
@@ -82,17 +82,17 @@
             .panel-body
               %p This trial does not have any scripts associated with it.
 
-              %p 
-                They might have been erased afer some period of time in order to 
+              %p
+                They might have been erased afer some period of time in order to
                 save space.  Administrators can adjust the retention time.
 
         - else
-          %h2 Scripts 
-          %ul.list-inline 
-            = render partial: 'script_label', 
-              collection: scripts, 
+          %h2 Scripts
+          %ul.list-inline
+            = render partial: 'script_label',
+              collection: scripts,
               as: :script
 
           %ul.list-unstyled.scripts
-            = render partial: 'script', 
+            = render partial: 'script',
               collection: scripts

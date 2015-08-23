@@ -4,11 +4,11 @@
 
 
 - task ||= @task
-- cs = [task.cache_signature,task.trials.collection_cache_tag]
+- cs = [task.cache_signature,task.trials.collection_cache_signature]
 
-- cache cs do |cache_tag|
+- cache cs do |cache_signature|
 
-  %tr.task.reload{id: task.id,data: {cache_tag: cs, state: task.state}}
+  %tr.task.reload{id: task.id,data: {cache_signature: cs, state: task.state}}
     %td.state
       =link_to workspace_task_path(task) do
         = render "label_for_state", state: task.state

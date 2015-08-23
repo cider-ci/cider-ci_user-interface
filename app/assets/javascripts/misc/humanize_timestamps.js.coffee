@@ -22,21 +22,23 @@ $ ->
       #console.log ["humanizing",$element]
 
       at = moment($element.attr("data-at"))
+      format = $element.attr("data-format")
       humanDist = at.fromNow()
       html = humanDist
 
       # add "on" if not today
-      if at.format("YYYY MM DD") isnt moment().format("YYYY MM DD")
-        html += " on #{at.format('dddd')}"
-        # add day of month if not same week and month
-        if at.format("YYYY MM W") isnt moment().format("YYYY MM W")
-          html += ", #{at.format('Do')}"
-          # add month if not same
-          if at.format("YYYY MM") isnt moment().format("YYYY MM")
-            html += " #{at.format('MMMM')}"
-            # and finaly the year
-            if at.format("YYYY") isnt moment().format("YYYY")
-              html += " #{at.format('YYYY')}"
+      if (format != 'short')
+        if at.format("YYYY MM DD") isnt moment().format("YYYY MM DD")
+          html += " on #{at.format('dddd')}"
+          # add day of month if not same week and month
+          if  at.format("YYYY MM W") isnt moment().format("YYYY MM W")
+            html += ", #{at.format('Do')}"
+            # add month if not same
+            if at.format("YYYY MM") isnt moment().format("YYYY MM")
+              html += " #{at.format('MMMM')}"
+              # and finaly the year
+              if at.format("YYYY") isnt moment().format("YYYY")
+                html += " #{at.format('YYYY')}"
 
       $element.html html
 

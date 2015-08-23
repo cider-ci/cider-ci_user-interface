@@ -4,10 +4,10 @@
 
 - job ||= @job
 - cs = @job_cache_signatures ? @job_cache_signatures.select{|cs| cs.job_id == job.id}.first :  job.job_cache_signature
-- cache [cs.tasks_signature || job.cache_signature] do |cache_tag|
+- cache [cs.tasks_signature || job.cache_signature] do |cache_signature|
   - _stat = job.job_stat
 
-  #stats-and-progress.reload.replace-without-animation{data: {state: job.state, cache_tag: _stat}}
+  #stats-and-progress.reload.replace-without-animation{data: {state: job.state, cache_signature: _stat}}
     %table.stats-and-progress.result-summary
       %thead
       %tbody

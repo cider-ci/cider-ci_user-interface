@@ -1,0 +1,47 @@
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Licensed under the terms of the GNU Affero General Public License v3.
+-#  See the LICENSE.txt file provided with this software.
+
+- job ||= @job
+
+- cs = @job_cache_signatures ? @job_cache_signatures.select{|cs| cs.job_id == job.id}.first :  job.job_cache_signature
+
+- cache [job.cache_signature,
+    cs.tasks_signature, cs.commits_signature,
+    cs.branches_signature, cs.repositories_signature ] do |cache_signature|
+
+  - commits = job.commits
+
+  %tr.job.reload{id: job.id, class: job.state,data: {cache_signature: cache_signature}}
+
+    %td.job-id.id
+      %i{class: icon_class_for_state(job.state)}
+      %span.nowrap.job-id
+        = link_to workspace_job_path(job)  do
+          %span<>= job.id[0..5]
+
+    %td.created-at= render 'humanized_time_from_now', at: job.created_at, format: 'short'
+
+    %td.stats
+      = render "stats_summary", stats: job.job_stat
+
+    %td.job
+      %span.nowrap
+        %span{style: "margin-left: 0.5em"}<
+          =job.name.truncate(20)
+
+    %td.repositories
+      %ul.list-unstyled
+        - job.repositories.each do |repository|
+          %li<>
+            %span.nowrap
+              -# %i.icon-repository
+              %strong.nowrap= repository.name
+
+    %td.commits
+      %ul.list-unstyled
+        - commits.where(id: @commits.map(&:id)).each do |commit|
+          %li
+            %a{href: "##{commit.id}"}
+              %img{src: gravatar_url(commit.author_email)}
+              %em= commit.subject.truncate(30)

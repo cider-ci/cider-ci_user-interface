@@ -91,7 +91,7 @@ class PublicController < ApplicationController
     if @job = Job.find_by_repo_branch_name(params[:repository_name],
                                            params[:branch_name],
                                            params[:job_name])
-      if  tree_attachment = TreeAttachment \
+      if tree_attachment = TreeAttachment \
         .find_by(path: "/#{@job.tree_id}/#{params[:path]}")
         redirect_to workspace_attachment_path('tree_attachment', tree_attachment.path)
       else

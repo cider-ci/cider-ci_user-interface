@@ -9,8 +9,8 @@ module ActionView
           # VIEW TODO: Make #capture usable outside of ERB
           # This dance is needed because Builder can't use capture
           pos = output_buffer.length
-          cache_tag = Digest::MD5.hexdigest(name.to_s)
-          yield cache_tag, name
+          cache_signature = Digest::MD5.hexdigest(name.to_s)
+          yield cache_signature, name
           output_safe = output_buffer.html_safe?
           fragment = output_buffer.slice!(pos..-1)
           if output_safe

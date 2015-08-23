@@ -1,7 +1,9 @@
 CiderCI::Application.routes.draw do
 
-  get '/workspace/dashboard',
-      controller: 'workspace', action: 'dashboard'
+  get '/workspace', controller: 'workspace', action: 'index', as: 'workspace'
+
+  match '/workspace/filter', via: [:get, :post],
+                             controller: 'workspace', action: 'filter', as: 'workspace_filter'
 
   namespace 'workspace' do
 
@@ -47,7 +49,7 @@ CiderCI::Application.routes.draw do
     end
 
     resources :branch_update_triggers
-    resources :commits
+    resources :commits, only: [:show]
     resources :jobs do
       member do
         get :tasks
@@ -62,7 +64,7 @@ CiderCI::Application.routes.draw do
       end
     end
 
-    resources :trees, only: [] do
+    resources :trees, only: [:show] do
       get :attachments
       get :configfile
     end
@@ -87,9 +89,9 @@ CiderCI::Application.routes.draw do
       end
     end
 
-    get '/attachments/:kind/*path', controller: :attachments,
-                                    action: :show, constraints: { path: /.*/ },
-                                    as: :attachment
+    get '/attachments/:kind/:path_id/*path', controller: :attachments,
+                                             action: :show, constraints: { path: /.*/ },
+                                             as: :attachment
 
   end
 

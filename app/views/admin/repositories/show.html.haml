@@ -31,10 +31,6 @@
     - @repository.branches.reorder(updated_at: :desc).each do |branch|
       %tr.branch-row
         %td
-          =link_to workspace_commits_path({ repository: {names: @repository.name},
-            branch:{names: branch.name}}) do
-            =branch.name
-        %td
           updated
           =render 'humanized_time_from_now', at:  branch.updated_at
         %td

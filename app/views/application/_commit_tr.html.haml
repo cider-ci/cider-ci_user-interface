@@ -1,0 +1,98 @@
+-#  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
+-#  Licensed under the terms of the GNU Affero General Public License v3.
+-#  See the LICENSE.txt file provided with this software.
+
+- commit ||= @commit
+- cs = @commit_cache_signatures ? @commit_cache_signatures.select{|cs| cs.commit_id == commit.id}.first :  commit.commit_cache_signature
+
+- cache [commit.cache_signature, cs.branches_signature, cs.jobs_signature, cs.repositories_signature] do |cache_signature|
+
+  :ruby
+    branches = commit.branches.map \
+      do |branch|
+        OpenStruct.new(
+          name: branch.name,
+          repository_name: branch.repository.name,
+          depth: branch.current_commit.depth - commit.depth)
+    end.select do |b|
+      if (depth = params[:depth].to_i) >= 0
+        b.depth <= depth
+      else
+        true
+      end
+    end.sort_by{|b| b.depth}
+
+    repositories = commit.repositories.uniq.sort
+
+    commit_base_url = if repository = repositories.first
+                        convert_anygit_to_https_url(repository.git_url)
+                      end
+
+  %tr.commit.reload{{id: commit.id, data: {cache_signature: cache_signature}}}
+
+    %td.commit
+      - if commit_base_url
+        =link_to "#{commit_base_url}/commit/#{commit.id}", class: "show-commit" do
+          %span.nowrap
+            %i.text-muted{class: git_icon_for_url(commit_base_url)} &nbsp;
+            %span.commit-id<>= commit.id[0..5]
+      - else
+        %span.text-warning.nowrap
+          %i.icon-warning
+          orphaned
+
+    %td.tree
+      = link_to workspace_tree_path(commit.tree_id)  do
+        %span.nowrap
+          %i.icon-tree.text-muted
+          %span.id= commit.tree_id[0..5]
+
+    %td.committer-date=render 'humanized_time_from_now', at: commit.committer_date, format: 'short'
+
+    %td
+      - if commit.committer_name == commit.author_name
+        %a{ href: "#",
+
+            title: "Authored and committed by <b>#{commit.author_name}</b> <em>#{commit.committer_date}</em>",
+            data: {toggle: 'tooltip', html: "true"}}
+          %img{src: gravatar_url(commit.author_email)}
+      - else
+        %a{ href: "#",
+            title: "Authored by <b>#{commit.author_name}</b> <em>#{commit.author_date}</em>",
+            data: {toggle: 'tooltip', html: "true"}}
+          %img{src: gravatar_url(commit.author_email)}
+        ="/"
+        %a{ href: "#",
+            title: "Committed by <b>#{commit.committer_name}</b> <em>#{commit.committer_date}</em>",
+            data: {toggle: 'tooltip', html: "true"}}
+          %img{src: gravatar_url(commit.committer_email)}
+
+    %td.subject= commit.subject.truncate(50)
+
+    %td.repositories
+      - repositories.each do |repository|
+        %b.repository{data: {name: repository.name}}
+          = repository.to_s.truncate(20)
+
+    %td.branches
+      %ul.list-unstyled
+        = render partial: "branch_li", collection: branches, as: :branch, locals: {commit: commit}
+
+    %td.jobs
+      %ul.list-inline
+        - commit.jobs.reorder(name: :asc).each do |job|
+          %li.job{data: {key: job.key, name: job.name, state: job.state}}
+            %a.label{href: "##{job.id}",
+                class: label_class_for_state(job.state),
+                title: job.name,
+                data: {toggle: 'tooltip'}}
+              %i{class: icon_class_for_state(job.state)}
+
+    %td.actions
+      %ul.actions.list-inline
+        - if commit.branches.count > 0
+          %li
+            =link_to new_workspace_job_path(tree_id: commit.tree_id), class: "btn btn-xs btn-primary run-a-job"  do
+              %i.icon-job
+              %span Run &hellip;
+

@@ -1,27 +1,25 @@
 - tree_id ||= params[:tree_id]
 
-.attachments.tree_attachments 
 
-  .row
-    .col-md-6
-      %ol.breadcrumb.pull-left
-        = render "breadcrumbs/home"
-        %li.active Tree-Attachments
-    .col-md-6
-      %ol.breadcrumb.with-circle-separator.pull-right
-        %li
-          = link_to workspace_jobs_path({tree_id: tree_id}) do
-            Related jobs
+.row
+  .col-md-12
+    %ol.breadcrumb.pull-left
+      = render "breadcrumbs/tree_objects", tree_id: tree_id
+      %li.active Tree-Attachments
 
+%h1.text-center
+  %i.icon-attachments
+  Tree-Attachments for
+  %span.id= tree_id[0..5]
 
-  %h2 
-    Tree-Attachments
+-if @tree_attachments.size == 0
+  There are no attachments for the tree-id
+  %span.id<= tree_id
+  %span='.'
 
+%table.table.table-striped
+  %thead
+  %tbody
+    =render partial: 'attachment', collection: @tree_attachments, as: :attachment
 
-
-  %table.table.table-striped
-    %thead
-    %tbody
-      =render partial: 'attachment', collection: @tree_attachments, as: :attachment
-
-  = paginate @tree_attachments, theme: 'default'
+= paginate @tree_attachments, theme: 'default'

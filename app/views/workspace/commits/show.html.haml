@@ -1,12 +1,14 @@
 - commit = @commit
 #commit{data: {id: commit.id}}
 
-  .row
-    .col-md-6
+  .orientation.row
+    .col-md-4
       %ol.breadcrumb.pull-left
         = render '/breadcrumbs/commit', commit: commit
+    .col-md-4
+      %h1.text-center Commit
 
-    .col-md-6
+    .col-md-4
       %ol.breadcrumb.with-circle-separator.pull-right
         %li
           =link_to workspace_tree_configfile_path(tree_id: @commit.tree_id), class: ""  do

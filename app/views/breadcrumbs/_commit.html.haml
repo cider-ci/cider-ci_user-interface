@@ -1,8 +1,8 @@
-= render partial: "/breadcrumbs/home" 
+= render partial: "/breadcrumbs/workspace"
 
-%li 
-  = link_to workspace_commits_path do
-    Commits
+%li
+  = link_to workspace_path(git_ref: commit.tree_id) do
+    Related commits & jobs
 
-%li 
-  Commit 
+%li
+  Commit

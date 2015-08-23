@@ -2,7 +2,10 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-%li 
-  = link_to workspace_commits_path(repository: {name: repository.name}) do
-    = repository.name
+.table-responsive
+  %table#commits-table.commits.table.table-striped.reload{data: {cache_signature: @commits.map(&:id)}}
+    %thead
+    %tbody
+      =render partial: 'commit_tr', collection: commits, as: :commit
+
 

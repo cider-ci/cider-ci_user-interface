@@ -10,27 +10,27 @@ module ServiceCheck
     include Concerns::UrlBuilder
 
     def check_api
-      check_service Settings.services.api.http,  Settings.basic_auth
+      check_service Settings.services.api.http, Settings.basic_auth
     end
 
     def check_builder
-      check_service Settings.services.builder.http,  Settings.basic_auth
+      check_service Settings.services.builder.http, Settings.basic_auth
     end
 
     def check_dispatcher
-      check_service Settings.services.dispatcher.http,  Settings.basic_auth
+      check_service Settings.services.dispatcher.http, Settings.basic_auth
     end
 
     def check_notifier
-      check_service Settings.services.notifier.http,  Settings.basic_auth
+      check_service Settings.services.notifier.http, Settings.basic_auth
     end
 
     def check_repository
-      check_service Settings.services.repository.http,  Settings.basic_auth
+      check_service Settings.services.repository.http, Settings.basic_auth
     end
 
     def check_storage
-      check_service Settings.services.storage.http,  Settings.basic_auth
+      check_service Settings.services.storage.http, Settings.basic_auth
     end
 
     def check_service(http_opts, basic_auth)
