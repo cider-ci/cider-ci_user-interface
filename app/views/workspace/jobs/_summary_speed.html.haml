@@ -2,11 +2,13 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- speedup = (job.accumulated_time/job.duration).round(2) rescue nil
-- duration = job.duration.round rescue nil
-- time = job.accumulated_time.round rescue nil
+:ruby
+  speedup = (job.accumulated_time/job.duration).round(2) rescue nil
+  duration = job.duration.round rescue nil
+  time = job.accumulated_time.round rescue nil
+  cache_signature = CacheSignature.signature speedup, duration, time
 
-- cache [speedup,duration,time] do |cache_signature|
+- cache  cache_signature do
 
   #speed-summary.table-responsive.reload.replace-without-animation{data: {cache_signature: cache_signature}}
     %table.table.summary

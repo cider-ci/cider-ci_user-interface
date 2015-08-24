@@ -2,15 +2,18 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- job ||= @job
 
-- cs = @job_cache_signatures ? @job_cache_signatures.select{|cs| cs.job_id == job.id}.first :  job.job_cache_signature
+:ruby
 
-- cache [job.cache_signature,
-    cs.tasks_signature, cs.commits_signature,
-    cs.branches_signature, cs.repositories_signature ] do |cache_signature|
+  job ||= @job
+  cs = @job_cache_signatures ? @job_cache_signatures.select{|cs| cs.job_id == job.id}.first :  job.job_cache_signature
 
-  - commits = job.commits
+  cache_signature = CacheSignature.signature "_job_tr", job.cache_signature,
+    cs.tasks_signature, cs.commits_signature, cs.branches_signature, cs.repositories_signature
+
+  commits = job.commits
+
+- cache cache_signature do
 
   %tr.job.reload{id: job.id, class: job.state,data: {cache_signature: cache_signature}}
 

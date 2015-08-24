@@ -4,7 +4,7 @@
 
 - # we should not need the Commit.collection_cache_signature; it seems that
 - # the updated_at on brach is not reliably updated
-- cache [@branches.collection_cache_signature, Commit.collection_cache_signature] do
+- cache CacheSignature.signature(@branches.collection_cache_signature, Commit.collection_cache_signature) do
   .branch_heads
 
     %h2

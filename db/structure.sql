@@ -1063,13 +1063,6 @@ CREATE INDEX index_tasks_on_traits ON tasks USING btree (traits);
 
 
 --
--- Name: index_tree_attachments_on_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_tree_attachments_on_path ON tree_attachments USING btree (path);
-
-
---
 -- Name: index_tree_attachments_on_tree_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1077,10 +1070,10 @@ CREATE INDEX index_tree_attachments_on_tree_id ON tree_attachments USING btree (
 
 
 --
--- Name: index_trial_attachments_on_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tree_attachments_on_tree_id_and_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE UNIQUE INDEX index_trial_attachments_on_path ON trial_attachments USING btree (path);
+CREATE UNIQUE INDEX index_tree_attachments_on_tree_id_and_path ON tree_attachments USING btree (tree_id, path);
 
 
 --
@@ -1088,6 +1081,13 @@ CREATE UNIQUE INDEX index_trial_attachments_on_path ON trial_attachments USING b
 --
 
 CREATE INDEX index_trial_attachments_on_trial_id ON trial_attachments USING btree (trial_id);
+
+
+--
+-- Name: index_trial_attachments_on_trial_id_and_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_trial_attachments_on_trial_id_and_path ON trial_attachments USING btree (trial_id, path);
 
 
 --

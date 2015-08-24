@@ -13,6 +13,9 @@ class Workspace::TreesController < WorkspaceController
 
     def show
       @tree_id = params[:id]
+      @attachments = TreeAttachment.where(tree_id: @tree_id)
+      @commits = Commit.where(tree_id: @tree_id)
+      @jobs = Job.where(tree_id: @tree_id)
     end
 
     def get_configfile(tree_id)

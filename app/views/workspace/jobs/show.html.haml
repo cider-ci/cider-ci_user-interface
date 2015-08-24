@@ -2,17 +2,18 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- job ||= @job
-- state = job.state
-- ecs = job.job_cache_signature
-- ccss = CommitCacheSignature.where(%< commit_id IN (?) >, job.commits.map(&:id))
-- relevant_ccss = [ccss.map(&:commit_id), ccss.map(&:branches_signature), ccss.map(&:repositories_signature), ccss.map(&:jobs_signature)].flatten
+:ruby
+  job ||= @job
+  state = job.state
+  ecs = job.job_cache_signature
+  ccss = CommitCacheSignature.where(%< commit_id IN (?) >, job.commits.map(&:id))
+  relevant_ccss = [ccss.map(&:commit_id), ccss.map(&:branches_signature), ccss.map(&:repositories_signature), ccss.map(&:jobs_signature)].flatten
 
-- cs = [job.id, job.updated_at, ecs.repositories_signature,
+  cache_signature = CacheSignature.signature job.id, job.updated_at, ecs.repositories_signature,
     ecs.branches_signature, ecs.tasks_signature, ecs.job_issues_count,
-    params, @trials.collection_cache_signature] + relevant_ccss
+    params, @trials.collection_cache_signature, relevant_ccss
 
-- cache cs  do |cache_signature|
+- cache cache_signature do
 
   - tasks ||= @tasks
   - reload_timeout= session_adjust_reload_timeout(%w(failed passed).include?(job.state) ? 30 : 3)

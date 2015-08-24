@@ -2,10 +2,14 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- commit ||= @commit
-- cs = @commit_cache_signatures ? @commit_cache_signatures.select{|cs| cs.commit_id == commit.id}.first :  commit.commit_cache_signature
 
-- cache [commit.cache_signature, cs.branches_signature, cs.jobs_signature, cs.repositories_signature] do |cache_signature|
+:ruby
+
+  commit ||= @commit
+  cs = @commit_cache_signatures ? @commit_cache_signatures.select{|cs| cs.commit_id == commit.id}.first : commit.commit_cache_signature
+  cache_signature = CacheSignature.signature "_commit_tr", commit.cache_signature, cs.branches_signature, cs.jobs_signature, cs.repositories_signature
+
+- cache  cache_signature do
 
   :ruby
     branches = commit.branches.map \
@@ -30,6 +34,12 @@
 
   %tr.commit.reload{{id: commit.id, data: {cache_signature: cache_signature}}}
 
+    %td.tree
+      = link_to workspace_tree_path(commit.tree_id)  do
+        %span.nowrap
+          %i.icon-tree.text-muted
+          %span.id= commit.tree_id[0..5]
+
     %td.commit
       - if commit_base_url
         =link_to "#{commit_base_url}/commit/#{commit.id}", class: "show-commit" do
@@ -40,12 +50,6 @@
         %span.text-warning.nowrap
           %i.icon-warning
           orphaned
-
-    %td.tree
-      = link_to workspace_tree_path(commit.tree_id)  do
-        %span.nowrap
-          %i.icon-tree.text-muted
-          %span.id= commit.tree_id[0..5]
 
     %td.committer-date=render 'humanized_time_from_now', at: commit.committer_date, format: 'short'
 

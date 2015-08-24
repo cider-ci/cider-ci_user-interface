@@ -2,11 +2,15 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- trial ||= @trial
-- scripts ||= @scripts
-- issues = trial.trial_issues
-- cache [trial.cache_signature,
-          trial.trial_attachments.collection_cache_signature,admin?] do |cache_signature|
+:ruby
+  trial ||= @trial
+  scripts ||= @scripts
+  issues = trial.trial_issues
+  cache_signature = CacheSignature.signature trial.cache_signature,
+          trial.trial_attachments.collection_cache_signature, admin?
+
+
+- cache cache_signature do
 
   - reload_timeout= session_adjust_reload_timeout(%w(aborted failed passed).include?(trial.state) ? 30 : 3)
   #reload-page{data: { cache_signature: cache_signature, reload_timeout: reload_timeout}}

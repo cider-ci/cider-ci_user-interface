@@ -1,23 +1,10 @@
-- tree_id ||= params[:tree_id]
-
-
 .orientation.row
-  .col-md-6
+  .col-md-12
     %ol.breadcrumb.pull-left
       = render "breadcrumbs/workspace"
       %li.active
         %i.icon-tree
         Tree-Objects
-  .col-md-6
-    %ol.breadcrumb.with-circle-separator.pull-right
-      %li
-        = link_to workspace_path({git_ref: @tree_id}) do
-          %i.icon-workspace
-          Commits & Jobs
-      %li
-        = link_to workspace_tree_configfile_path(@tree_id) do
-          %i.icon-configuration-file
-          Project-Configuration
 
 
 
@@ -34,19 +21,52 @@
     %span.id= @tree_id
 
 
-  = link_to workspace_tree_attachments_path(@tree_id) do
-    %h2
-      %i.icon-attachments
-      Attachments
+  = cache CacheSignature.signature("attachments_count", @tree_id, @attachments.count) do
+    - case @attachments.count
+    - when 0
+      %h2
+        %i.icon-attachments
+        Attachments
+      %p There are currently no attachments for this tree-id.
+    - else
+      = link_to workspace_tree_attachments_path(@tree_id) do
+        %h2
+          %i.icon-attachments
+          Attachments
+      - case @attachments.count
+      - when 1
+        %p There exists currently one attachment for this tree-id.
+      - else
+        %p There are #{attachments.count} attachments for this tree-id.
 
-  = link_to workspace_path({git_ref: @tree_id}) do
-    %h2
-      %i.icon-workspace
-      Commits & Jobs
 
   = link_to workspace_tree_configfile_path(@tree_id) do
     %h2
       %i.icon-configuration-file
       Project-Configuration
 
+  :ruby
+    @commits_cache_signatures = CommitCacheSignature.where(
+        commit_id: @commits.map(&:id))
+
+    @job_cache_signatures = JobCacheSignature.where(
+        job_id: @jobs.map(&:id))
+
+    commits_jobs_cache_signature = CacheSignature.signature "trees#show commits & jobs", @commits_cache_signatures, @job_cache_signatures
+
+  = cache commits_jobs_cache_signature do
+
+    %h2
+      Commits & Jobs
+
+    %h3.text-center Commits
+    - if @commits.count == 0
+      There are no commits known for this tree-id.
+    - else
+      = render 'commits_table', commits: @commits
+    %h3.text-center{style: "margin-top: 5px"} Jobs
+    - if @jobs.count == 0
+      There are currently no jobs for this tree-id.
+    - else
+      = render 'jobs_table', jobs: @jobs
 
