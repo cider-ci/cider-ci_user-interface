@@ -4,15 +4,16 @@
 
 .navbar.navbar-default{role: 'navigation'}
 
-  .navbar-header 
+  .navbar-header
     = link_to public_path, class: "navbar-brand" do
       %b<>
         Cider-CI&nbsp;
-        %span{class:  Settings.releases[0].version_pre.present? ? "text-warning" : ""}<>
-          = render partial: 'application/semantic_version', 
+        %span{class:  Settings.releases[0].version_pre.present? ? "text-warning" : ""}<
+          = render partial: 'application/semantic_version',
             locals: { semver: Semver.get }
-
-
+          - if release_name = Settings.releases[0].name
+            %em
+              "#{release_name}"
 
   .collaps.navbar-collapse
 
@@ -21,5 +22,5 @@
       = render partial: "admin/navbar_actions" if admin?
 
     = render partial: "navbar/user"
-    
-  
+
+

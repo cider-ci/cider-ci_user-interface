@@ -78,15 +78,16 @@ module Concerns
         else
           # a bit ugly but actually faster then the recursive with query we used before
           # if the depth is limited and the form offer only up to depth 3
-          query = commits.joins(:head_of_branches).reorder('').distinct
-           .select('commits.id AS id, commits.depth AS depth' \
-                   ', head_of_branches_commits.id AS branch_id ')
+          query = commits \
+            .joins('JOIN branches AS heads ON commits.id = heads.current_commit_id') \
+            .reorder('').distinct .select('commits.id AS id, commits.depth AS depth' \
+                                        ', heads.id AS branch_id ')
           sub_cs = query.map.with_index do |h, i|
-                     "(SELECT cs#{i}.id FROM commits AS cs#{i} " \
-                     " JOIN branches_commits AS bcs#{i} ON bcs#{i}.commit_id = cs#{i}.id " \
-                     " JOIN branches AS bs#{i} ON bcs#{i}.branch_id = bs#{i}.id " \
-                     " WHERE bs#{i}.id = '#{h[:branch_id]}'::UUID " \
-                     " AND cs#{i}.depth > #{h[:depth] - depth - 1} )"
+            "(SELECT cs#{i}.id FROM commits AS cs#{i} " \
+              " JOIN branches_commits AS bcs#{i} ON bcs#{i}.commit_id = cs#{i}.id " \
+              " JOIN branches AS bs#{i} ON bcs#{i}.branch_id = bs#{i}.id " \
+              " WHERE bs#{i}.id = '#{h[:branch_id]}'::UUID " \
+              " AND cs#{i}.depth > #{h[:depth] - depth - 1} )"
           end.join(' UNION ')
           commits.where(" commits.id in ( #{sub_cs} )")
         end

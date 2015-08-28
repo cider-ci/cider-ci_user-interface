@@ -22,6 +22,9 @@
       = render partial: 'application/semantic_version',
         locals: { semver: Semver.get }
 
+      - if release_name = Settings.releases[0].name
+        %em "#{release_name}"
+
   %p
     %strong
       Cider-CI is an application and service stack for

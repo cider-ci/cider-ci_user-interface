@@ -1,17 +1,24 @@
+:ruby
+  major= semver['version_major'].presence
+  minor= semver['version_minor'].presence
+  patch= semver['version_patch'].presence
+  pre = semver['version_pre'].presence
+  build= semver['version_build'].presence
+
 %span.semantic-version<>
   %span.major<>
-    =semver['version_major'].to_s
+    =major.to_s
   %span.minor<>
     %span.divider<>='.'
     =semver['version_minor'].to_s
-  %span.minor<>
-    %span.divider<>='.'
-    =semver['version_patch'].to_s
-  - if semver['version_pre'].present?
+  - if patch && ( patch != 0 || pre || build )
+    %span.minor<>
+      %span.divider<>='.'
+      = patch
+  - if pre
     %span.version<>
       %span.divider<>='-'
-      =semver['version_pre'].to_s
-  - if semver['version_build'].present?
+      #{pre}
+  - if build
     %span.build<>
       %span.divider<>='+'
-      =semver['version_build'].to_s
