@@ -28,18 +28,18 @@ module Workspace::JobsControllerModules::JobsFilter
   end
 
   def filter_by_repository_names(jobs)
-    unless repository_names_filter.empty?
+    unless repository_name_param.empty?
       jobs.joins(commits: { branches: :repository }) \
-        .distinct.where(repositories: { name: repository_names_filter })
+        .distinct.where(repositories: { name: repository_name_param })
     else
       jobs
     end
   end
 
   def filter_jobs_for_branch_name(jobs)
-    unless branch_names_filter.empty?
+    unless branch_name_param.empty?
       jobs.joins(commits: :branches) \
-        .where(branches: { name: branch_names_filter })
+        .where(branches: { name: branch_name_param })
     else
       jobs
     end

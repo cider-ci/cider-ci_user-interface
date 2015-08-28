@@ -26,7 +26,8 @@
 
 @import lib/stats-and-progress
 
-.hidden 
+.hidden
+
   display: none
 i
   &.success
@@ -45,12 +46,29 @@ i
     &.#{$state}
       background-color: nth($ci-colors,$i) !important
 
+form.workspace-filter-form
+  input
+    color: $state-warning-text
 
-.commit-id
+.orientation
+  ul, ol
+    margin-bottom: 5px
+  .pull-right
+    ul.pagination
+      margin-top: 0px
+  h1, h2, h3, h4, h5, h5
+    margin-top: 0px
+
+.id, .job-id, .commit-id
   font-family: $font-family-monospace
 
 span.nowrap, strong.nowrap
   white-space: nowrap
+
+form
+  .form-button-container
+    margin: 5px
+    margin-bottom: 15px
 
 .well.right-top-form
   padding: 7px
@@ -76,13 +94,6 @@ ul.nested-inline
   >li
     display: inline
 
-
-#welcome-page
-  .radiator
-    table.table.radiator-table
-      tr:first-child
-        td
-          border: 0px solid
 
 
 @each $state in $ci-states
@@ -126,6 +137,9 @@ ul.nested-inline
 .email
   font-family: $font-family-monospace
 
+.author-date, .commiter-date
+  font-style: italic
+
 ul.repositories
   li.repository
     margin-top: 1em
@@ -139,6 +153,13 @@ ul.commits
   li.commit
     margin-top: 0.5em
     margin-bottom: 0.5em
+
+td.jobs
+  ul.list-inline
+    li
+      display: table-cell
+      padding-left: 3px
+      padding-right: 3px
 
 
 .subject
@@ -175,7 +196,6 @@ pre.message
   white-space: pre-wrap
 
 
-
 html, body, .container, #application,  #attachment-panel, .panel-body
   height: 100%
 
@@ -190,3 +210,9 @@ html, body, .container, #application,  #attachment-panel, .panel-body
 .navbar-default
   .semantic-version .build
     @extend .hide
+
+
+#tree-objects-page
+  tr.commit
+    td.run-job, td.tree-objects-link
+      display: none

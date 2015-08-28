@@ -2,9 +2,11 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- job ||= @job
-- cs = job.job_cache_signature
-- tasks ||= @tasks
+:ruby
+  job ||= @job
+  cs = job.job_cache_signature
+  tasks ||= @tasks
+
 #tasks.tasks
 
   .pull-right
@@ -13,7 +15,7 @@
       %fieldset
         .pull-right
           %ul.list-inline
-            %li#tasks-select-condition-item.reload{data: {cache_tag: @tasks_select_condition}}
+            %li#tasks-select-condition-item.reload{data: {cache_signature: @tasks_select_condition}}
               .form-group
                 %label.sr-only{for: "tasks_select_condition"}
                 = select_tag :tasks_select_condition,
@@ -47,14 +49,14 @@
 
   .clearfix
 
-  %table#tasks-table.tasks.table.table-striped.reload{data: {cache_tag: tasks.map(&:id)}}
+  %table#tasks-table.tasks.table.table-striped.reload{data: {cache_signature: tasks.map(&:id)}}
     %thead
     %tbody
       - tasks.each do |task|
         = render 'task_tr', task: task
 
 
-  #task-pagination.replace-without-animation.reload{data: {cache_tag: cs.tasks_signature}}
+  #task-pagination.replace-without-animation.reload{data: {cache_signature: cs.tasks_signature}}
     = paginate tasks, theme: 'default'
 
 

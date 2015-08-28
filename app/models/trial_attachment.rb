@@ -2,12 +2,11 @@ class TrialAttachment < ActiveRecord::Base
   include Concerns::UrlBuilder
 
   def url
-    service_path(::Settings.services.storage.http) +
-      '/trial-attachments' + path
+    "#{service_path(::Settings.services.storage.http)}/trial-attachments/#{trial_id}/#{path}"
   end
 
-  def trial_id
-    path.split('/').second
+  def path_id
+    trial_id
   end
 
   default_scope { reorder(path: :asc) }

@@ -1,17 +1,29 @@
-#stats-and-progress
+table.stats-and-progress
+  margin-bottom: 10px
+  width: 100%
+  max-width: 100%
+  td
+    text-align: center
+    vertical-align: middle
+    color: $progress-bar-color !important
+    @each $state in $ci-states
+      $i: index($ci-states,$state)
+      &.#{$state}
+        background-color: nth($ci-colors,$i)
+
+
+.job-page
   table.stats-and-progress
-    margin-bottom: 10px
-    width: 100%
-    max-width: 100%
     td
       padding: 8pt
-      text-align: center
-      vertical-align: middle
-      color: $progress-bar-color !important
-      @each $state in $ci-states
-        $i: index($ci-states,$state)
-        &.#{$state}
-          background-color: nth($ci-colors,$i)
-      //&.executing
-      //  @include striped-executing
+
+.job-tr
+  table.stats-and-progress
+    margin-bottom: 0px
+    max-width: 20em
+    td
+      padding: 1pt 3pt
+      span.icon
+        display: none
+
 

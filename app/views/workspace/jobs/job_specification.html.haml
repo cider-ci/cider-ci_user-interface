@@ -7,16 +7,15 @@
 
 %section.job-specification
 
-  %h1 JobSpecification 
+  %h1.text-center
+    Job-Specifcation
 
 
-  - if @job.job_specification 
-
-    %p This is the job_specification which was used to build the corresponding tasks.
+  - if @job.job_specification
 
     %pre= @job.job_specification.data.to_yaml
 
-  - else 
+  - else
 
     %p.text-danger
 

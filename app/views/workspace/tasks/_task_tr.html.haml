@@ -3,12 +3,13 @@
 -#  See the LICENSE.txt file provided with this software.
 
 
-- task ||= @task
-- cs = [task.cache_signature,task.trials.collection_cache_tag]
+:ruby
+  task ||= @task
+  cache_signature = CacheSignature.signature task.cache_signature, task.trials.collection_cache_signature
 
-- cache cs do |cache_tag|
+- cache cache_signature do
 
-  %tr.task.reload{id: task.id,data: {cache_tag: cs, state: task.state}}
+  %tr.task.reload{id: task.id,data: {cache_signature: cache_signature, state: task.state}}
     %td.state
       =link_to workspace_task_path(task) do
         = render "label_for_state", state: task.state

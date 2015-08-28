@@ -3,18 +3,18 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - block_output ||= nil
-%tr.executor.reload{id: executor.id,  data: {cache_tag: "#{executor.updated_at}  #{executor.current_load}"}}
-  %td.name #{executor.name} 
+%tr.executor.reload{id: executor.id,  data: {cache_signature: "#{executor.updated_at}  #{executor.current_load}"}}
+  %td.name #{executor.name}
   %td.enabled
-    - if executor.enabled 
+    - if executor.enabled
       %i.success.fa.fa-check
-    - else 
+    - else
       %i.icon-unchecked
   %td.online
-    - unless executor.enabled 
+    - unless executor.enabled
       %i.icon-offline
     - else
-      - if executor.online? 
+      - if executor.online?
         %i.success.icon-online.fa.fa-heart
       - else
         %i.warning.fa.fa-heart-o
@@ -24,4 +24,4 @@
       %span #{executor.current_load} / #{executor.max_load}
 
   - if block_output
-    = block_output 
+    = block_output

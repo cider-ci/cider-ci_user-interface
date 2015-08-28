@@ -7,9 +7,15 @@ class Workspace::TreesController < WorkspaceController
     include Concerns::HTTP
 
     def attachments
-      @tree_attachments = \
-        TreeAttachment.where("path like '/#{params[:tree_id]}/%'") \
-        .page(params[:page])
+      @tree_attachments = TreeAttachment \
+        .where(tree_id: params[:tree_id]).page(params[:page])
+    end
+
+    def show
+      @tree_id = params[:id]
+      @attachments = TreeAttachment.where(tree_id: @tree_id)
+      @commits = Commit.where(tree_id: @tree_id)
+      @jobs = Job.where(tree_id: @tree_id)
     end
 
     def get_configfile(tree_id)

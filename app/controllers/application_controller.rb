@@ -27,7 +27,12 @@ class ApplicationController < ActionController::Base
   end
 
   def redirect
-    redirect_to public_path
+    if current_user
+
+      redirect_to workspace_path(user_workspace_filter)
+    else
+      redirect_to public_path
+    end
   end
 
   def current_user
@@ -46,6 +51,10 @@ class ApplicationController < ActionController::Base
   def render_404(msg = nil)
     @alerts[:warnings] << msg if msg
     render 'public/404', status: 404
+  end
+
+  def user_workspace_filter
+    current_user.try(:workspace_filters) || {}
   end
 
 end

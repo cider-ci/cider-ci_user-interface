@@ -1,21 +1,20 @@
 .row
-  .col-md-6
+  .col-md-12
     %ol.breadcrumb.pull-left
       - case @attachment
       - when TreeAttachment
         = render '/breadcrumbs/tree_attachment', tree_id: @attachment.tree_id
       - when TrialAttachment
-        - # binding.pry
+        = render '/breadcrumbs/trial_attachment', trial: Trial.find(@attachment.trial_id)
+        %li
+          Attachment
 
-  .col-md-6
-
- 
 
 #attachment-panel.panel.panel-default.no-padding-panel
-  .panel-heading.clearfix  
-    .pull-right 
+  .panel-heading.clearfix
+    .pull-right
       %a#open-content.btn.btn-default.btn-xs{href: @attachment.url}
-        %i.fa.fa-arrows-alt 
+        %i.fa.fa-arrows-alt
 
     .pull-left
       %span
@@ -25,15 +24,15 @@
         - when TrialAttachment
           Trial-Attachment:
 
-      %span.monospaced= "/" + @attachment.path.split("/").drop(2).join("/")
+      %span.monospaced= "./" + @attachment.path
 
-      %p 
+      %p
         %span Content-type:&nbsp;
         %span.monospaced>= @attachment.content_type
-        %span ,&nbsp; content_length: 
+        %span ,&nbsp; content_length:
         %span.monospaced= number_to_human_size(@attachment.content_length)
 
   .panel-body
-    %iframe#iframe{src: @attachment.url, style: "width: 100%; height: 100%; seamless: 'seamless' "} 
+    %iframe#iframe{src: @attachment.url, style: "width: 100%; height: 100%; seamless: 'seamless' "}
 
 

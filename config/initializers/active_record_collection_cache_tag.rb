@@ -1,5 +1,5 @@
 class ActiveRecord::Base
-  def self.collection_cache_tag(&block)
+  def self.collection_cache_signature(&block)
     if block_given?
       block.call(self)
     else

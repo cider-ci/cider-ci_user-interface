@@ -2,18 +2,21 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- trial ||= @trial
-- cache trial.cache_signature do 
-  - task = trial.task
-  - job = task.job
-  - state ||= trial.state
+:ruby
+  trial ||= @trial
+
+- cache CacheSignature.signature("_trial_row", trial.cache_signature) do
+  :ruby
+    task = trial.task
+    job = task.job
+    state ||= trial.state
   %tr
     %td
       .label{class: label_class_for_state(state)}<
-        %i{class: icon_class_for_state(state)} 
+        %i{class: icon_class_for_state(state)}
 
     %td
-      %small 
+      %small
         =render 'humanized_time_from_now', at: trial.created_at
 
     %td
@@ -21,7 +24,7 @@
         =link_to workspace_task_path(task) do
           #{task}
 
-    %td 
+    %td
       %small
         =job.name
         on
@@ -29,5 +32,5 @@
 
     %td
       = link_to workspace_trial_path(trial) do
-        %i.icon-eye-open 
+        %i.icon-eye-open
         details ...

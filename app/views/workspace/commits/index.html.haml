@@ -2,14 +2,15 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-- commits ||= @commits
-- link_params ||= @link_params
+:ruby
 
-- cs= [@link_params,@commits_cache_signatures_array]
+ commits ||= @commits
+ link_params ||= @link_params
+ cache_signature = CacheSignature.signature @link_params, @commits_cache_signatures_array
 
-- cache cs do |cache_tag|
+- cache cache_signature do
 
-  #reload-page.jobs-page{data: {cache_tag: cache_tag, reload_timeout: session_adjust_reload_timeout(3)}}
+  #reload-page.jobs-page{data: {cache_signature: cache_signature, reload_timeout: session_adjust_reload_timeout(3)}}
 
     = render 'index_head', params: params
 

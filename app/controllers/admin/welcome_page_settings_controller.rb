@@ -9,9 +9,6 @@ class Admin::WelcomePageSettingsController < AdminController
     @welcome_message =
       params[:welcome_page_settings].try(:[], 'welcome_message') ||
         @welcome_page_settings.welcome_message
-    @radiator_config_yaml =
-      params[:welcome_page_settings].try(:[], 'radiator_config_yaml') ||
-        @welcome_page_settings.radiator_config.to_yaml
   end
 
   def update
@@ -21,10 +18,7 @@ class Admin::WelcomePageSettingsController < AdminController
     Fun.wrap_exception_with_redirect self, rescue_path do
       ActiveRecord::Base.transaction do
         WelcomePageSettings.find.update_attributes!(
-          welcome_message:
-            params[:welcome_page_settings][:welcome_message],
-          radiator_config:
-            YAML.load(params[:welcome_page_settings][:radiator_config_yaml]))
+          welcome_message: params[:welcome_page_settings][:welcome_message])
 
         redirect_to edit_admin_welcome_page_settings_path,
                     flash: {

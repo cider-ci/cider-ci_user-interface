@@ -2,11 +2,10 @@
   - if stats.failed > 0
     %span.job-stats-badge.badge.failed= stats.failed
   - if stats.failed > 0 and stats.passed > 0
-    %span : 
+    %span :
   - if stats.passed> 0
     %span.job-stats-badge.badge.passed=  stats.passed
   - if stats.failed > 0 and stats.passed > 0
-    %span / 
+    %span /
     %span.job-stats-badge.badge #{stats.total}
-
 

@@ -22,8 +22,8 @@
   %body{data: {user: user?, admin: admin?, session: {reload: {strategy: session[:reload_strategy]}}}}
     .container
 
-      = cache [current_user,admin?,request.original_fullpath] do 
-        = render partial: "navbar/navbar" 
+      = cache CacheSignature.signature("layouts/application", current_user, request.original_fullpath) do
+        = render partial: "navbar/navbar"
 
       #messages
         - {success: :successes, info: :infos, warning: :warnings, danger: :errors}.each do |bs_type, msg_key|
@@ -34,6 +34,6 @@
 
       %div#application{data: {env: Rails.env}}
 
-        = yield 
+        = yield
 
 

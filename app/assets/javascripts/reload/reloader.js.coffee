@@ -53,11 +53,11 @@ $ ->
         $el= $(el)
         id = $el.attr("id")
         $new_el = $new.find("##{id}")
-        oldCacheTag= $el.attr("data-cache-tag")
-        newCacheTag= $new_el.attr("data-cache-tag")
+        oldCacheTag= $el.attr("data-cache-signature")
+        newCacheTag= $new_el.attr("data-cache-signature")
         if (not oldCacheTag) or (oldCacheTag isnt newCacheTag)
           replaceElement $el, $new_el, id
-        $el.attr("data-cache-tag",newCacheTag)
+        $el.attr("data-cache-signature",newCacheTag)
       catch error
         logger.error error
 

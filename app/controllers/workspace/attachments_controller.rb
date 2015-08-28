@@ -8,11 +8,16 @@ class Workspace::AttachmentsController < WorkspaceController
 
   def show
     klass = params[:kind].camelize.constantize
-    full_path = '/' + params[:path]
-    if @attachment = klass.find_by(path: full_path)
+    @attachment = case klass.name
+                  when 'TreeAttachment'
+                    klass.find_by(tree_id: params[:path_id], path: params[:path])
+                  when 'TrialAttachment'
+                    klass.find_by(trial_id: params[:path_id], path: params[:path])
+                  end
+    if @attachment
       require_sign_in unless public_view_permission?(@attachment)
     else
-      render_404 "You are looking for the #{klass.name} #{full_path}.
+      render_404 "You are looking for the #{klass.name} /#{params[:id_part]}/#{params[:path]}.
         It doesn't exist at this time. You can try again later.".squish
     end
   end

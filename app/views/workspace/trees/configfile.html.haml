@@ -1,6 +1,18 @@
+- tree_id ||= params[:tree_id]
+
+.row
+  .col-md-12
+    %ol.breadcrumb.pull-left
+      = render "breadcrumbs/tree_objects", tree_id: tree_id
+      %li.active
+        %i.icon-project-configuration
+        Project-Configuration
+
+%h1.text-center
+  %i.icon-project-configuration
+  Project-Configuration for
+  %span.id= tree_id[0..5]
+
 .panel.panel-default
-  .panel-heading
-    .h1
-      Project Configuration File
   .panel-body
     %pre.script= @configfile.to_yaml

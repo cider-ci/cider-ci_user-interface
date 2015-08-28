@@ -30,7 +30,7 @@ gem 'sass-rails'
 
 
 # The rest
-#gem 'rack-mini-profiler'
+gem 'rack-mini-profiler'
 gem "nilify_blanks"
 gem 'bcrypt-ruby'
 gem 'bootswatch-rails'

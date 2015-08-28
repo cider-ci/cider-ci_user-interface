@@ -113,6 +113,9 @@ Style/IndentationWidth:
 Style/ModuleFunction:
   Enabled: false
 
+Metrics/ModuleLength:
+  Max: 120
+
 Style/MultilineBlockChain:
   Enabled: false
 

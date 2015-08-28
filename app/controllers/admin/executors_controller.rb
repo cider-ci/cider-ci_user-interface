@@ -30,7 +30,7 @@ class Admin::ExecutorsController < AdminController
   end
 
   def update
-      @executor =  Executor.find params[:id]
+      @executor = Executor.find params[:id]
       @executor.update_attributes! processed_params
       redirect_to admin_executor_path(@executor),
                   flash: { successes: ['The executor has been updated.'] }
