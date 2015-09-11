@@ -3,7 +3,7 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - state =script["state"]
-%li.script.well{data: {state: state, name: script["name"], started_at: script["started_at"]}}  
+%li.script.well{data: {state: state, name: script["name"], started_at: script["started_at"]}}
 
   %h3{id: script["name"], name: script["name"]}
     %span.label{class: label_class_for_state(state)}<>
@@ -13,7 +13,7 @@
   - started_at= Time.zone.parse(script["started_at"]) rescue false
   - finished_at= Time.zone.parse(script["finished_at"]) rescue false
 
-  %ul.list-inline 
+  %ul.list-inline
     -if finished_at and started_at
       %li Duration: #{distance_of_time_in_words(started_at,finished_at,include_seconds: true)} (#{(finished_at - started_at).round(2)} seconds)
 
@@ -23,9 +23,23 @@
     -if finished_at
       %li Finished #{render 'humanized_time_from_now', at: started_at}
 
+  :ruby
+    errors = script["errors"] || []
+    errors << script["error"] if script["error"].present?
+
+  - if not errors.empty?
+    %h4.text-danger Errors
+    - errors.each do |error|
+      - case error
+      - when String
+        %pre.script.error.text-danger= error
+      - else
+        %pre.script.error.text-danger= error.to_yaml
+
+
 
   %ul.list-unstyled
-    - ["body","environment-variables","error","stderr","stdout"].reject{|att_name| script[att_name].blank?}.each do |att_name|
+    - ["body","environment-variables","stderr","stdout"].reject{|att_name| script[att_name].blank?}.each do |att_name|
       %li
         %h4
           =att_name.capitalize
@@ -37,4 +51,4 @@
 
 
   %h4 Internal Properties
-  %pre.script= script.except("body","environment-variables","error","stderr","stdout").to_yaml
+  %pre.script= script.except("body","errors","exec-future","environment-variables","error","stderr","stdout").to_yaml
