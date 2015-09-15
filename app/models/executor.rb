@@ -20,6 +20,11 @@ class Executor < ActiveRecord::Base
     !Executor.online.find_by(id: self.id).nil?
   end
 
+  def auth_password
+    OpenSSL::HMAC.hexdigest(
+      OpenSSL::Digest.new('sha1'), Settings.secret, id)
+  end
+
   def to_s
     "#{name}"
   end

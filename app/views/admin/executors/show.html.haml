@@ -60,13 +60,11 @@
       %td Base URL
       %td= @executor.base_url
     %tr
-      %td Basic Auth. User Name
-      %td= @executor.name
+      %td Auth. User Name
+      %td= @executor.id
     %tr
-      %td Basic Auth. Password
-      %td= OpenSSL::HMAC.hexdigest(OpenSSL::Digest.new('sha1'),Settings.secret,@executor.name)
-
-
+      %td Auth. Password
+      %td= @executor.auth_password
 
 
 %h2 Traits
