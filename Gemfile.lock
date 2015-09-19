@@ -115,7 +115,7 @@ GEM
       coffee-script-source
       execjs
     coffee-script-source (1.9.1.1)
-    configuration_management_backdoor (1.0.0)
+    configuration_management_backdoor (1.1.0)
       rails (>= 4.0.0, < 5.0)
     diff-lcs (1.2.5)
     docile (1.1.5)
@@ -367,7 +367,7 @@ DEPENDENCIES
   cider_ci-rspec_support (>= 1.0.3, < 2.0.0)
   cider_ci-support (~> 1.2.0)
   coffee-rails
-  configuration_management_backdoor (>= 1.0.0, < 2.0)
+  configuration_management_backdoor (>= 1.1.0, < 2.0)
   factory_girl
   factory_girl_rails
   faker
