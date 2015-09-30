@@ -77,7 +77,7 @@ module Concerns
           commits.joins(:head_of_branches)
         else
           # a bit ugly but actually faster then the recursive with query we used before
-          # if the depth is limited and the form offer only up to depth 3
+          # if the depth is limited; the form offers only up to depth 3
           query = commits \
             .joins('JOIN branches AS heads ON commits.id = heads.current_commit_id') \
             .reorder('').distinct .select('commits.id AS id, commits.depth AS depth' \
@@ -88,8 +88,12 @@ module Concerns
               " JOIN branches AS bs#{i} ON bcs#{i}.branch_id = bs#{i}.id " \
               " WHERE bs#{i}.id = '#{h[:branch_id]}'::UUID " \
               " AND cs#{i}.depth > #{h[:depth] - depth - 1} )"
-          end.join(' UNION ')
-          commits.where(" commits.id in ( #{sub_cs} )")
+          end.join(' UNION ').squish
+          if sub_cs.present?
+            commits.where(" commits.id in ( #{sub_cs} )")
+          else
+            commits
+          end
         end
       end
     end
