@@ -4,47 +4,69 @@
 
 - commits = @commits
 
-%h1 Run a Job 
-
-#commits
-  %h2 For #{ commits.count > 1 ? "Commits" : "Commit"}
-  %table.commits.table.table-striped
-    %thead
-      %tbody
-        != render partial: "commit_tr", collection: commits, as: :commit
+#new-job-page
 
 
-- @runnable_jobs.map{|attrs| Job.new(attrs)}.each do |job| 
-
-  .well.well-sm.runnable-job{data: {name: job.name}}
-
-    %h4= job.name
-
-    - if job.description.present? 
-      = markdown(job.description)
-
-    = form_for job, url: workspace_jobs_path,  
-      method: 'POST', html: {class: "form-inline", role: "form" } do |f|
-
-      = f.hidden_field :tree_id
-      = f.hidden_field :description
-      = f.hidden_field :name
-      = f.hidden_field :job_specification_id
-      = f.hidden_field :key
-
-      .form-group
-        %label Tags: 
-        = text_field_tag :tags, "", 
-          placeholder: "tag 1, tag 2, ...", 
-          data:{autocomplete_path: workspace_tags_path}, 
-          class: "form-control"
-
-      .form-group
-        %label Priority:
-        = f.text_field :priority, type: :number, class: "form-control" 
-
-      .form-group
-        =button_tag type: 'submit', class: "btn btn-primary" do
+  .row
+    .col-md-12
+      %ol.breadcrumb.pull-left
+        = render "breadcrumbs/tree_objects", tree_id: params[:tree_id]
+        %li.active
           %i.icon-job
-          Run 
+          Run a Job
+
+  #commits
+
+    %h2 #{ commits.count > 1 ? "Commits" : "Commit"}
+
+    %table.commits.table.table-striped
+      %thead
+        %tbody
+          != render partial: "commit_tr", collection: commits, as: :commit
+
+  %h2 Available Jobs
+
+  - @runnable_jobs.map{|attrs| Job.new(attrs)}.each do |job|
+
+    .well.well-sm.runnable-job{data: {name: job.name}}
+
+      .row
+        .col-md-10
+          %h4= job.name
+
+          - if job.description.present?
+            = markdown(job.description)
+
+        .col-md-2
+          = form_for job, url: workspace_jobs_path,
+            method: 'POST', html: {class: "form-inline pull-right", role: "form" } do |f|
+
+            = f.hidden_field :tree_id
+            = f.hidden_field :description
+            = f.hidden_field :name
+            = f.hidden_field :job_specification_id
+            = f.hidden_field :key
+
+            .form-group
+              =button_tag type: 'submit', class: "btn btn-primary" do
+                %i.icon-job
+                Run
+
+  %h2 Unavailable Jobs
+
+  %p
+    These jobs are declared but they are currently not available for being run.
+
+  - @un_runnable_jobs.each do |job|
+
+    .well.well-sm.un-runnable-job
+      %h4= job[:name]
+      - if job[:description].present?
+        = markdown(job[:description])
+
+      - (job[:reasons] || []).each do |reason|
+        .alert.alert-warning
+          = markdown(reason)
+
+
 

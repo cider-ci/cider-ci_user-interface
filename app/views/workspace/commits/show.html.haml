@@ -23,7 +23,7 @@
   %ul.list-inline.actions.pull-right
     - if commit.branches.count > 0
       %li.for-signed-in-user
-        =link_to new_workspace_job_path(tree_id: commit.tree_id), class: "btn btn-primary run-a-job"  do
+        =link_to new_workspace_tree_job_path(tree_id: commit.tree_id), class: "btn btn-primary run-a-job"  do
           %i.icon-job
           %span Run job
 

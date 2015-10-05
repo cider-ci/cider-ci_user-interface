@@ -50,7 +50,7 @@ CiderCI::Application.routes.draw do
 
     resources :branch_update_triggers
     resources :commits, only: [:show]
-    resources :jobs do
+    resources :jobs, only: [:show, :create, :edit] do
       member do
         get :tasks
         get :tree_attachments
@@ -67,6 +67,7 @@ CiderCI::Application.routes.draw do
     resources :trees, only: [:show] do
       get :attachments
       get :configfile
+      resources :jobs, only: [:new]
     end
 
     resources :executors
