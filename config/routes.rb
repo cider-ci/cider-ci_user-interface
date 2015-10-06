@@ -66,7 +66,9 @@ CiderCI::Application.routes.draw do
 
     resources :trees, only: [:show] do
       get :attachments
-      get :configfile
+      # TODO: rename to project_configuration
+      get 'project-configuration'
+      get 'project-configuration/validation', action: 'project_configuration_validation'
       resources :jobs, only: [:new]
     end
 

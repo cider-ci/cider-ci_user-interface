@@ -3,47 +3,52 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Workspace::TreesController < WorkspaceController
-    include Concerns::UrlBuilder
-    include Concerns::HTTP
+  include Concerns::UrlBuilder
+  include Concerns::HTTP
 
-    def attachments
-      @tree_attachments = TreeAttachment \
-        .where(tree_id: params[:tree_id]).page(params[:page])
-    end
+  def attachments
+    @tree_attachments = TreeAttachment \
+      .where(tree_id: params[:tree_id]).page(params[:page])
+  end
 
-    def show
-      @tree_id = params[:id]
-      @attachments = TreeAttachment.where(tree_id: @tree_id)
-      @commits = Commit.where(tree_id: @tree_id)
-      @jobs = Job.where(tree_id: @tree_id)
-    end
+  def show
+    @tree_id = params[:id]
+    @attachments = TreeAttachment.where(tree_id: @tree_id)
+    @commits = Commit.where(tree_id: @tree_id)
+    @jobs = Job.where(tree_id: @tree_id)
+  end
 
-    def get_configfile(tree_id)
-      url = service_base_url(::Settings.services.repository.http) +
-        "/project-configuration/#{tree_id}"
-      http_get(url)
-    end
+  def get_project_configuration(tree_id)
+    url = service_base_url(::Settings.services.repository.http) +
+      "/project-configuration/#{tree_id}"
+    http_get(url)
+  end
 
-    def configfile
-      @configfile_response =
-        begin
-          get_configfile(params[:tree_id])
-        rescue Faraday::ClientError => e
-          Rails.logger.warn(Formatter.exception_to_log_s(e))
-          e.response
-        end
-      case @configfile_response[:status].presence || @configfile_response.status
-      when 200..299
-        @configfile = JSON.parse @configfile_response.body
-      when 404
-        render :configfile_error
-      when 422
-        render :configfile_error
-      when 500
-        render :configfile_error
-      else
-        raise "Handle for #{@configfile_response[:status].presence} is missing"
+  def project_configuration
+    @project_configuration_response =
+      begin
+        get_project_configuration(params[:tree_id])
+      rescue Faraday::ClientError => e
+        Rails.logger.warn(Formatter.exception_to_log_s(e))
+        e.response
       end
+    status = @project_configuration_response[:status].presence ||
+      @project_configuration_response.status
+    case status
+    when 200..299
+      @project_configuration = JSON.parse @project_configuration_response.body
+    when 404
+      render :project_configuration_error
+    when 422
+      render :project_configuration_error
+    when 500
+      render :project_configuration_error
+    else
+      raise "Handle for #{@project_configuration_response[:status].presence} is missing"
     end
+  end
+
+  def project_configuration_validation
+  end
 
 end
