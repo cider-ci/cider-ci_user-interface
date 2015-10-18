@@ -22,7 +22,7 @@
       .col-md-6
 
         :ruby
-          commit_ref = `git log -n 1 --format=%H`.strip rescue 'master'
+          commit_ref = `cd .. && git log -n 1 --format=%H`.strip rescue 'master'
 
         %h2 About Cider-CI
 
