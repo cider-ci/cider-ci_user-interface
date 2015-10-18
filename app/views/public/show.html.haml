@@ -14,23 +14,34 @@
 
   %hr
 
-  %h2 About Cider-CI
 
-  %p#release-info
-    = link_to "https://github.com/cider-ci/cider-ci/blob/master/config/releases.yml" do
-      Version&nbsp;
-      = render partial: 'application/semantic_version',
-        locals: { semver: Semver.get }
+  - cache Settings.releases[0] do
 
-      - if release_name = Settings.releases[0].name
-        %em "#{release_name}"
+    .row
+      .col-md-3
+      .col-md-6
 
-  %p
-    %strong
-      Cider-CI is an application and service stack for
-      highly parallelized testing and continuous integration.
+        :ruby
+          commit_ref = `git log -n 1 --format=%H`.strip rescue 'master'
 
-  %p
-    Read more about Cider-CI on the
-    %a{href: "https://github.com/cider-ci/cider-ci"}
-      Cider-CI github project page.
+        %h2 About Cider-CI
+
+        %p#release-info
+          = link_to "https://github.com/cider-ci/cider-ci/blob/#{commit_ref}/config/releases.yml" do
+            Version&nbsp;
+            = render partial: 'application/semantic_version',
+              locals: { semver: Semver.get }
+
+            - if release_name = Settings.releases[0].name
+              %em "#{release_name}"
+
+        :markdown
+          Cider-CI is an application and service stack for **highly parallelized**
+          and **resilient integration testing**.  Read more about Cider-CI at
+          [cider-ci.info](http://cider-ci.info/).
+
+        - if Settings.releases[0]['about-name']
+          %p.about-name= markdown(Settings.releases[0]['about-name'])
+
+      .col-md-3
+

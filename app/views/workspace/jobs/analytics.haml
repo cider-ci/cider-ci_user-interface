@@ -1,0 +1,94 @@
+:ruby
+  job= Job.find(params[:id])
+
+.orientation.row
+
+  .col-md-8
+    %ol.breadcrumb.pull-left
+      = render '/breadcrumbs/workspace_job_analytics', job: job
+
+  .col-md-4
+    %ol.breadcrumb.with-circle-separator.pull-right
+      = render '/breadcrumbs/items/workspace_job_statistics', job: job
+
+#job
+
+  %h1 Analytics
+
+
+  .table-responsive
+    %table#jobs-table.table.jobs-table
+      %thead
+      %tbody
+        = render 'job_tr', job: job
+
+  = render 'commits_table', commits: job.commits
+
+
+%section#duration#speed
+  %h2 Duration
+  = render 'summary_speed', job: job
+
+%section#tasks
+
+  :ruby
+    tasks_with_failed_trials  = job.tasks.where("EXISTS (SELECT 1 FROM trials WHERE trials.task_id = tasks.id AND trials.state = 'failed')")
+
+    tasks_with_failed_trials_data = tasks_with_failed_trials.map{ |task|
+      OpenStruct.new task.attributes.merge(failed_count: task.trials.where(state: 'failed').count)
+      }
+
+  %h2 Overview of Tasks
+
+  = render 'summary_stats', job: job
+
+
+%section#tasks
+
+  -if tasks_with_failed_trials_data.length > 0
+
+    %h2 Tasks with Failed Trials
+
+    - tasks_with_failed_trials_data.each do |task|
+      = link_to workspace_task_path(id: task.id) do
+        .fraction-bar{class: task.state}
+          .fraction-bar-text
+            #{task.name}: #{task.failed_count}
+
+
+#trials
+  - cache CacheSignature.signature job.trials.reorder(updated_at: :desc).limit(1).first  do
+
+    :ruby
+
+      max_trial_duration = 0
+
+      trials_duration_data= job.trials.map{|t| OpenStruct.new t.attributes.except('scripts','error') \
+        .merge(name: t.task.name)} \
+        .select(&:started_at).select(&:finished_at)
+        .each{ |t| t.duration = t.finished_at - t.started_at
+            max_trial_duration =  max_trial_duration < t.duration ? t.duration : max_trial_duration}
+        .each{ |t| t.fraction = t.duration / max_trial_duration }
+        .sort_by(&:duration).reverse
+
+    %h2 Durations of Trials
+
+    - trials_duration_data.each do |t|
+      .duration{class: t.state}
+        .duration-bar{class: t.state, style: "width: #{t.fraction * 100.0}%"}
+        .duration-text
+          = link_to workspace_trial_path(id: t.id) do
+            %i.icon-trial
+            %span #{t.name}
+          = link_to duration_analysis_workspace_trial_path(id: t.id) do
+            %i.icon-gantt-chart{style: 'margin-left: 1em'}
+            - if t.duration > 300
+              %span.humanize-duration{data: {duration: t.duration}} #{t.duration} Seconds
+            - else
+              %span #{pluralize t.duration.round, "second"}
+
+
+
+
+
+

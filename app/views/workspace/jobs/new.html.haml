@@ -10,7 +10,7 @@
   .row
     .col-md-12
       %ol.breadcrumb.pull-left
-        = render "breadcrumbs/tree_objects", tree_id: params[:tree_id]
+        = render "breadcrumbs/workspace_tree_objects", tree_id: params[:tree_id]
         %li.active
           %i.icon-job
           Run a Job
@@ -49,7 +49,6 @@
 
             .form-group
               =button_tag type: 'submit', class: "btn btn-primary" do
-                %i.icon-job
                 Run
 
   %h2 Unavailable Jobs

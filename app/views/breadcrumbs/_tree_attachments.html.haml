@@ -1,4 +1,2 @@
-= render "/breadcrumbs/tree_objects", tree_id: tree_id
-%li
-  = link_to workspace_tree_attachments_path(tree_id) do
-    Tree-Attachments
+= render "/breadcrumbs/workspace_tree_objects", tree_id: tree_id
+= render '/breadcrumbs/items/tree_attachments', tree_id: tree_id

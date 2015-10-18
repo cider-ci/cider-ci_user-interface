@@ -45,12 +45,14 @@ CiderCI::Application.routes.draw do
         get 'result'
         get :issues, action: 'issues'
         delete 'issues/:issue_id', action: 'delete_issue', as: 'issue'
+        get 'duration-analysis'
+        get 'scripts-gantt-chart'
       end
     end
 
     resources :branch_update_triggers
     resources :commits, only: [:show]
-    resources :jobs, only: [:show, :create, :edit] do
+    resources :jobs, only: [:show, :create, :edit, :update] do
       member do
         get :tasks
         get :tree_attachments
@@ -60,7 +62,9 @@ CiderCI::Application.routes.draw do
         post :add_tags
         post :retry_and_resume
         post :abort
-        get 'result'
+        get :result
+        get :analytics
+        get :statistics
       end
     end
 

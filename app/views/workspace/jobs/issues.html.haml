@@ -2,12 +2,12 @@
 .row
   .col-md-6
     %ol.breadcrumb.pull-left
-      = render '/breadcrumbs/job', job: @job
+      = render '/breadcrumbs/workspace_job', job: @job
       %li.inactive
         Issues
 
-%ul.list-unstyled 
-  = render partial: 'issue', collection: @issues 
+%ul.list-unstyled
+  = render partial: 'issue', collection: @issues
 
 = paginate @issues, theme: 'default'
 

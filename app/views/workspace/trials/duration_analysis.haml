@@ -1,0 +1,45 @@
+
+:ruby
+  trial = Trial.find params[:id]
+  cache_signature = CacheSignature.signature(trial)
+
+- cache cache_signature do
+
+  - reload_timeout= session_adjust_reload_timeout(%w(aborted failed passed).include?(trial.state) ? 30 : 3)
+  #Xreload-page{data: { cache_signature: cache_signature, reload_timeout: reload_timeout}}
+
+    #trial.reload{data: {cache_signature: cache_signature}}
+
+      .row
+        .col-md-12
+          %ol.breadcrumb.pull-left
+            =render '/breadcrumbs/trial', trial: trial
+            %li.active
+              %i.icon-gantt-chart
+              Duration Analysis
+
+
+      %h1 Time and Duration Analysis
+      %ul
+        %li "#{trial.task.name}" in "#{trial.task.job.name}"
+        %li
+          duration from start to finish of last script:
+          :ruby
+            duration = begin
+                         trial.finished_at - trial.started_at
+                       rescue
+                         nil
+                       end
+
+          -if duration
+            %span.humanize-duration{data: {duration: duration}} #{duration} seconds
+            %span (#{pluralize duration, "second"})
+          -else
+            unknown
+
+    %section#timeline.timeline
+
+      %h2 Gantt Chart
+
+      %object#gant-chart{type: 'image/svg+xml', data: (workspace_trial_path(trial) + '/scripts-gantt-chart.svg'), style: "width: 100%" }
+

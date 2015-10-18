@@ -1,4 +1,5 @@
-= render '/breadcrumbs/job', job: task.job
-%li 
+= render '/breadcrumbs/workspace_job', job: task.job
+%li
   = link_to workspace_task_path(task) do
+    %i.icon-task
     Task

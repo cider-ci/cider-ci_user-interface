@@ -23,26 +23,23 @@
             =render '/breadcrumbs/trial', trial: trial
         .col-md-6
           %ol.breadcrumb.with-circle-separator.pull-right
-            %li
-              - if trial.trial_attachments.count > 0
-                = link_to attachments_workspace_trial_path(trial) do
-                  Attachments
-              - else
-                %span.text-muted Attachments
+            = render 'breadcrumbs/items/trial_attachments', trial: trial
 
-            %li#issues-link.reload{data: {cache_signature: issues.count}}
-              - if issues.count <= 0
-                %span.text-muted Issues
-              - else
+            - if issues.count > 0
+              %li#issues-link.reload{data: {cache_signature: issues.count}}
                 = link_to issues_workspace_trial_path(trial) do
                   %span.text-danger= pluralize(issues.count,"Issue")
 
-            %li
-              - if trial.result
+            - if trial.result
+              %li
                 = link_to result_workspace_trial_path(trial) do
                   Result
-              - else
-                %span.text-muted Result
+
+            %li
+              = link_to duration_analysis_workspace_trial_path(trial) do
+                %i.icon-gantt-chart
+                Duration Analysis
+
 
 
       #issues-alert.reload{data: {cache_signature: issues.count}}
@@ -50,6 +47,14 @@
           .alert.alert-danger
             %p This trial has #{pluralize(issues.count,"issue")}!
 
+
+      %ul.list-inline.actions.pull-right
+        %li.for-signed-in-user
+          = form_tag retry_workspace_task_path(trial.task), method: 'POST', remote: false do
+            = hidden_field_tag :authenticity_token, form_authenticity_token
+            = button_tag type: :submit, class: "btn btn-primary" do
+              %i.icon-retry
+              Retry
 
 
       %h1{style: "margin-top: 10px"}

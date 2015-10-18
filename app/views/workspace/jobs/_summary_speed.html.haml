@@ -3,25 +3,34 @@
 -#  See the LICENSE.txt file provided with this software.
 
 :ruby
-  speedup = (job.accumulated_time/job.duration).round(2) rescue nil
+  speedup = begin
+              raw_speedup =  job.accumulated_time/job.duration
+              round= -Math.log10(raw_speedup).round + 2
+              raw_speedup.round(round)
+            rescue
+              nil
+            end
   duration = job.duration.round rescue nil
   time = job.accumulated_time.round rescue nil
   cache_signature = CacheSignature.signature speedup, duration, time
 
 - cache  cache_signature do
 
-  #speed-summary.table-responsive.reload.replace-without-animation{data: {cache_signature: cache_signature}}
-    %table.table.summary
-      %thead
-      %tbody
-        %tr
-          - if speedup
-            %td Speedup: #{speedup}
-          - if duration
-            %td
-              Duration:
-              %span.humanize-duration{data: {duration: duration}} #{duration} seconds
-          - if time
-            %td
-              Processing time:
-              %span.humanize-duration{data: {duration: time}} #{time} seconds
+  %ul
+
+  -if duration
+    %li
+      duration from start of first trial to finish of last trial:
+      %span.humanize-duration{data: {duration: duration}} #{duration} seconds
+      %span (#{pluralize duration, "second"})
+
+  -if time
+    %li
+      accumulated processing time of all trials:
+      %span.humanize-duration{data: {duration: time}} #{time} seconds
+      %span (#{pluralize time, "second"})
+
+  -if speedup
+    %li
+      speedup factor: #{speedup}
+

@@ -21,31 +21,39 @@
 
     .orientation.row
 
-      .col-md-6
+      .col-md-4
         %ol.breadcrumb.pull-left
-          = render '/breadcrumbs/job', job: job
-      .col-md-6
+          = render '/breadcrumbs/workspace_job', job: job
+      .col-md-8
         %ol.breadcrumb.with-circle-separator.pull-right
+
           %li
-            = link_to workspace_tree_attachments_path(job.tree_id) do
-              Tree-Attachments
-          %li#issues-link.reload{data: {cache_signature: ecs.job_issues_count}}
-            - if ecs.job_issues_count <= 0
-              %span.text-muted Issues
-            - else
-              = link_to issues_workspace_job_path(job) do
-                %span.text-danger= pluralize(ecs.job_issues_count,"Issue")
+            = link_to analytics_workspace_job_path(job) do
+              %i.icon-analytics
+              Analytics
+
+          -if ecs.job_issues_count > 0
+            %li#issues-link.reload{data: {cache_signature: ecs.job_issues_count}}
+              - if ecs.job_issues_count <= 0
+                %span.text-muted Issues
+              - else
+                = link_to issues_workspace_job_path(job) do
+                  %span.text-danger= pluralize(ecs.job_issues_count,"Issue")
 
           %li
             = link_to job_specification_workspace_job_path(job) do
-              Job-Specification
+              %i.icon-spec
+              Specification
 
-          %li#result-link.reload{data: {cache_signature: job.result_summary?.to_s}}
-            - if job.result
-              = link_to result_workspace_job_path(job) do
-                Result
-            - else
-              %span.text-muted Result
+          -if job.result.present?
+            %li#result-link.reload{data: {cache_signature: job.result_summary?.to_s}}
+              - if job.result
+                = link_to result_workspace_job_path(job) do
+                  Result
+              - else
+                %span.text-muted Result
+
+          = render '/breadcrumbs/items/tree_attachments', tree_id: job.tree_id
 
 
     #issues-alert.reload{data: {cache_signature: ecs.job_issues_count}}

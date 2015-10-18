@@ -1,0 +1,67 @@
+:ruby
+  job ||= @job || Job.find(params[:id])
+
+  group_size= 10
+  batches_count= 3
+
+  repositories = job.repositories
+  name = job.name
+
+  jobs = Job.where(key: job.key, name: name) \
+    .joins(commits: {branches: :repository}) \
+    .where("repositories.id IN (?)", repositories.map(&:id))
+
+  job_groups = batches_count.times.map{|i|
+    jobs.limit(group_size).offset(i*group_size).select(:created_at,:id).distinct.map(&:id) }
+
+  job_group= ->(i){ jobs.limit(group_size).offset(i*group_size) }
+
+  jobids= ->(i,job_query){ job_query.limit(group_size).offset(i*group_size).select(:created_at,:id).distinct.map(&:id) }
+
+.row
+  .col-md-12
+    %ol.breadcrumb.pull-left
+      = render "breadcrumbs/workspace_job_analytics_statistics", job: job
+
+
+#jobs-statistics
+
+%h1
+  Statistics for
+  %em #{name}
+  in
+  %em #{repositories.first.name}
+
+%p Statistics of grouping jobs from newest first in #{pluralize batches_count, "group"} each with #{pluralize group_size, "item"}.
+
+%section#states
+
+  %h2 States
+
+  :ruby
+    states_data= batches_count.times.map{ |i|
+      Job.where(id: job_groups[i]).group(:state).reorder("").count
+    }
+
+  %pre= states_data.to_yaml
+
+
+%section#durations
+
+  %h2 Durations of Passed Jobs
+
+  :ruby
+    duration_data= batches_count.times.map{ |i|
+      passed_jobs = jobs.where(state: 'passed')
+      jobids.call(i, passed_jobs).map{|job_id|
+        begin
+          started_at= Trial.joins(task: :job).where("jobs.id = ?", job_id).reorder(started_at: :asc).first.started_at
+          finished_at=  Trial.joins(task: :job).where("jobs.id = ?", job_id).reorder(finished_at: :desc).first.finished_at
+          finished_at - started_at
+        rescue
+          nil
+        end
+      }.compact
+    }
+
+  %pre= duration_data.to_yaml

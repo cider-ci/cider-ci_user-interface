@@ -39,6 +39,9 @@ class Workspace::TrialsController < WorkspaceController
     redirect_to issues_workspace_trial_path(params[:id])
   end
 
+  def scripts_gantt_chart
+  end
+
   private
 
   def script_order(s)

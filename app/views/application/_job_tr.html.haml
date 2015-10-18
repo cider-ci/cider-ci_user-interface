@@ -46,7 +46,7 @@
 
     %td.commits
       %ul.list-unstyled
-        - commits.where(id: @commits.map(&:id)).each do |commit|
+        - commits.where(id: commits.map(&:id)).each do |commit|
           %li
             %img{src: gravatar_url(commit.author_email)}
             %em= commit.subject.truncate(30)

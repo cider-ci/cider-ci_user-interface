@@ -26,6 +26,67 @@
 
 @import lib/stats-and-progress
 
+
+svg.scripts.timeline
+  alignment-baseline: hanging
+  dominant-baseline: hanging
+  rect.script-background
+    fill: $gray-lighter
+  rect.script
+    @each $state in $ci-states
+      $i: index($ci-states,$state)
+      &.#{$state}
+        fill: nth($ci-colors-bg,$i)
+        stroke-width: 1
+        stroke: nth($ci-colors,$i)
+  line.start-dependency
+    stroke: $ci-passed
+    stroke-width: 1.5
+
+.duration
+  margin-top: 0.5 * $line-height-computed
+  overflow: hidden
+  position: relative
+  left: 0
+  top: 0
+  width: 100%
+  color: white
+  background-color: $gray-light
+  height: $line-height-computed
+  &.failed
+    background-color: mix($gray-lighter,$ci-failed)
+  &.passed
+    background-color: mix($gray-lighter,$ci-passed)
+  &.aborted
+    background-color: mix($gray-lighter,$ci-aborted)
+  a
+    color: white
+
+
+  .duration-bar
+    position: relative
+    left: 0
+    top: 0
+    height: $line-height-computed
+    background-color: $brand-primary
+    z-index: 1
+    &.failed
+      background-color: darken($ci-failed,25%)
+    &.passed
+      background-color: darken($ci-passed,25%)
+    &.aborted
+      background-color: darken($ci-aborted,25%)
+
+
+  .duration-text
+    position: relative
+    position: absolute
+    left: 0
+    top: 0
+    z-index: 10
+    height: $line-height-computed
+    padding-left: 1em
+
 .hidden
 
   display: none
@@ -206,11 +267,6 @@ html, body, .container, #application,  #attachment-panel, .panel-body
     iframe
       border: 0px
       background-color: white
-
-.navbar-default
-  .semantic-version .build
-    @extend .hide
-
 
 #tree-objects-page, #new-job-page
   tr.commit

@@ -5,7 +5,7 @@ class ActiveRecord::Base
     else
       self
     end.instance_eval do
-     "[#{self.class.name}: #{id} - #{updated_at}]"
+     "[#{self.class.name}: #{id} - #{attributes_before_type_cast['updated_at']}]"
     end or Time.zone.now.iso8601(4)
   end
 end

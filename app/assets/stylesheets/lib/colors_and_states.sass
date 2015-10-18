@@ -3,11 +3,12 @@ $ci-executing-bg: mix($ci-executing,$body-bg,60%) !default
 $ci-failed-bg: mix($ci-failed,$body-bg,60%) !default
 $ci-passed-bg: mix($ci-passed,$body-bg,60%) !default
 $ci-pending-bg: mix($ci-pending,$body-bg,60%) !default
+$ci-skipped-bg: mix($ci-skipped,$body-bg,60%) !default
 $ci-unavailable-bg: mix($ci-unavailable,$body-bg,60%) !default
 
-$ci-states: 'aborted', 'executing', 'failed', 'passed', 'pending', 'unavailable'
-$ci-colors: $ci-aborted, $ci-executing, $ci-failed, $ci-passed, $ci-pending, $ci-unavailable
-$ci-colors-bg: $ci-aborted-bg, $ci-executing-bg, $ci-failed-bg, $ci-passed-bg, $ci-pending-bg, $ci-unavailable-bg
+$ci-states: 'aborted', 'executing', 'failed', 'passed', 'pending', 'skipped', 'unavailable'
+$ci-colors: $ci-aborted, $ci-executing, $ci-failed, $ci-passed, $ci-pending, $ci-skipped, $ci-unavailable
+$ci-colors-bg: $ci-aborted-bg, $ci-executing-bg, $ci-failed-bg, $ci-passed-bg, $ci-pending-bg, $ci-skipped-bg, $ci-unavailable-bg
 
 @mixin striped-executing()
   //background-image: -webkit-linear-gradient($angle, $color 25%, transparent 25%, transparent 50%, $color 50%, $color 75%, transparent 75%, transparent)

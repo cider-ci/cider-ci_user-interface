@@ -16,9 +16,7 @@
         %li
           = link_to workspace_jobs_path(tree_id: commit.tree_id) do
             Jobs
-        %li
-          = link_to workspace_tree_attachments_path(commit.tree_id) do
-            Tree-Attachments
+        = render '/breadcrumbs/items/tree_attachments', tree_id: commit.tree_id
 
   %ul.list-inline.actions.pull-right
     - if commit.branches.count > 0

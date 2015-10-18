@@ -1,8 +1,10 @@
 .row
   .col-md-9
     %ol.breadcrumb.pull-left
-      = render '/breadcrumbs/job', job: @job
-      %li.active JobSpecification
+      = render '/breadcrumbs/workspace_job', job: @job
+      %li.active
+        %i.icon-spec
+        Specification
 
 
 %section.job-specification

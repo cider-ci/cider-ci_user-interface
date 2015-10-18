@@ -1,0 +1,5 @@
+-if trial.trial_attachments.count > 0
+  %li
+    = link_to attachments_workspace_trial_path(trial) do
+      %i.icon-attachments
+      = "Attachment".pluralize(trial.trial_attachments.count)

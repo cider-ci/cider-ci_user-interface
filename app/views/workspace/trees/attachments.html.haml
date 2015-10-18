@@ -1,11 +1,8 @@
 - tree_id ||= params[:tree_id]
 
-
 .row
   .col-md-12
-    %ol.breadcrumb.pull-left
-      = render "breadcrumbs/tree_objects", tree_id: tree_id
-      %li.active Tree-Attachments
+    = render '/breadcrumbs/items/tree_attachments', tree_id: tree_id
 
 %h1.text-center
   %i.icon-attachments
