@@ -359,6 +359,24 @@ ALTER TABLE ONLY executors_with_load REPLICA IDENTITY NOTHING;
 
 
 --
+-- Name: job_cache_signatures; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE job_cache_signatures (
+    job_id uuid,
+    branches_signature text,
+    commits_signature text,
+    job_issues_signature text,
+    job_issues_count bigint,
+    repositories_signature text,
+    tasks_signature text,
+    tree_attachments_count bigint
+);
+
+ALTER TABLE ONLY job_cache_signatures REPLICA IDENTITY NOTHING;
+
+
+--
 -- Name: job_issues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -374,12 +392,12 @@ CREATE TABLE job_issues (
 
 
 --
--- Name: jobs_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: job_specifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
-CREATE TABLE jobs_tags (
-    job_id uuid,
-    tag_id uuid
+CREATE TABLE job_specifications (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    data jsonb
 );
 
 
@@ -401,42 +419,6 @@ CREATE TABLE tasks (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
-);
-
-
---
--- Name: job_cache_signatures; Type: VIEW; Schema: public; Owner: -
---
-
-CREATE VIEW job_cache_signatures AS
- SELECT jobs.id AS job_id,
-    md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
-    md5(string_agg(DISTINCT (commits.updated_at)::text, ', '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
-    md5(string_agg(DISTINCT (job_issues.updated_at)::text, ', '::text ORDER BY (job_issues.updated_at)::text)) AS job_issues_signature,
-    count(DISTINCT job_issues.*) AS job_issues_count,
-    md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
-    ( SELECT md5(string_agg((jobs_tags.tag_id)::text, ','::text ORDER BY jobs_tags.tag_id)) AS md5
-           FROM jobs_tags
-          WHERE (jobs_tags.job_id = jobs.id)) AS tags_signature,
-    ( SELECT (((count(DISTINCT tasks.id))::text || ' - '::text) || (max(tasks.updated_at))::text)
-           FROM tasks
-          WHERE (tasks.job_id = jobs.id)) AS tasks_signature
-   FROM (((((jobs
-     LEFT JOIN job_issues ON ((jobs.id = job_issues.job_id)))
-     LEFT JOIN commits ON (((jobs.tree_id)::text = (commits.tree_id)::text)))
-     LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
-     LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
-     LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
-  GROUP BY jobs.id;
-
-
---
--- Name: job_specifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE job_specifications (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    data jsonb
 );
 
 
@@ -468,6 +450,16 @@ CREATE VIEW job_stats AS
            FROM tasks
           WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'passed'::text))) AS passed
    FROM jobs;
+
+
+--
+-- Name: jobs_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE jobs_tags (
+    job_id uuid,
+    tag_id uuid
+);
 
 
 --
@@ -1161,6 +1153,36 @@ CREATE RULE "_RETURN" AS
 
 
 --
+-- Name: _RETURN; Type: RULE; Schema: public; Owner: -
+--
+
+CREATE RULE "_RETURN" AS
+    ON SELECT TO job_cache_signatures DO INSTEAD  SELECT jobs.id AS job_id,
+    md5(string_agg(DISTINCT (branches.updated_at)::text, ',
+               '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
+    md5(string_agg(DISTINCT (commits.updated_at)::text, ',
+               '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
+    md5(string_agg(DISTINCT (job_issues.updated_at)::text, ',
+               '::text ORDER BY (job_issues.updated_at)::text)) AS job_issues_signature,
+    count(DISTINCT job_issues.*) AS job_issues_count,
+    md5(string_agg(DISTINCT (repositories.updated_at)::text, ',
+               '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
+    ( SELECT (((count(DISTINCT tasks.id))::text || ' - '::text) || (max(tasks.updated_at))::text)
+           FROM tasks
+          WHERE (tasks.job_id = jobs.id)) AS tasks_signature,
+    ( SELECT count(DISTINCT tree_attachments.id) AS count
+           FROM tree_attachments
+          WHERE (tree_attachments.tree_id = (jobs.tree_id)::text)) AS tree_attachments_count
+   FROM (((((jobs
+     LEFT JOIN job_issues ON ((jobs.id = job_issues.job_id)))
+     LEFT JOIN commits ON (((jobs.tree_id)::text = (commits.tree_id)::text)))
+     LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
+     LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
+     LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
+  GROUP BY jobs.id;
+
+
+--
 -- Name: update_updated_at_column_of_branches; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1453,6 +1475,8 @@ INSERT INTO schema_migrations (version) VALUES ('41');
 INSERT INTO schema_migrations (version) VALUES ('42');
 
 INSERT INTO schema_migrations (version) VALUES ('43');
+
+INSERT INTO schema_migrations (version) VALUES ('45');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 

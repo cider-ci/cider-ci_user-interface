@@ -5,13 +5,14 @@
 :ruby
   job ||= @job
   state = job.state
-  ecs = job.job_cache_signature
-  ccss = CommitCacheSignature.where(%< commit_id IN (?) >, job.commits.map(&:id))
-  relevant_ccss = [ccss.map(&:commit_id), ccss.map(&:branches_signature), ccss.map(&:repositories_signature), ccss.map(&:jobs_signature)].flatten
+  jcs = job.job_cache_signature
+  ccs = CommitCacheSignature.where(%< commit_id IN (?) >, job.commits.map(&:id))
+  relevant_ccs = [ccs.map(&:commit_id), ccs.map(&:branches_signature),
+    ccs.map(&:repositories_signature), ccs.map(&:jobs_signature)].flatten
 
-  cache_signature = CacheSignature.signature job.id, job.updated_at, ecs.repositories_signature,
-    ecs.branches_signature, ecs.tasks_signature, ecs.job_issues_count,
-    params, @trials.collection_cache_signature, relevant_ccss
+  cache_signature = CacheSignature.signature job.cache_signature,
+    jcs.repositories_signature, jcs.branches_signature, jcs.tasks_signature,
+    jcs.job_issues_count, params, @trials.collection_cache_signature, relevant_ccs
 
 - cache cache_signature do
 
@@ -32,13 +33,13 @@
               %i.icon-analytics
               Analytics
 
-          -if ecs.job_issues_count > 0
-            %li#issues-link.reload{data: {cache_signature: ecs.job_issues_count}}
-              - if ecs.job_issues_count <= 0
+          -if jcs.job_issues_count > 0
+            %li#issues-link.reload{data: {cache_signature: jcs.job_issues_count}}
+              - if jcs.job_issues_count <= 0
                 %span.text-muted Issues
               - else
                 = link_to issues_workspace_job_path(job) do
-                  %span.text-danger= pluralize(ecs.job_issues_count,"Issue")
+                  %span.text-danger= pluralize(jcs.job_issues_count,"Issue")
 
           %li
             = link_to job_specification_workspace_job_path(job) do
@@ -53,13 +54,14 @@
               - else
                 %span.text-muted Result
 
-          = render '/breadcrumbs/items/tree_attachments', tree_id: job.tree_id
+          -if jcs.tree_attachments_count > 0 then
+            = render '/breadcrumbs/items/tree_attachments', tree_id: job.tree_id
 
 
-    #issues-alert.reload{data: {cache_signature: ecs.job_issues_count}}
-      - if ecs.job_issues_count >= 1
+    #issues-alert.reload{data: {cache_signature: jcs.job_issues_count}}
+      - if jcs.job_issues_count >= 1
         .alert.alert-danger
-          %p This job has #{pluralize(ecs.job_issues_count,"issue")}!
+          %p This job has #{pluralize(jcs.job_issues_count,"issue")}!
 
 
     #job.job{data: {id: job.id, name: job.name, state: job.state}}
@@ -93,7 +95,7 @@
 
       = render 'summary_stats', job: job, cache_signature: cache_signature
 
-      - cache relevant_ccss  do |commits_cache_signature|
+      - cache relevant_ccs  do |commits_cache_signature|
 
         #commits.commits.reload.replace-without-animation{data: {cache_signature: commits_cache_signature}}
           %h2 #{ job.commits.count > 1 ? "Commits" : "Commit"}
