@@ -2,7 +2,7 @@ module Workspace::JobsControllerModules::JobsFilter
   extend ActiveSupport::Concern
 
   def build_jobs_for_params
-    filter_jobs_for_tree_id filter_jobs_for_tags filter_by_repository_names \
+    filter_jobs_for_tree_id filter_by_repository_names \
       filter_jobs_for_branch_name set_per_page build_jobs_initial_scope
   end
 
@@ -40,14 +40,6 @@ module Workspace::JobsControllerModules::JobsFilter
     unless branch_name_param.empty?
       jobs.joins(commits: :branches) \
         .where(branches: { name: branch_name_param })
-    else
-      jobs
-    end
-  end
-
-  def filter_jobs_for_tags(jobs)
-    if job_tags_filter.count > 0
-      jobs.joins(:tags).where(tags: { tag: job_tags_filter })
     else
       jobs
     end

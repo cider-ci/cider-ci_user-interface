@@ -92,7 +92,7 @@ class Workspace::JobsController < WorkspaceController
     @job = Job.select(:id, :state, :updated_at,
                       :name, :tree_id, :description, :result).find(params[:id])
     require_sign_in unless @job.public_view_permission?
-    @link_params = params.slice(:branch, :page, :repository, :job_tags)
+    @link_params = params.slice(:branch, :page, :repository)
     @trials = Trial.joins(task: :job).where('jobs.id = ?', @job.id)
     set_and_filter_tasks params
     set_filter_params params
@@ -137,10 +137,6 @@ class Workspace::JobsController < WorkspaceController
 
   def result
     @job = Job.find(params[:id])
-  end
-
-  def param_tags
-    params[:job][:tags].split(',').select(&:present?)
   end
 
 end

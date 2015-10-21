@@ -60,11 +60,6 @@ class WorkspaceController < ApplicationController
     end
   end
 
-  def job_tags_filter
-    params.try('[]', 'job_tags').presence \
-      .split(',').map(&:strip).reject(&:blank?).sort.uniq rescue []
-  end
-
   def tree_id_filter
     params.try('[]', 'tree_id').presence
   end

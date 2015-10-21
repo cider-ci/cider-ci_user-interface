@@ -4,8 +4,6 @@
 
 =form_for @job, url: workspace_job_path(@job),method: 'PUT', html: {class: "form-horizontal"} do |form|
 
-  - tags= @job.tags
-
   =form_group "Priority" do |opts|
     = form.text_field :priority, type: :number, class: "form-control", id: opts[:control_id]
 

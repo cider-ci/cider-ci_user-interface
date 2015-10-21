@@ -13,8 +13,6 @@ class Job < ActiveRecord::Base
 
   belongs_to :job_specification
 
-  has_and_belongs_to_many :tags
-
   has_many :commits, primary_key: 'tree_id', foreign_key: 'tree_id'
   has_many :job_issues
   has_many :branches, through: :commits
@@ -57,17 +55,6 @@ class Job < ActiveRecord::Base
 
   def create_tasks_and_trials
     Messaging.publish('job.create-tasks-and-trials', job_id: id)
-  end
-
-  def add_strings_as_tags(seq_of_strings)
-    seq_of_strings \
-      .map(&:strip).reject(&:blank?).compact.map { |name| Tag.tagify name } \
-      .map { |tagified_name| Tag.find_or_create_by(tag: tagified_name) } \
-      .each { |tag| self.add_tag tag }
-  end
-
-  def add_tag(tag)
-    tags << tag unless tags.include? tag
   end
 
   def sha1

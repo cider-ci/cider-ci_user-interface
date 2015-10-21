@@ -453,16 +453,6 @@ CREATE VIEW job_stats AS
 
 
 --
--- Name: jobs_tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE jobs_tags (
-    job_id uuid,
-    tag_id uuid
-);
-
-
---
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -479,18 +469,6 @@ CREATE TABLE submodules (
     submodule_commit_id character varying NOT NULL,
     path text NOT NULL,
     commit_id character varying NOT NULL
-);
-
-
---
--- Name: tags; Type: TABLE; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE TABLE tags (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    tag character varying,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -678,14 +656,6 @@ ALTER TABLE ONLY repositories
 
 ALTER TABLE ONLY submodules
     ADD CONSTRAINT submodules_pkey PRIMARY KEY (commit_id, path);
-
-
---
--- Name: tags_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
---
-
-ALTER TABLE ONLY tags
-    ADD CONSTRAINT tags_pkey PRIMARY KEY (id);
 
 
 --
@@ -956,20 +926,6 @@ CREATE INDEX index_jobs_on_tree_id ON jobs USING btree (tree_id);
 
 
 --
--- Name: index_jobs_tags_on_job_id_and_tag_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE UNIQUE INDEX index_jobs_tags_on_job_id_and_tag_id ON jobs_tags USING btree (job_id, tag_id);
-
-
---
--- Name: index_jobs_tags_on_tag_id_and_job_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_jobs_tags_on_tag_id_and_job_id ON jobs_tags USING btree (tag_id, job_id);
-
-
---
 -- Name: index_repositories_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1009,13 +965,6 @@ CREATE INDEX index_submodules_on_commit_id ON submodules USING btree (commit_id)
 --
 
 CREATE INDEX index_submodules_on_submodule_commit_id ON submodules USING btree (submodule_commit_id);
-
-
---
--- Name: index_tags_on_tag; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX index_tags_on_tag ON tags USING btree (tag);
 
 
 --
@@ -1100,20 +1049,6 @@ CREATE INDEX index_trials_on_state ON trials USING btree (state);
 --
 
 CREATE INDEX index_trials_on_task_id ON trials USING btree (task_id);
-
-
---
--- Name: tags_tag_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX tags_tag_idx ON tags USING gin (tag gin_trgm_ops);
-
-
---
--- Name: tags_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
---
-
-CREATE INDEX tags_to_tsvector_idx ON tags USING gin (to_tsvector('english'::regconfig, (tag)::text));
 
 
 --
@@ -1222,13 +1157,6 @@ CREATE TRIGGER update_updated_at_column_of_jobs BEFORE UPDATE ON jobs FOR EACH R
 --
 
 CREATE TRIGGER update_updated_at_column_of_repositories BEFORE UPDATE ON repositories FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
-
-
---
--- Name: update_updated_at_column_of_tags; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_tags BEFORE UPDATE ON tags FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1361,22 +1289,6 @@ ALTER TABLE ONLY job_issues
 
 
 --
--- Name: jobs-tags_jobs_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY jobs_tags
-    ADD CONSTRAINT "jobs-tags_jobs_fkey" FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE;
-
-
---
--- Name: jobs-tags_tags_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY jobs_tags
-    ADD CONSTRAINT "jobs-tags_tags_fkey" FOREIGN KEY (tag_id) REFERENCES tags(id) ON DELETE CASCADE;
-
-
---
 -- Name: jobs_job-specifications_fkey; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1477,6 +1389,8 @@ INSERT INTO schema_migrations (version) VALUES ('42');
 INSERT INTO schema_migrations (version) VALUES ('43');
 
 INSERT INTO schema_migrations (version) VALUES ('45');
+
+INSERT INTO schema_migrations (version) VALUES ('46');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
 
