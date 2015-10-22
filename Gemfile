@@ -5,7 +5,7 @@ source 'https://rubygems.org'
 ####################################################################
 
 # RAILS
-gem 'rails', '~> 4.2.1'
+gem 'rails', '~> 4.2'
 
 # DATABASE
 gem 'activerecord-jdbcpostgresql-adapter',  platform: :jruby
