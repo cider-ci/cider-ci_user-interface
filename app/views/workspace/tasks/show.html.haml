@@ -9,15 +9,11 @@
     %ol.breadcrumb.pull-left
       = render '/breadcrumbs/task', task: task
   .col-md-6
-    %ol.breadcrumb.with-circle-separator.pull-right
-      %li 
-        - if task.result 
+    - if task.result
+      %ol.breadcrumb.with-circle-separator.pull-right
+        %li
           = link_to result_workspace_task_path(task) do
             Result
-        - else 
-          %span.text-muted Result
-
-
 
 %ul.list-inline.actions.pull-right
   %li.for-signed-in-user
@@ -25,10 +21,10 @@
       = hidden_field_tag :authenticity_token, form_authenticity_token
       = button_tag type: :submit, class: "btn btn-primary" do
         %i.icon-retry
-        Retry 
+        Retry
 
 
-%h1 
+%h1
   %span.label{class: label_class_for_state(state)}<>
     %i{class: icon_class_for_state(state)}<>
   %span &nbsp; Task "#{task.name}"
@@ -43,15 +39,15 @@
       - task.trials.reorder(created_at: :asc).each_with_index do |trial,i|
         %tr.trial
           %td
-            = link_to workspace_trial_path(trial), 
+            = link_to workspace_trial_path(trial),
               class: "label trial-label #{label_class_for_state(trial.state)}" do
-              %i{class: icon_class_for_state(trial.state)} 
+              %i{class: icon_class_for_state(trial.state)}
               =(i+1).ordinalize
           %td
-            %ul.list-inline 
+            %ul.list-inline
               - if trial.scripts.is_a? Hash
-                = render partial: 'script_label', 
-                  collection: trial.scripts.map{|k,v| v.merge({"id" => k})}, 
+                = render partial: 'script_label',
+                  collection: trial.scripts.map{|k,v| v.merge({"id" => k})},
                   as: :script,
                   locals: {trial: trial}
 
@@ -61,8 +57,8 @@
   %thead
   %tbody
     - task.attributes.reject{|k,v| %().include? k}.sort.each do |k,v|
-      %tr 
-        %td=k 
+      %tr
+        %td=k
         %td
           %pre.script{style: "border: none; padding: 0; margin: 0"}<>
             = (v.is_a? Array or v.is_a? Hash) ? v.to_yaml : v

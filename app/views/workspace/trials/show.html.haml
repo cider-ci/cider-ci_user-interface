@@ -23,6 +23,11 @@
             =render '/breadcrumbs/trial', trial: trial
         .col-md-6
           %ol.breadcrumb.with-circle-separator.pull-right
+            %li
+              = link_to analytics_workspace_trial_path(trial) do
+                %i.icon-analytics
+                Analytics
+
             = render 'breadcrumbs/items/trial_attachments', trial: trial
 
             - if issues.count > 0
@@ -34,11 +39,6 @@
               %li
                 = link_to result_workspace_trial_path(trial) do
                   Result
-
-            %li
-              = link_to duration_analysis_workspace_trial_path(trial) do
-                %i.icon-gantt-chart
-                Duration Analysis
 
 
 

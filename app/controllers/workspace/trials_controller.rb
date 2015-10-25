@@ -42,6 +42,9 @@ class Workspace::TrialsController < WorkspaceController
   def scripts_gantt_chart
   end
 
+  def scripts_dependency_graph
+  end
+
   private
 
   def script_order(s)

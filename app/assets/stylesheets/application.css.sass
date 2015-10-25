@@ -27,6 +27,15 @@
 @import lib/stats-and-progress
 
 
+svg
+  #scripts-dependency-graph
+    .node
+      @each $state in $ci-states
+        $i: index($ci-states,$state)
+        &.#{$state}
+          ellipse
+            fill: nth($ci-colors-bg,$i)
+
 svg.scripts.timeline
   alignment-baseline: hanging
   dominant-baseline: hanging

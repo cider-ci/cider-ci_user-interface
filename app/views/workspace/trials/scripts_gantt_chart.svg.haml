@@ -7,6 +7,13 @@
 
   :ruby
 
+    show_arrows= if params[:arrows].present?
+                   case params[:arrows].downcase
+                   when "1", "true"
+                     true
+                   end
+                 end
+
 
     scripts = trial.scripts.with_indifferent_access.select{ |k,v|
       (v[:started_at] || v[:skipped_at]) && ( v[:finished_at] || v[:aborted_at] || v[:skipped_at])
@@ -87,7 +94,7 @@
     arrows = scripts_key_map.map{|k,v| v}.map.with_index{|target, i|
       x2= target[:rect][:x]
       y2= target[:rect][:y] + row_height/2
-      (trial.scripts[target[:key]].try(:[],'start-when') || []).map {|dependency|
+      (trial.scripts[target[:key]].try(:[],'start-when') || []).map{|k,v| v || k}.map{|dependency|
         if source = (scripts_key_map[dependency['script']] rescue nil)
           states = dependency['states'] || ['passed']
           if states.include? 'executing'
@@ -121,8 +128,9 @@
     - script_rects.each do |r|
       %rect{r.to_h}
 
-    - arrows.each do |a|
-      %line.start-dependency{a.to_h.merge('marker-end': "url(#tip)")}
+    - if show_arrows
+      - arrows.each do |a|
+        %line.start-dependency{a.to_h.merge('marker-end': "url(#tip)")}
 
     - labels.each_with_index do |l,i|
       %text{l.to_h}

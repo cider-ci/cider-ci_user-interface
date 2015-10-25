@@ -80,15 +80,10 @@
           = link_to workspace_trial_path(id: t.id) do
             %i.icon-trial
             %span #{t.name}
-          = link_to duration_analysis_workspace_trial_path(id: t.id) do
+          = link_to analytics_workspace_trial_path(id: t.id) do
             %i.icon-gantt-chart{style: 'margin-left: 1em'}
             - if t.duration > 300
               %span.humanize-duration{data: {duration: t.duration}} #{t.duration} Seconds
             - else
               %span #{pluralize t.duration.round, "second"}
-
-
-
-
-
 
