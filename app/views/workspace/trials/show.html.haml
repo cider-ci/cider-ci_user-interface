@@ -60,7 +60,15 @@
       %h1{style: "margin-top: 10px"}
         %span{class: "label #{label_class_for_state(trial.state)}"}<>
           %i{class: icon_class_for_state(trial.state)}<>
-        %span{style: "margin-left: .5em"} Trial for the task "#{trial.task.name}"
+        %span{style: "margin-left: .5em"}
+          Trial for
+          "#{trial.task.name}"
+          in
+          "#{trial.task.job.name}"
+          - if (trial.task.job.repositories.first rescue nil)
+            of
+            "#{trial.task.job.repositories.first.name}"
+
 
 
       %p
@@ -82,7 +90,7 @@
           %code= trial.error
 
 
-      .scripts
+      %section#overview
         - if trial.scripts.blank?
 
           .panel.panel-warning
@@ -96,12 +104,61 @@
                 save space.  Administrators can adjust the retention time.
 
         - else
-          %h2 Scripts
+          %h2 Scripts Overview
           %ul.list-inline
             = render partial: 'script_label',
               collection: scripts,
               as: :script
 
-          %ul.list-unstyled.scripts
-            = render partial: 'script',
-              collection: scripts
+
+      %section#start-dependencies
+        :ruby
+          has_start_when = lambda{|trial|
+            trial.scripts.present?  \
+              && trial.scripts.to_a.length >= 2 \
+              && trial.scripts.map{|k,v| v || k} \
+                .any?{|v| v.with_indifferent_access[:'start-when']}}
+        - if has_start_when.(trial)
+          :ruby
+            svg_start_deps_path= scripts_start_dependency_graph_workspace_trial_path(format: :svg)
+          %h2
+            =link_to svg_start_deps_path do
+              %i.fa.fa-image
+              Start-Dependencies
+          %object#dependencies{type: 'image/svg+xml', data: svg_start_deps_path, style: "width: 100%" }
+
+      %section#terminate-dependencies
+        :ruby
+          has_terminate_when = lambda{|trial|
+            trial.scripts.present?  \
+              && trial.scripts.to_a.length >= 2 \
+              && trial.scripts.map{|k,v| v || k} \
+                .any?{|v| v.with_indifferent_access[:'terminate-when']}}
+        - if has_terminate_when.(trial)
+          :ruby
+            svg_terminate_deps_path= scripts_terminate_dependency_graph_workspace_trial_path(format: :svg)
+          %h2
+            =link_to svg_terminate_deps_path do
+              %i.fa.fa-image
+              Terminate-Dependencies
+          %object#dependencies{type: 'image/svg+xml', data: svg_terminate_deps_path, style: "width: 100%" }
+
+
+      %section#gantt-chart
+
+        :ruby
+          gantt_chart_path= scripts_gantt_chart_workspace_trial_path(format: :svg)
+        %h2
+          = link_to gantt_chart_path do
+            %i.icon-gantt-chart
+            Gantt-Chart
+        %object#gant-chart{type: 'image/svg+xml', data: gantt_chart_path, style: "width: 100%" }
+
+
+      %section.scripts-details
+        %h2 Script Details
+        %ul.list-unstyled.scripts
+          = render partial: 'script',
+            collection: scripts
+
+

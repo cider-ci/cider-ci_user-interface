@@ -4,6 +4,8 @@
 
 class Workspace::TrialsController < WorkspaceController
 
+  include ::Workspace::Trials::ScriptDependencyGraph
+
   skip_before_action :require_sign_in,
                      only: [:show, :attachments]
 
@@ -43,6 +45,12 @@ class Workspace::TrialsController < WorkspaceController
   end
 
   def scripts_dependency_graph
+  end
+
+  def scripts_start_dependency_graph
+  end
+
+  def scripts_terminate_dependency_graph
   end
 
   private

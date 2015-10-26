@@ -7,6 +7,7 @@
 # Ignore bundler config.
 
 #config/secrets.yml
+.mux.yml
 /.bundle
 /.ruby-version
 /.sass-cache
@@ -22,3 +23,5 @@ config/environments/*.local.yml
 config/settings.local.yml
 config/settings/*.local.yml
 result.json
+/node_modules
+.rubocop_todo.yml

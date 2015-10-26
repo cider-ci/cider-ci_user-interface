@@ -48,6 +48,8 @@ CiderCI::Application.routes.draw do
         get :analytics
         get 'scripts-gantt-chart'
         get 'scripts-dependency-graph'
+        get 'scripts-start-dependency-graph'
+        get 'scripts-terminate-dependency-graph'
       end
     end
 

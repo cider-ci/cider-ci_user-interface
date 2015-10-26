@@ -63,7 +63,8 @@
       svg = xml.to_s
     }
 
-    graphviz_nodes = trial.scripts.with_indifferent_access.map{|k,v| v}
+    graphviz_nodes = trial.scripts.with_indifferent_access
+      .map{|k,v| v.merge(key: (v[:key] || k), name: (v[:name] || k)) }
       .map{|n| n.slice(:key,:name)}.map{ |n|
         id = sanitize.(n[:key])
         label = sanitize.(n[:name])

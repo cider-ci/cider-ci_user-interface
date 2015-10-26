@@ -46,9 +46,9 @@
 
     duration = finished_at - started_at
 
-    width= 800
-    row_height= 24
-    row_margin= 12
+    width= 1024
+    row_height= 21
+    row_margin= 7
 
     height= scripts.length * (row_height + row_margin)
 
@@ -79,6 +79,7 @@
       { x: x,
         y: script_rect[:y] + row_height/2,
         text: "#{script[:name]} (#{pluralize secs, 'second'})",
+        key: "#{script[:key]}",
         'text-anchor': anchor,
         'dominant-baseline': 'central'
         }}
@@ -134,5 +135,6 @@
 
     - labels.each_with_index do |l,i|
       %text{l.to_h}
-        = l[:text]
+        %a{'xlink:href': (workspace_trial_path(trial) + "##{l[:key]}"), 'xlink:show': 'new'}
+          = l[:text]
 

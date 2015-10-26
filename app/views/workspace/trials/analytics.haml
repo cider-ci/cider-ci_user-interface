@@ -64,21 +64,31 @@
     %section#dependencies.depencencies
 
       %h2 Dependencies
-      %a{href: dependency_graph_svg_href.()} Show only the graph.
 
-      Show
-      %a{href: analytics_workspace_trial_path(params_options.except('terminate-when'))} start
-      or
-      %a{href: analytics_workspace_trial_path(params_options.merge('terminate-when': true))} terminate
-      dependencies.
+      %section.start-dependencies
+        :ruby
+          start_dependencies_svg_path= dependency_graph_svg_href.()
+        %h3
+          Start-Dependencies
+          %span
+            =link_to start_dependencies_svg_path do
+              %i.fa.fa-image
+              SVG
 
-      Switch layouter to:
-      %a{href: analytics_workspace_trial_path(params_options.merge('layouter': 'hierarcic'))}<> &nbsp;hierarchic
-      ,
-      %a{href: analytics_workspace_trial_path(params_options.merge('layouter': 'force-directed'))}<> &nbsp;force directed
-      \.
+        %object#dependencies{type: 'image/svg+xml', data: start_dependencies_svg_path, style: "width: 100%" }
 
-      %object#dependencies{type: 'image/svg+xml', data: dependency_graph_svg_href.(), style: "width: 100%" }
+
+      %section.terminate-dependencies
+        :ruby
+          terminate_dependencies_svg_path= dependency_graph_svg_href.('terminate-when': true)
+        %h3
+          Terminate-Dependencies
+          %span
+            =link_to terminate_dependencies_svg_path do
+              %i.fa.fa-image
+              SVG
+        %object#dependencies{type: 'image/svg+xml', data: terminate_dependencies_svg_path, style: "width: 100%" }
+
 
 
     %section#timeline.timeline

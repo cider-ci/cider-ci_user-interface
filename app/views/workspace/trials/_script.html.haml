@@ -5,10 +5,19 @@
 - state =script["state"]
 %li.script.well{data: {state: state, name: script["name"], started_at: script["started_at"]}}
 
-  %h3{id: script["name"], name: script["name"]}
-    %span.label{class: label_class_for_state(state)}<>
-      %i{class: icon_class_for_state(state)}<>
-    %span &nbsp; "#{script["name"]}"
+  .row
+    .col-md-8
+      .pull-left
+        %h3{id: script["name"], name: script["name"], style: 'margin-top: 0px'}
+          %span.label{class: label_class_for_state(state)}<>
+            %i{class: icon_class_for_state(state)}<>
+          %span &nbsp; "#{script["name"]}"
+
+    .col-md-4
+      .pull-right
+        %a{href: "#overview"}
+          %i.fa.fa-arrow-up
+          Overview
 
   - started_at= Time.zone.parse(script["started_at"]) rescue false
   - finished_at= Time.zone.parse(script["finished_at"]) rescue false

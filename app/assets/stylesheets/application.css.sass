@@ -26,7 +26,6 @@
 
 @import lib/stats-and-progress
 
-
 svg
   #scripts-dependency-graph
     .node
@@ -37,6 +36,8 @@ svg
             fill: nth($ci-colors-bg,$i)
 
 svg.scripts.timeline
+  font-size: $font-size-base
+  font-family: $font-family-base
   alignment-baseline: hanging
   dominant-baseline: hanging
   rect.script-background
