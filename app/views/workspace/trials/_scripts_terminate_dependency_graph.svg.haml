@@ -1,6 +1,5 @@
 :ruby
-  trial= Trial.find(params[:id])
-  cache_signature= scripts_dependency_svg_graph_cache_signature(trial,:terminate)
+  trial ||= Trial.find(params[:id])
+  cache_signature ||= scripts_dependency_svg_graph_cache_signature(trial,:terminate)
 - cache cache_signature do
-  #scripts-terminate-dependency-svg-graph.reload{data: {cache_signature: cache_signature}}
-    != scripts_dependency_svg_graph trial, :terminate
+  != scripts_dependency_svg_graph trial, :terminate

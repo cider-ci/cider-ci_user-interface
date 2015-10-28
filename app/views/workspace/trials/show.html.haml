@@ -119,33 +119,45 @@
           .col-lg-6
             - if has_start_when_dependencies
               %section#start-dependencies
-                :ruby
-                  svg_start_deps_path=
-                    scripts_start_dependency_graph_workspace_trial_path(format: :svg)
-                  cache_signature= scripts_dependency_svg_graph_cache_signature(trial)
-                %h2
-                  =link_to svg_start_deps_path do
-                    %i.fa.fa-image
-                    Start-Dependencies
-                #start-dependencies-graph.reload{style: 'text-align: center;',
-                    data: { cache_signature: cache_signature}}
-                  = render 'scripts_start_dependency_graph.svg.haml',
-                    trial: trial, cache_signature: cache_signature
+                - begin
+                  :ruby
+                    svg_start_deps_path=
+                      scripts_start_dependency_graph_workspace_trial_path(format: :svg)
+                    cache_signature= scripts_dependency_svg_graph_cache_signature(trial)
+                  %h2
+                    =link_to svg_start_deps_path do
+                      %i.fa.fa-image
+                      Start-Dependencies
+                  #start-dependencies-graph.reload{style: 'text-align: center;',
+                      data: { cache_signature: cache_signature}}
+                    = render 'scripts_start_dependency_graph.svg.haml',
+                      trial: trial, cache_signature: cache_signature
+                - rescue Exception => e
+                  - Rails.logger.error Formatter.exception_to_log_s e
+                  .alert.alert-warning
+                    Error during rendering of the dependency graph!
+                    See the server logs for details.
 
             - if has_terminate_when_dependencies
               %section#terminate-dependencies
-                :ruby
-                  svg_terminate_deps_path=
-                    scripts_terminate_dependency_graph_workspace_trial_path(format: :svg)
-                  cache_signature= scripts_dependency_svg_graph_cache_signature(trial,:terminate)
-                %h2
-                  =link_to svg_terminate_deps_path do
-                    %i.fa.fa-image
-                    Terminate-Dependencies
-                #terminate-dependencies-graph.reload{style: 'text-align: center;',
-                    data: { cache_signature: cache_signature}}
-                  = render 'scripts_terminate_dependency_graph.svg.haml',
-                    trial: trial, cache_signature: cache_signature
+                - begin
+                  :ruby
+                    svg_terminate_deps_path=
+                      scripts_terminate_dependency_graph_workspace_trial_path(format: :svg)
+                    cache_signature= scripts_dependency_svg_graph_cache_signature(trial,:terminate)
+                  %h2
+                    =link_to svg_terminate_deps_path do
+                      %i.fa.fa-image
+                      Terminate-Dependencies
+                  #terminate-dependencies-graph.reload{style: 'text-align: center;',
+                      data: { cache_signature: cache_signature}}
+                    = render 'scripts_terminate_dependency_graph.svg.haml',
+                      trial: trial, cache_signature: cache_signature
+                - rescue Exception => e
+                  - Rails.logger.error Formatter.exception_to_log_s e
+                  .alert.alert-warning
+                    Error during rendering of the dependency graph!
+                    See the server logs for details.
 
         .div{class: has_some_dependency ? "col-lg-6" : "col-lg-12"}
           %section#gantt-chart
@@ -153,11 +165,19 @@
               = link_to scripts_gantt_chart_workspace_trial_path(format: :svg) do
                 %i.icon-gantt-chart
                 Gantt-Chart
-            :ruby
-              cache_signature= CacheSignature.signature(trial)
-            #scripts-gantt-chart.reload{style: 'text-align: center',
-               data: { cache_signature: cache_signature}}
-              = render 'scripts_gantt_chart.svg.haml', trial: trial
+            - begin
+              :ruby
+                cache_signature= CacheSignature.signature(trial)
+              #scripts-gantt-chart.reload{style: 'text-align: center',
+                 data: { cache_signature: cache_signature}}
+                = render 'scripts_gantt_chart.svg.haml', trial: trial
+            - rescue Exception => e
+              - Rails.logger.error Formatter.exception_to_log_s e
+              .alert.alert-warning
+                Error during rendering of the Gantt-chart!
+                See the server logs for details.
+
+
 
       %section.scripts-details
         %h2 Script Details

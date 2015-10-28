@@ -1,3 +1,5 @@
+require 'active_support/core_ext/numeric/bytes'
+
 require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
@@ -59,7 +61,7 @@ module CiderCI
 
     config.action_controller.relative_url_root = '/cider-ci/ui'
 
-    config.cache_store = :memory_store
+    config.cache_store = :memory_store, {size: (Settings.ui_cache_size_megabytes.presence || 128).megabytes}
 
   end
 end

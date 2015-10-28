@@ -8,10 +8,11 @@ module ::Workspace::Trials::ScriptDependencyGraph
       :scripts_dependency_svg_graph_cache_signature
   end
 
-  def scripts_dependency_svg_graph_cache_signature(trial, _type = :start)
-    CacheSignature.signature trial.task.task_specification_id,
-      trial.scripts.with_indifferent_access.map { |k, v| v || k } \
-      .sort_by { |s| s[:key] || s[:name] || s[:stated_at] || s[:skipped_at] } \
+  def scripts_dependency_svg_graph_cache_signature(trial, type = :start)
+    CacheSignature.signature type, trial.task.task_specification_id,
+      trial.scripts.with_indifferent_access \
+      .map { |k, v| v.merge(key: (v[:key] || k), name: (v[:name] || k)) } \
+      .sort_by { |s| s[:key].presence || s[:name].presence || s[:stated_at].presence || s[:skipped_at].presence || s.to_s } \
       .map { |s| s[:state] }
   end
 
