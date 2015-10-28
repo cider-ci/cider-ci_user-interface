@@ -45,9 +45,7 @@ CiderCI::Application.routes.draw do
         get 'result'
         get :issues, action: 'issues'
         delete 'issues/:issue_id', action: 'delete_issue', as: 'issue'
-        get :analytics
         get 'scripts-gantt-chart'
-        get 'scripts-dependency-graph'
         get 'scripts-start-dependency-graph'
         get 'scripts-terminate-dependency-graph'
       end

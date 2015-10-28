@@ -23,11 +23,6 @@
             =render '/breadcrumbs/trial', trial: trial
         .col-md-6
           %ol.breadcrumb.with-circle-separator.pull-right
-            %li
-              = link_to analytics_workspace_trial_path(trial) do
-                %i.icon-analytics
-                Analytics
-
             = render 'breadcrumbs/items/trial_attachments', trial: trial
 
             - if issues.count > 0
@@ -39,7 +34,6 @@
               %li
                 = link_to result_workspace_trial_path(trial) do
                   Result
-
 
 
       #issues-alert.reload{data: {cache_signature: issues.count}}
@@ -109,56 +103,64 @@
             = render partial: 'script_label',
               collection: scripts,
               as: :script
+      :ruby
+        has_start_when_dependencies = trial.scripts.present? \
+          && trial.scripts.to_a.length >= 2 \
+          && trial.scripts.map{|k,v| v || k}.any?{|v| v.with_indifferent_access[:'start-when']}
 
+        has_terminate_when_dependencies = trial.scripts.present? \
+            && trial.scripts.to_a.length >= 2 \
+            && trial.scripts.map{|k,v| v || k}.any?{|v| v.with_indifferent_access[:'terminate-when']}
 
-      %section#start-dependencies
-        :ruby
-          has_start_when = lambda{|trial|
-            trial.scripts.present?  \
-              && trial.scripts.to_a.length >= 2 \
-              && trial.scripts.map{|k,v| v || k} \
-                .any?{|v| v.with_indifferent_access[:'start-when']}}
-        - if has_start_when.(trial)
-          :ruby
-            svg_start_deps_path= scripts_start_dependency_graph_workspace_trial_path(format: :svg)
-          %h2
-            =link_to svg_start_deps_path do
-              %i.fa.fa-image
-              Start-Dependencies
-          %object#dependencies{type: 'image/svg+xml', data: svg_start_deps_path, style: "width: 100%" }
+        has_some_dependency = has_start_when_dependencies || has_terminate_when_dependencies
 
-      %section#terminate-dependencies
-        :ruby
-          has_terminate_when = lambda{|trial|
-            trial.scripts.present?  \
-              && trial.scripts.to_a.length >= 2 \
-              && trial.scripts.map{|k,v| v || k} \
-                .any?{|v| v.with_indifferent_access[:'terminate-when']}}
-        - if has_terminate_when.(trial)
-          :ruby
-            svg_terminate_deps_path= scripts_terminate_dependency_graph_workspace_trial_path(format: :svg)
-          %h2
-            =link_to svg_terminate_deps_path do
-              %i.fa.fa-image
-              Terminate-Dependencies
-          %object#dependencies{type: 'image/svg+xml', data: svg_terminate_deps_path, style: "width: 100%" }
+      .row
+        - if has_some_dependency
+          .col-lg-6
+            - if has_start_when_dependencies
+              %section#start-dependencies
+                :ruby
+                  svg_start_deps_path=
+                    scripts_start_dependency_graph_workspace_trial_path(format: :svg)
+                  cache_signature= scripts_dependency_svg_graph_cache_signature(trial)
+                %h2
+                  =link_to svg_start_deps_path do
+                    %i.fa.fa-image
+                    Start-Dependencies
+                #start-dependencies-graph.reload{style: 'text-align: center;',
+                    data: { cache_signature: cache_signature}}
+                  = render 'scripts_start_dependency_graph.svg.haml',
+                    trial: trial, cache_signature: cache_signature
 
+            - if has_terminate_when_dependencies
+              %section#terminate-dependencies
+                :ruby
+                  svg_terminate_deps_path=
+                    scripts_terminate_dependency_graph_workspace_trial_path(format: :svg)
+                  cache_signature= scripts_dependency_svg_graph_cache_signature(trial,:terminate)
+                %h2
+                  =link_to svg_terminate_deps_path do
+                    %i.fa.fa-image
+                    Terminate-Dependencies
+                #terminate-dependencies-graph.reload{style: 'text-align: center;',
+                    data: { cache_signature: cache_signature}}
+                  = render 'scripts_terminate_dependency_graph.svg.haml',
+                    trial: trial, cache_signature: cache_signature
 
-      %section#gantt-chart
-
-        :ruby
-          gantt_chart_path= scripts_gantt_chart_workspace_trial_path(format: :svg)
-        %h2
-          = link_to gantt_chart_path do
-            %i.icon-gantt-chart
-            Gantt-Chart
-        %object#gant-chart{type: 'image/svg+xml', data: gantt_chart_path, style: "width: 100%" }
-
+        .div{class: has_some_dependency ? "col-lg-6" : "col-lg-12"}
+          %section#gantt-chart
+            %h2
+              = link_to scripts_gantt_chart_workspace_trial_path(format: :svg) do
+                %i.icon-gantt-chart
+                Gantt-Chart
+            :ruby
+              cache_signature= CacheSignature.signature(trial)
+            #scripts-gantt-chart.reload{style: 'text-align: center',
+               data: { cache_signature: cache_signature}}
+              = render 'scripts_gantt_chart.svg.haml', trial: trial
 
       %section.scripts-details
         %h2 Script Details
         %ul.list-unstyled.scripts
           = render partial: 'script',
             collection: scripts
-
-

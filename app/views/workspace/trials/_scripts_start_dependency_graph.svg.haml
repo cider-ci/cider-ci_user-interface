@@ -1,0 +1,5 @@
+:ruby
+  trial||= Trial.find(params[:id])
+  cache_signature ||= scripts_dependency_svg_graph_cache_signature(trial)
+- cache cache_signature do
+  != scripts_dependency_svg_graph trial

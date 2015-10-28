@@ -20,7 +20,7 @@
         .for-admin
           display: none !important
   %body{data: {user: user?, admin: admin?, session: {reload: {strategy: session[:reload_strategy]}}}}
-    .container
+    .container-fluid
 
       = cache CacheSignature.signature("layouts/application", current_user, request.original_fullpath) do
         = render partial: "navbar/navbar"

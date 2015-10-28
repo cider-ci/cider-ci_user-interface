@@ -27,6 +27,9 @@
 @import lib/stats-and-progress
 
 svg
+  max-width: 100%
+
+svg
   #scripts-dependency-graph
     .node
       @each $state in $ci-states
@@ -35,7 +38,8 @@ svg
           ellipse
             fill: nth($ci-colors-bg,$i)
 
-svg.scripts.timeline
+svg.scripts-gantt-chart
+  width: 100%
   font-size: $font-size-base
   font-family: $font-family-base
   alignment-baseline: hanging

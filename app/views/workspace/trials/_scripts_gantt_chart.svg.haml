@@ -1,0 +1,102 @@
+
+:ruby
+  trial ||=  @trial || Trial.find(params[:id])
+  cache_signature = CacheSignature.signature(trial)
+
+- cache cache_signature do
+
+  :ruby
+
+    scripts = trial.scripts.with_indifferent_access.map{|k,v| (v && v.merge(key: v[:key].presence || k)) || k
+    }.select{|s| (s[:started_at].presence || s[:skipped_at].presence)
+    }.map{ |s|
+      { key: s[:key],
+        state: s[:state],
+        name: s[:name] || s[:key],
+        started_at: Time.iso8601(s[:started_at].presence || s[:skipped_at].presence),
+        finished_at: Time.iso8601(s[:finished_at].presence || s[:aborted_at].presence || s[:skipped_at].presence || Time.now.iso8601)}
+    }.map{|s|
+      duration= [s[:finished_at] - s[:started_at],1].max
+      s.merge(duration: duration)
+    }.sort_by{|s| [s[:started_at],s[:finished_at]]}
+
+    first_script_started_at = scripts.map{|s| s[:started_at]}.reduce{ |m, t| m < t ? m : t }
+
+    scripts<< {
+      key: 'prepare',
+      state: 'unavailable',
+      name: 'prepare',
+      started_at: trial[:started_at],
+      finished_at: first_script_started_at,
+      duration: first_script_started_at - trial[:started_at] }
+
+
+    scripts.sort_by!{|s| [s[:started_at],s[:finished_at]]}
+
+    started_at = scripts.map{|s| s[:started_at]}.reduce{ |m, t| m < t ? m : t }
+
+    finished_at = scripts.map{|s| s[:finished_at]}.reduce{ |m, t| m > t ? m : t}
+
+    duration = finished_at - started_at
+
+    width= 1024
+    row_height= 21
+    row_margin= 7
+
+    height= scripts.length * (row_height + row_margin)
+
+    scale= ->(x){ (x - started_at) / duration * width  }
+
+    script_rects = scripts.map.with_index{ |s,i|
+      { x: scale.(s[:started_at]),
+        y: i * (row_height + row_margin) + 1,
+        height: row_height - 2,
+        width: [s[:duration] / duration * width - 2, 1].max,
+        class: "script #{s[:state]}"
+      }
+    }
+
+    # LABELS ##################################################################
+
+    labels = scripts.map.with_index{ |s,i|
+      script = scripts[i]
+      script_rect = script_rects[i]
+      if script_rect[:x] <= width/2
+        x= script_rect[:x] + 5
+        anchor='start'
+      else
+        x= script_rect[:x] - 5
+        anchor='end'
+      end
+      secs = script[:duration].round
+      { x: x,
+        y: script_rect[:y] + row_height/2,
+        text: "#{script[:name]} (#{pluralize secs, 'second'})",
+        key: "#{script[:key]}",
+        'text-anchor': anchor,
+        'dominant-baseline': 'central'
+        }}
+
+
+  <?xml-stylesheet href="#{stylesheet_path('application')}" type="text/css" ?>
+
+  %svg.scripts-gantt-chart(x=0 y=0 width=width height=height
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        preserveAspectRatio="xMinYMin meet"
+        viewBox="0 0 #{width} #{height}")
+
+    %defs
+      <marker id="tip" viewBox="0 -5 10 10" refX="15" refY="-1.5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0,-5L10,0L0,5"></path></marker>
+
+    - script_rects.each_with_index do |r,i|
+      %rect.script-background{x: 0, y: r[:y] - 1 , width: width, height: row_height}
+
+    - script_rects.each do |r|
+      %rect{r.to_h}
+
+    - labels.each_with_index do |l,i|
+      %text{l.to_h}
+        %a{'xlink:href': (workspace_trial_path(trial) + "##{l[:key]}"), 'xlink:show': 'replace'}
+          = l[:text]
+

@@ -4,16 +4,26 @@ module ::Workspace::Trials::ScriptDependencyGraph
   extend ActiveSupport::Concern
 
   included do
-    helper_method :scripts_dependency_svg_graph
+    helper_method :scripts_dependency_svg_graph,
+      :scripts_dependency_svg_graph_cache_signature
   end
 
-  def scripts_dependency_svg_graph(scripts, type = :start)
+  def scripts_dependency_svg_graph_cache_signature(trial, type = :start)
+    CacheSignature.signature trial.task.task_specification_id,
+      trial.scripts.with_indifferent_access.map{|k,v| v || k} \
+      .sort_by{|s| s[:key] || s[:name] || s[:stated_at] || s[:skipped_at]} \
+      .map{|s| s[:state] }
+  end
+
+
+  def scripts_dependency_svg_graph(trial, type = :start)
+    scripts = trial.scripts.with_indifferent_access
     sanitize = lambda do|str|
       str.gsub(/[^0-9A-Za-z.\-]/, '_') rescue ''
     end
 
     build_arcs = lambda do|scripts, type|
-        scripts.with_indifferent_access.flat_map do |key, map|
+        scripts.flat_map do |key, map|
           map[type] && map[type].map { |k, v| v || k }.map do |dependency|
             [sanitize.(dependency['script']),
              sanitize.(key),
