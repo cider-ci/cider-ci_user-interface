@@ -11,6 +11,6 @@ class Workspace::SessionsController < WorkspaceController
     session[:reload_strategy] = params[:reload_strategy] || 'default'
     session[:reload_frequency] = params[:reload_frequency] || 'default'
     redirect_to edit_workspace_session_path,
-                flash: { successes: ['The session parameters have been set.'] }
+      flash: { successes: ['The session parameters have been set.'] }
   end
 end

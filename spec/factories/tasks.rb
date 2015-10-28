@@ -5,7 +5,7 @@ FactoryGirl.define do
     name { Faker::Lorem.sentence }
     after(:create) do |task|
       FactoryGirl.create :executing_trial,
-                         task_id: task
+        task_id: task
     end
   end
 
@@ -14,7 +14,7 @@ FactoryGirl.define do
     name { Faker::Lorem.sentence }
     after(:create) do |task|
       FactoryGirl.create :failed_trial,
-                         task_id: task
+        task_id: task
     end
   end
 
@@ -23,7 +23,7 @@ FactoryGirl.define do
     name { Faker::Lorem.sentence }
     after(:create) do |task|
       FactoryGirl.create :passed_trial,
-                         task_id: task
+        task_id: task
     end
   end
 
@@ -32,7 +32,7 @@ FactoryGirl.define do
     name { Faker::Lorem.sentence }
     after(:create) do |task|
       FactoryGirl.create :pending_trial,
-                         task_id: task
+        task_id: task
     end
   end
 end

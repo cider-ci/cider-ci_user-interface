@@ -8,10 +8,10 @@ module Concerns
           commits
         elsif git_ref.length == 40
           commits.where('commits.id = :git_ref OR tree_id = :git_ref',
-                        git_ref: git_ref)
+            git_ref: git_ref)
         else
           commits.where('commits.id ilike :git_ref OR tree_id ilike :git_ref',
-                        git_ref: (git_ref + '%'))
+            git_ref: (git_ref + '%'))
         end
       end
     end

@@ -16,11 +16,11 @@ CiderCI::Application.routes.draw do
     resource :account, only: [:edit, :update] do
       post :email_addresses, to: 'accounts#add_email_address'
       delete '/email_address/:email_address',
-             email_address: /[^\/]+/, to: 'accounts#delete_email_address',
-             as: 'delete_email_address'
+        email_address: /[^\/]+/, to: 'accounts#delete_email_address',
+        as: 'delete_email_address'
       post '/email_address/:email_address/as_primary',
-           email_address: /[^\/]+/, to: 'accounts#as_primary_email_address',
-           as: 'primary_email_address'
+        email_address: /[^\/]+/, to: 'accounts#as_primary_email_address',
+        as: 'primary_email_address'
     end
 
     resource :session, only: [:edit, :update]
@@ -118,14 +118,14 @@ CiderCI::Application.routes.draw do
         get '/email_addresses', action: 'email_addressses'
         post '/email_addresses', action: 'add_email_address'
         put '/email_address/:email_address',
-            email_address: /[^\/]+/, action: :put_email_address,
-            as: :email_address
+          email_address: /[^\/]+/, action: :put_email_address,
+          as: :email_address
         post '/email_address/:email_address/as_primary',
-             email_address: /[^\/]+/, action: :as_primary_email_address,
-             as: :primary_email_address
+          email_address: /[^\/]+/, action: :as_primary_email_address,
+          as: :primary_email_address
         delete '/email_address/:email_address',
-               email_address: /[^\/]+/, action: :delete_email_address,
-               as: :delete_email_address
+          email_address: /[^\/]+/, action: :delete_email_address,
+          as: :delete_email_address
       end
     end
     resources :executors do
@@ -148,16 +148,16 @@ CiderCI::Application.routes.draw do
     post 'sign_out'
 
     get 'attachments/:repository_name/:branch_name/:job_name/*path',
-        action: :redirect_to_tree_attachment_content,
-        constraints: { path: /.*/ }
+      action: :redirect_to_tree_attachment_content,
+      constraints: { path: /.*/ }
 
     get 'jobs/:repository_name/:branch_name/:job_name',
-        action: :redirect_to_job
+      action: :redirect_to_job
 
     get '/:repository_name/:branch_name/:job_names/summary',
-        controller: 'summary', action: 'show', as: 'summary',
-        constraints: { repository_name: /[^\/]+/, branch_name: /[^\/]+/,
-                       job_names: /[^\/]+/ }
+      controller: 'summary', action: 'show', as: 'summary',
+      constraints: { repository_name: /[^\/]+/, branch_name: /[^\/]+/,
+                     job_names: /[^\/]+/ }
 
     resources :badges, only: [] do
       collection do

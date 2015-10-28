@@ -11,8 +11,8 @@ class Admin::RepositoriesController < AdminController
   def permited_repository_params(params)
     if params[:repository]
       params[:repository].permit(:name, :github_authtoken, :use_default_github_authtoken,
-                                 :git_url, :git_fetch_and_update_interval,
-                                 :public_view_permission)
+        :git_url, :git_fetch_and_update_interval,
+        :public_view_permission)
     end
   end
 

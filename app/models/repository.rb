@@ -9,7 +9,7 @@ class Repository < ActiveRecord::Base
   before_validation on: :create do
     raise 'git_url is required' if self.git_url.blank?
     self.id = UUIDTools::UUID.sha1_create(UUIDTools::UUID_URL_NAMESPACE,
-                                          self.git_url).to_s
+      self.git_url).to_s
     self.name ||= self.id
   end
 

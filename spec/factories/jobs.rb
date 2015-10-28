@@ -9,11 +9,11 @@ FactoryGirl.define do
 
     after(:create) do |job|
       FactoryGirl.create :passed_task,
-                         job_id: job.id
+        job_id: job.id
       FactoryGirl.create :executing_task,
-                         job_id: job.id
+        job_id: job.id
       FactoryGirl.create :pending_task,
-                         job_id: job.id
+        job_id: job.id
     end
   end
 
@@ -24,7 +24,7 @@ FactoryGirl.define do
 
     after(:create) do |job|
       FactoryGirl.create :pending_task,
-                         job_id: job.id
+        job_id: job.id
     end
   end
 
@@ -35,13 +35,13 @@ FactoryGirl.define do
 
      after(:create) do |job|
        FactoryGirl.create :failed_task,
-                          job_id: job.id
+         job_id: job.id
        FactoryGirl.create :passed_task,
-                          job_id: job.id
+         job_id: job.id
        FactoryGirl.create :executing_task,
-                          job_id: job.id
+         job_id: job.id
        FactoryGirl.create :pending_task,
-                          job_id: job.id
+         job_id: job.id
      end
   end
 
@@ -51,9 +51,9 @@ FactoryGirl.define do
     name { Faker::App.name }
     after(:create) do |job|
       FactoryGirl.create :passed_task,
-                         job_id: job.id
+        job_id: job.id
       FactoryGirl.create :passed_task,
-                         job_id: job.id
+        job_id: job.id
     end
   end
 
@@ -64,8 +64,8 @@ FactoryGirl.define do
     result ({ value: 42, summary: '42 OK' })
     after(:create) do |job|
       task = FactoryGirl.create :passed_task,
-                                job_id: job.id,
-                                result: { value: 42, summary: '42 OK' }
+        job_id: job.id,
+        result: { value: 42, summary: '42 OK' }
       task.trials.first.update_attributes! result: { value: 42, summary: '42 OK' }
     end
   end
@@ -77,7 +77,7 @@ FactoryGirl.define do
 
     after(:create) do |job|
       FactoryGirl.create :job_issue,
-                         type: 'error', job: job
+        type: 'error', job: job
       FactoryGirl.create :failed_task, job: job
     end
   end

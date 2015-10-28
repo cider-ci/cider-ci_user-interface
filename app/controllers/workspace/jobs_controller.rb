@@ -12,7 +12,7 @@ class Workspace::JobsController < WorkspaceController
   include ::Concerns::UrlBuilder
 
   skip_before_action :require_sign_in,
-                     only: [:show, :tree_attachments, :job_specification, :result]
+    only: [:show, :tree_attachments, :job_specification, :result]
 
   before_action do
     @_lookup_context.prefixes << 'workspace/commits'
@@ -59,13 +59,13 @@ class Workspace::JobsController < WorkspaceController
     case response.status
     when 300..600
       redirect_to workspace_job_path(job.id),
-                  flash: { errors: [" #{response.status} #{name}" \
-                                    "request failed! #{response.body}"] }
+        flash: { errors: [" #{response.status} #{name}" \
+                          "request failed! #{response.body}"] }
     else
       redirect_to workspace_job_path(job.id, @filter_params),
-                  flash: { successes:
-                           ["#{response.status} #{name} " \
-                            "request succeeded. #{response.body}"] }
+        flash: { successes:
+                 ["#{response.status} #{name} " \
+                  "request succeeded. #{response.body}"] }
     end
   end
 
@@ -90,7 +90,7 @@ class Workspace::JobsController < WorkspaceController
 
   def show
     @job = Job.select(:id, :state, :updated_at,
-                      :name, :tree_id, :description, :result).find(params[:id])
+      :name, :tree_id, :description, :result).find(params[:id])
     require_sign_in unless @job.public_view_permission?
     @link_params = params.slice(:branch, :page, :repository)
     @trials = Trial.joins(task: :job).where('jobs.id = ?', @job.id)
@@ -127,12 +127,12 @@ class Workspace::JobsController < WorkspaceController
     job = Job.find(params[:id])
     job.update_attributes! params.require(:job).permit(:priority)
     redirect_to workspace_job_path(job),
-                flash: { successes: ['The job has been updated.'] }
+      flash: { successes: ['The job has been updated.'] }
   end
 
   def set_filter_params(params)
     @filter_params = params.slice(:tasks_select_condition,
-                                  :name_substring_term, :per_page)
+      :name_substring_term, :per_page)
   end
 
   def result

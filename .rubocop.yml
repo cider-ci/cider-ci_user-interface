@@ -118,6 +118,9 @@ Style/ModuleFunction:
 Metrics/ModuleLength:
   Max: 120
 
+Style/AlignParameters:
+  EnforcedStyle: 'with_fixed_indentation'
+
 Style/MultilineBlockChain:
   Enabled: false
 

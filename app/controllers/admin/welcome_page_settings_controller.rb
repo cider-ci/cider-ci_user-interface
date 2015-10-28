@@ -21,8 +21,8 @@ class Admin::WelcomePageSettingsController < AdminController
           welcome_message: params[:welcome_page_settings][:welcome_message])
 
         redirect_to edit_admin_welcome_page_settings_path,
-                    flash: {
-                      infos: [%(The welcome page settings have been updated.)] }
+          flash: {
+            infos: [%(The welcome page settings have been updated.)] }
       end
     end
   end

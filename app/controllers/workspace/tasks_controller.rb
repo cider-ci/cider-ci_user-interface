@@ -17,11 +17,11 @@ class Workspace::TasksController < WorkspaceController
     case response.status
     when 200..299
       redirect_to workspace_trial_path(JSON.parse(response.body)['id']),
-                  flash: { successes: ['A new trial has been created.'] }
+        flash: { successes: ['A new trial has been created.'] }
     else
       redirect_to workspace_task_path(@task.id),
-                  flash: { errors: [" #{response.status} " \
-                                    "Retry of task failed! #{response.body}"] }
+        flash: { errors: [" #{response.status} " \
+                          "Retry of task failed! #{response.body}"] }
     end
   end
 

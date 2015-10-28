@@ -7,7 +7,7 @@ class Workspace::TrialsController < WorkspaceController
   include ::Workspace::Trials::ScriptDependencyGraph
 
   skip_before_action :require_sign_in,
-                     only: [:show, :attachments]
+    only: [:show, :attachments]
 
   def show
     begin

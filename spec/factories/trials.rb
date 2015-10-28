@@ -17,7 +17,7 @@ FactoryGirl.define do
 
     after(:create) do |trial|
       FactoryGirl.create :trial_issue,
-                         type: 'error', trial: trial
+        type: 'error', trial: trial
     end
 
   end

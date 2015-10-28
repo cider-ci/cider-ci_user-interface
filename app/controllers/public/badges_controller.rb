@@ -20,7 +20,7 @@ class Public::BadgesController < PublicController
 
     if @job and (not @job.public_view_permission?)
       @view_params = build_small_badge_params_403(@view_params,
-                                                  params[:job_name])
+        params[:job_name])
       if params.key?(:respond_with_200)
         render
       else

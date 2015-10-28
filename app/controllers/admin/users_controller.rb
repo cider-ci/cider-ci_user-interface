@@ -10,13 +10,13 @@ class Admin::UsersController < AdminController
   def create
     @user = User.create! params.require(:user).permit!
     redirect_to admin_users_path,
-                flash: { successes: ['The user has been created'] }
+      flash: { successes: ['The user has been created'] }
   end
 
   def destroy
     User.find(params[:id]).destroy
     redirect_to admin_users_path,
-                flash: { successes: ['The user has been deleted'] }
+      flash: { successes: ['The user has been deleted'] }
   end
 
   def index

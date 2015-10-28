@@ -8,9 +8,9 @@ class Admin::ExecutorsController < AdminController
   def create
     @executor = Executor.create! processed_params
     redirect_to admin_executors_path,
-                flash: {
-                  successes:
-                  [%( The new executor "#{@executor}" has been created.)] }
+      flash: {
+        successes:
+        [%( The new executor "#{@executor}" has been created.)] }
   end
 
   def destroy
@@ -33,7 +33,7 @@ class Admin::ExecutorsController < AdminController
       @executor = Executor.find params[:id]
       @executor.update_attributes! processed_params
       redirect_to admin_executor_path(@executor),
-                  flash: { successes: ['The executor has been updated.'] }
+        flash: { successes: ['The executor has been updated.'] }
   end
 
   def processed_params

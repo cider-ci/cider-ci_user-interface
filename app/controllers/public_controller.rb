@@ -49,7 +49,7 @@ class PublicController < ApplicationController
             current_path
           end
         redirect_to post_sign_in_path,
-                    flash: { successes: ['You have been signed in!'] }
+          flash: { successes: ['You have been signed in!'] }
       else
         reset_session
         cookies.delete 'cider-ci_services-session'
@@ -66,13 +66,13 @@ class PublicController < ApplicationController
     reset_session
     cookies.delete 'cider-ci_services-session'
     redirect_to current_path,
-                flash: { successes: ['You have been signed out!'] }
+      flash: { successes: ['You have been signed out!'] }
   end
 
   def redirect_to_job
     if @job = Job.find_by_repo_branch_name(params[:repository_name],
-                                           params[:branch_name],
-                                           params[:job_name])
+      params[:branch_name],
+      params[:job_name])
       redirect_to workspace_job_path(@job)
     else
       render_404_job_not_found
@@ -81,8 +81,8 @@ class PublicController < ApplicationController
 
   def redirect_to_tree_attachment_content
     if @job = Job.find_by_repo_branch_name(params[:repository_name],
-                                           params[:branch_name],
-                                           params[:job_name])
+      params[:branch_name],
+      params[:job_name])
       if tree_attachment = TreeAttachment \
         .find_by(path: "/#{@job.tree_id}/#{params[:path]}")
         redirect_to workspace_attachment_path('tree_attachment', tree_attachment.path)

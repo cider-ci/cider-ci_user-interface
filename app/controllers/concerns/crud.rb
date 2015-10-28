@@ -6,8 +6,8 @@ module Concerns
     instance = model.find params[:id]
     instance.destroy!
     redirect_to path,
-                flash: { successes: [%(The #{model.name.downcase}
-                                     "#{instance}" has been deleted.).squish] }
+      flash: { successes: [%(The #{model.name.downcase}
+                           "#{instance}" has been deleted.).squish] }
     end
 
   end

@@ -36,8 +36,8 @@ class WorkspaceController < ApplicationController
     .apply(build_commits_by_page(params[:page], commits_per_page_param))
     .distinct.reorder(committer_date: :desc, depth: :desc)
       .select(:author_email, :committer_email, :author_date, :author_name,
-              :committer_date, :committer_name,
-              :depth, :id, :subject, :tree_id, :updated_at)
+        :committer_date, :committer_name,
+        :depth, :id, :subject, :tree_id, :updated_at)
   end
 
   def get_filter_params
