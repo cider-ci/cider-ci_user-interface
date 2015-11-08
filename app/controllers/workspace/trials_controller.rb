@@ -5,6 +5,7 @@
 class Workspace::TrialsController < WorkspaceController
 
   include ::Workspace::Trials::ScriptDependencyGraph
+  helper_method :service_base_url, :api_browser_path
 
   skip_before_action :require_sign_in,
     only: [:show, :attachments]
@@ -13,8 +14,6 @@ class Workspace::TrialsController < WorkspaceController
     begin
       @trial = Trial.find params[:id]
       require_sign_in unless @trial.task.job.public_view_permission?
-      @scripts = @trial.scripts.map { |k, v| { 'name' => k }.merge(v) } \
-        .sort_by { |s| script_order(s) }
     rescue StandardError => e
       Rails.logger.warn(e)
       render 'show_raw'

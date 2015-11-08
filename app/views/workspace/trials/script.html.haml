@@ -1,0 +1,55 @@
+:ruby
+  script ||= Script.find_by(trial_id: params[:id], key: params[:key])
+  cache_signature = script.cache_signature
+
+- cache cache_signature do
+
+  :ruby
+    reload_timeout = Settings.constants.STATES.FINISHED.include?(script.state) ? 60 : 3
+
+  .row
+    .col-md-10
+      %ol.breadcrumb.pull-left
+        =render '/breadcrumbs/script', script: script
+    .col-md-2
+      %ol.breadcrumb.with-circle-separator.pull-right
+        %li
+          = link_to api_browser_path("/scripts/#{script.id}")  do
+            %icon.icon-raw-data
+            Data
+
+  %h1
+    Script
+    %em.name= script.name
+    = render 'for_task_header', task: script.trial.task
+
+  %ul.enumeration.list-unstyled.list-inline
+    %li
+      %span<>= render "label_for_state", state: script.state
+      &nbsp;
+      %span= script.state
+    - if script.started_at and script.finished_at
+      %li
+        - duration = script.finished_at - script.started_at
+        in
+        %span.humanize-duration{data: {duration: duration}} #{duration} seconds
+        %span (#{duration.round} #{"second".pluralize(duration.round)})
+    - elsif script.started_at
+      %li
+        - duration = Time.zone.now - script.started_at
+        since
+        %span.humanize-duration{data: {duration: duration}} #{duration} seconds
+        %span (#{duration.round} #{"second".pluralize(duration.round)})
+
+
+  #reload-page{data: { cache_signature: cache_signature, reload_timeout: reload_timeout}}
+
+    - %w(body stderr stdout).each do |property|
+      :ruby
+        value = script[property]
+        cache_signature= CacheSignature.signature(value)
+      %section.reload{id: property, data: {cache_signature: cache_signature}}
+        -if value.present?
+          %h3= property.camelize
+          %pre=  value.is_a?(String) ? value : value.to_yaml
+

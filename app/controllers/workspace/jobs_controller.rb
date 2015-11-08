@@ -89,7 +89,7 @@ class Workspace::JobsController < WorkspaceController
   end
 
   def show
-    @job = Job.select(:id, :state, :updated_at,
+    @job = Job.select(:id, :state, :created_at, :updated_at,
       :name, :tree_id, :description, :result).find(params[:id])
     require_sign_in unless @job.public_view_permission?
     @link_params = params.slice(:branch, :page, :repository)

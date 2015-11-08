@@ -1,0 +1,12 @@
+:ruby
+  script||= Script.find_by(trial_id: trial_id, key: key)
+
+= render '/breadcrumbs/trial', trial: script.trial
+
+%li
+  = link_to script_workspace_trial_path(script.trial,key: script.key) do
+    %i.icon-script
+    Script
+
+
+

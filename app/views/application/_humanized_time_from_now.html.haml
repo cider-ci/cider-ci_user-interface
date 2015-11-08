@@ -5,8 +5,8 @@
 - format ||= 'normal'
 
 - if at
-  %span.humanize-timestamp{data: {at: at.iso8601, format: format }}
-    =at
+  %span=" "
+  %span.humanize-timestamp{data: {at: at.iso8601, format: format }}=at
 - else
-  not available
+  %span="not available"
 

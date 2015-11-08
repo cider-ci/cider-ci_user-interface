@@ -10,23 +10,21 @@ module ::Workspace::Trials::ScriptDependencyGraph
 
   def scripts_dependency_svg_graph_cache_signature(trial, type = :start)
     CacheSignature.signature type, trial.task.task_specification_id,
-      trial.scripts.with_indifferent_access \
-      .map { |k, v| v.merge(key: (v[:key] || k), name: (v[:name] || k)) } \
-      .sort_by { |s| s[:key].presence || s[:name].presence || s[:stated_at].presence || s[:skipped_at].presence || s.to_s } \
-      .map { |s| s[:state] }
+      trial.scripts.sort_by { |s| s[:key].presence }.map { |s| s[:state] }
   end
 
   def scripts_dependency_svg_graph(trial, type = :start)
-    scripts = trial.scripts.with_indifferent_access
+    scripts = trial.scripts
+
     sanitize = lambda do|str|
       str.gsub(/[^0-9A-Za-z.\-]/, '_') rescue ''
     end
 
     build_arcs = lambda do|scripts, type|
-        scripts.flat_map do |key, map|
-          map[type] && map[type].map { |k, v| v || k }.map do |dependency|
+        scripts.flat_map do |s|
+          s[type] && s[type].map { |k, v| v || k }.map do |dependency|
             [sanitize.(dependency['script']),
-             sanitize.(key),
+             sanitize.(s[:key]),
              (dependency['states'] || ['passed']).map { |w| sanitize.(w) }]
           end
         end.compact
@@ -43,15 +41,24 @@ module ::Workspace::Trials::ScriptDependencyGraph
       xml = Nokogiri::XML(svg)
       xml.css('.node').each do |node|
         id = node.attr('id')
-        state = scripts[id]['state'] rescue 'undefined'
+        state = scripts.find { |s| sanitize.(s.key) == id }[:state] rescue 'undefined'
         node['class'] = [node.attr('class'), state].compact.join(' ')
       end
       _svg = xml.to_s
     end
 
-    graphviz_nodes = scripts.with_indifferent_access
-      .map { |k, v| v.merge(key: (v[:key] || k), name: (v[:name] || k)) }
-      .map { |n| n.slice(:key, :name) }.map do |n|
+    adjust_size_params = lambda do|svg|
+      xml = Nokogiri::XML(svg)
+      outer_svg_node = xml.css('svg').first
+      outer_svg_node['max-height'] = outer_svg_node['height']
+      outer_svg_node.remove_attribute('height')
+      # outer_svg_node['max-width'] = outer_svg_node['width']
+      # outer_svg_node.remove_attribute('width')
+      _svg = xml.to_s
+    end
+
+    graphviz_nodes = scripts.map { |s| s.slice(:key, :name) }
+      .map do |n|
         id = sanitize.(n[:key])
         label = sanitize.(n[:name])
         %( "#{id}" [id="#{id}", label="#{label}"];)
@@ -59,12 +66,12 @@ module ::Workspace::Trials::ScriptDependencyGraph
 
     case type
     when :start
-      start_arcs = build_arcs.(scripts, 'start-when')
+      start_arcs = build_arcs.(scripts, :start_when).select(&:present?)
       graphviz_start_arcs = arcs2graphviz.(start_arcs, 'green')
       graphviz_terminate_arcs = []
     when :terminate
       graphviz_start_arcs = []
-      terminate_arcs = build_arcs.(scripts, 'terminate-when')
+      terminate_arcs = build_arcs.(scripts, :terminate_when)
       graphviz_terminate_arcs = arcs2graphviz.(terminate_arcs, 'red')
     end
 
@@ -80,7 +87,7 @@ module ::Workspace::Trials::ScriptDependencyGraph
 
     graphviz_svg, _log = Open3.capture2('dot -T svg', stdin_data: graphviz)
 
-    _svg = add_node_classes.(graphviz_svg)
+    _svg = adjust_size_params.(add_node_classes.(graphviz_svg))
   end
 
 end

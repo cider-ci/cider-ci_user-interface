@@ -2,9 +2,7 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-%li
-  =link_to "##{script["name"]}" do
+%li.script{data: {name: script.name, state: script.state, key: script.key}}
+  %a{href: script_workspace_trial_path(trial, key: script.key)}
     %span.label{class: label_class_for_state(script["state"])}
       #{script["name"]}
-     
-

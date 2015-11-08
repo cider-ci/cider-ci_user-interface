@@ -11,7 +11,7 @@ class ApplicationController < ActionController::Base
   include Concerns::SessionHelper
   include Concerns::UrlBuilder
 
-  helper_method :current_user, :user?, :users?, :admin?
+  helper_method :current_user, :user?, :users?, :admin?, :api_browser_path
 
   before_action do
     @alerts ||= { errors: (flash[:errors] || []),

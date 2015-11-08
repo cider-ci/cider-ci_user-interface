@@ -68,4 +68,23 @@ class WorkspaceController < ApplicationController
     render 'public/401', status: :unauthorized unless user?
   end
 
+  SHOW_RAW_PERMITTED_TABLES = %w(trials scripts)
+
+  def show_raw
+    @table_name = params[:table_name]
+    @where_condition = JSON.parse(params['where']).with_indifferent_access
+    @attributes = @table_name.singularize.camelize\
+      .constantize.find_by(@where_condition).attributes
+
+    unless SHOW_RAW_PERMITTED_TABLES.include? @table_name
+      render 'public/403', status: :forbidden
+    else
+      respond_to do |format|
+        format.html
+        format.json { render json: @attributes }
+        format.yaml { render text:  @attributes.to_yaml, content_type: 'text/yaml' }
+      end
+    end
+  end
+
 end

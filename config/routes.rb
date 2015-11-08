@@ -7,6 +7,8 @@ CiderCI::Application.routes.draw do
 
   namespace 'workspace' do
 
+    get 'show_raw/:table_name', action: :show_raw, as: :show_raw
+
     get :user
 
     namespace 'api' do
@@ -48,6 +50,7 @@ CiderCI::Application.routes.draw do
         get 'scripts-gantt-chart'
         get 'scripts-start-dependency-graph'
         get 'scripts-terminate-dependency-graph'
+        get 'scripts/:key', action: :script, as: :script
       end
     end
 

@@ -1,1 +1,3 @@
+:ruby
+  trial||= Trial.find(params[:id])
 = render 'scripts_gantt_chart.svg.haml', trial: trial

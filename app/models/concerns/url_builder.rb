@@ -21,5 +21,9 @@ module Concerns
       service_path(Settings.services.api.http)
     end
 
+    def api_browser_path(resource_path = '')
+      "#{api_path}/api-browser/index.html##{api_path}#{resource_path}"
+    end
+
   end
 end

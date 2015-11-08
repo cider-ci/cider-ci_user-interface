@@ -4,7 +4,7 @@
 
 :ruby
   trial ||= @trial
-  scripts ||= @scripts
+  scripts= trial.scripts.select(:key,:name,:state)
   issues = trial.trial_issues
   cache_signature = CacheSignature.signature trial.cache_signature,
           trial.trial_attachments.collection_cache_signature, admin?
@@ -35,6 +35,10 @@
                 = link_to result_workspace_trial_path(trial) do
                   Result
 
+            %li
+              = link_to api_browser_path("/trial/#{trial.id}")  do
+                %icon.icon-raw-data
+                Data via API
 
       #issues-alert.reload{data: {cache_signature: issues.count}}
         - if issues.count >= 1
@@ -52,135 +56,109 @@
 
 
       %h1{style: "margin-top: 10px"}
-        %span{class: "label #{label_class_for_state(trial.state)}"}<>
-          %i{class: icon_class_for_state(trial.state)}<>
-        %span{style: "margin-left: .5em"}
-          Trial for
-          "#{trial.task.name}"
-          in
-          "#{trial.task.job.name}"
-          - if (trial.task.job.repositories.first rescue nil)
-            of
-            "#{trial.task.job.repositories.first.name}"
+        Trial
+        = render 'for_task_header', task: trial.task
+
+      - if trial.error.present?
+        .alert.alert-danger
+          %h2 Error
+          %pre.script= trial.error
 
 
-
-      %p
-
+      %ul.enumeration.list-unstyled.list-inline
+        %li
+          %span<>= render "label_for_state", state: trial.state
+          &nbsp;
+          %span>= trial.state
         -if trial.started_at
-          %b #{render 'humanized_time_from_now', at: trial.started_at}
+          %li
+            %span started
+            %b<>= render 'humanized_time_from_now', at: trial.started_at
         - if trial.finished_at and trial.started_at
-          in
-          %b= distance_of_time_in_words(trial.started_at,trial.finished_at,
-            include_seconds: true)
-          (#{(trial.finished_at - trial.started_at).round(2)} seconds)
+          %li
+            executed in
+            %b= distance_of_time_in_words(trial.started_at,trial.finished_at,
+              include_seconds: true)
+            (#{(trial.finished_at - trial.started_at).round(2)} seconds)
         - if executor_name = trial.executor.try(:name)
-          on
-          %b #{executor_name}.
-
-      -unless trial.error.blank?
-        %h3 Job Error
-        %pre
-          %code= trial.error
-
+          %li
+            on
+            %b #{executor_name}
 
       %section#overview
-        - if trial.scripts.blank?
+        %h2 Scripts Overview
+        %ul.list-inline
+          = render partial: 'script_label', collection: scripts,
+            as: :script, locals: {trial: trial}
 
-          .panel.panel-warning
-            .panel-heading
-              %h2 Scripts missing
-            .panel-body
-              %p This trial does not have any scripts associated with it.
 
-              %p
-                They might have been erased afer some period of time in order to
-                save space.  Administrators can adjust the retention time.
-
-        - else
-          %h2 Scripts Overview
-          %ul.list-inline
-            = render partial: 'script_label',
-              collection: scripts,
-              as: :script
       :ruby
         has_start_when_dependencies = trial.scripts.present? \
           && trial.scripts.to_a.length >= 2 \
-          && trial.scripts.map{|k,v| v || k}.any?{|v| v.with_indifferent_access[:'start-when']}
+          && trial.scripts.any?{|s| s.start_when.present?}
 
         has_terminate_when_dependencies = trial.scripts.present? \
             && trial.scripts.to_a.length >= 2 \
-            && trial.scripts.map{|k,v| v || k}.any?{|v| v.with_indifferent_access[:'terminate-when']}
+            && trial.scripts.any?{|s| s.terminate_when.present?}
 
         has_some_dependency = has_start_when_dependencies || has_terminate_when_dependencies
 
-      .row
-        - if has_some_dependency
-          .col-lg-6
-            - if has_start_when_dependencies
-              %section#start-dependencies
-                - begin
-                  :ruby
-                    svg_start_deps_path=
-                      scripts_start_dependency_graph_workspace_trial_path(format: :svg)
-                    cache_signature= scripts_dependency_svg_graph_cache_signature(trial)
-                  %h2
-                    =link_to svg_start_deps_path do
-                      %i.fa.fa-image
-                      Start-Dependencies
-                  #start-dependencies-graph.reload{style: 'text-align: center;',
-                      data: { cache_signature: cache_signature}}
-                    = render 'scripts_start_dependency_graph.svg.haml',
-                      trial: trial, cache_signature: cache_signature
-                - rescue Exception => e
-                  - Rails.logger.error Formatter.exception_to_log_s e
-                  .alert.alert-warning
-                    Error during rendering of the dependency graph!
-                    See the server logs for details.
-
-            - if has_terminate_when_dependencies
-              %section#terminate-dependencies
-                - begin
-                  :ruby
-                    svg_terminate_deps_path=
-                      scripts_terminate_dependency_graph_workspace_trial_path(format: :svg)
-                    cache_signature= scripts_dependency_svg_graph_cache_signature(trial,:terminate)
-                  %h2
-                    =link_to svg_terminate_deps_path do
-                      %i.fa.fa-image
-                      Terminate-Dependencies
-                  #terminate-dependencies-graph.reload{style: 'text-align: center;',
-                      data: { cache_signature: cache_signature}}
-                    = render 'scripts_terminate_dependency_graph.svg.haml',
-                      trial: trial, cache_signature: cache_signature
-                - rescue Exception => e
-                  - Rails.logger.error Formatter.exception_to_log_s e
-                  .alert.alert-warning
-                    Error during rendering of the dependency graph!
-                    See the server logs for details.
-
-        .div{class: has_some_dependency ? "col-lg-6" : "col-lg-12"}
-          %section#gantt-chart
+      - if has_some_dependency
+        - if has_start_when_dependencies
+          %section#start-dependencies
+            :ruby
+              svg_start_deps_path=
+                scripts_start_dependency_graph_workspace_trial_path(format: :svg)
+              cache_signature= scripts_dependency_svg_graph_cache_signature(trial)
             %h2
-              = link_to scripts_gantt_chart_workspace_trial_path(format: :svg) do
-                %i.icon-gantt-chart
-                Gantt-Chart
+              =link_to svg_start_deps_path do
+                %i.fa.fa-image
+                Start-Dependencies
             - begin
-              :ruby
-                cache_signature= CacheSignature.signature(trial)
-              #scripts-gantt-chart.reload{style: 'text-align: center',
-                 data: { cache_signature: cache_signature}}
-                = render 'scripts_gantt_chart.svg.haml', trial: trial
+              #start-dependencies-graph.reload{style: 'text-align: center;',
+                  data: { cache_signature: cache_signature}}
+                = render 'scripts_start_dependency_graph.svg.haml',
+                  trial: trial, cache_signature: cache_signature
             - rescue Exception => e
               - Rails.logger.error Formatter.exception_to_log_s e
               .alert.alert-warning
-                Error during rendering of the Gantt-chart!
+                Error during rendering of the dependency graph!
                 See the server logs for details.
 
+        - if has_terminate_when_dependencies
+          %section#terminate-dependencies
+            - begin
+              :ruby
+                svg_terminate_deps_path=
+                  scripts_terminate_dependency_graph_workspace_trial_path(format: :svg)
+                cache_signature= scripts_dependency_svg_graph_cache_signature(trial,:terminate)
+              %h2
+                =link_to svg_terminate_deps_path do
+                  %i.fa.fa-image
+                  Terminate-Dependencies
+              #terminate-dependencies-graph.reload{style: 'text-align: center;',
+                  data: { cache_signature: cache_signature}}
+                = render 'scripts_terminate_dependency_graph.svg.haml',
+                  trial: trial, cache_signature: cache_signature
+            - rescue Exception => e
+              - Rails.logger.error Formatter.exception_to_log_s e
+              .alert.alert-warning
+                Error during rendering of the dependency graph!
+                See the server logs for details.
 
-
-      %section.scripts-details
-        %h2 Script Details
-        %ul.list-unstyled.scripts
-          = render partial: 'script',
-            collection: scripts
+        %section#gantt-chart
+          %h2
+            = link_to scripts_gantt_chart_workspace_trial_path(format: :svg) do
+              %i.icon-gantt-chart
+              Gantt-Chart
+          - begin
+            :ruby
+              cache_signature= CacheSignature.signature(trial)
+            #scripts-gantt-chart.reload{style: 'text-align: center',
+               data: { cache_signature: cache_signature}}
+              = render 'scripts_gantt_chart.svg.haml', trial: trial
+          - rescue Exception => e
+            - Rails.logger.error Formatter.exception_to_log_s e
+            .alert.alert-warning
+              Error during rendering of the Gantt-chart!
+              See the server logs for details.

@@ -9,11 +9,23 @@
     %ol.breadcrumb.pull-left
       = render '/breadcrumbs/task', task: task
   .col-md-6
+
+    %ol.breadcrumb.with-circle-separator.pull-right
+      %li
+        = link_to api_browser_path("/tasks/#{task.id}")  do
+          %icon.icon-raw-data
+          Task Data
+
+      %li
+        = link_to api_browser_path("/task-specifications/#{task.task_specification_id}")  do
+          %icon.icon-raw-data
+          Task-Specification Data
+
+
     - if task.result
-      %ol.breadcrumb.with-circle-separator.pull-right
-        %li
-          = link_to result_workspace_task_path(task) do
-            Result
+      %li
+        = link_to result_workspace_task_path(task) do
+          Result
 
 %ul.list-inline.actions.pull-right
   %li.for-signed-in-user
@@ -25,9 +37,17 @@
 
 
 %h1
-  %span.label{class: label_class_for_state(state)}<>
-    %i{class: icon_class_for_state(state)}<>
-  %span &nbsp; Task "#{task.name}"
+  = render 'for_task_header', task: task, start: "Task"
+
+%ul.enumeration.list-unstyled.list-inline
+  %li
+    %span<>= render "label_for_state", state: task.state
+    &nbsp;
+    %span>= task.state
+  %li
+    %span created
+    %b<>= render 'humanized_time_from_now', at: task.created_at
+
 
 %section#trials
 
@@ -45,25 +65,6 @@
               =(i+1).ordinalize
           %td
             %ul.list-inline
-              - if trial.scripts.is_a? Hash
-                = render partial: 'script_label',
-                  collection: trial.scripts.map{|k,v| v.merge({"id" => k})},
-                  as: :script,
-                  locals: {trial: trial}
+              = render partial: 'script_label', collection: trial.scripts,
+                as: :script, locals: {trial: trial}
 
-
-%h2 Properties
-%table.table.table-bordered.table-condensed
-  %thead
-  %tbody
-    - task.attributes.reject{|k,v| %().include? k}.sort.each do |k,v|
-      %tr
-        %td=k
-        %td
-          %pre.script{style: "border: none; padding: 0; margin: 0"}<>
-            = (v.is_a? Array or v.is_a? Hash) ? v.to_yaml : v
-
-
-%h2 Task-Specification
-
-%pre= task.task_specification.data.to_yaml

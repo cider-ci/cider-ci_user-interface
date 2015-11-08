@@ -1,0 +1,11 @@
+:ruby
+  start ||= "for the task"
+
+= start
+%em.name= task.name
+in job
+%em.name= task.job.name
+- if repo = task.job.repositories.first
+  of
+  %em.name= repo.name
+

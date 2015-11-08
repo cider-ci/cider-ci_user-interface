@@ -1,2 +1,5 @@
+:ruby
+  trial ||= Trial.find(params[:id])
+  cache_signature ||= scripts_dependency_svg_graph_cache_signature(trial,:terminate)
 = render 'scripts_terminate_dependency_graph.svg.haml',
   trial: trial, cache_signature: cache_signature

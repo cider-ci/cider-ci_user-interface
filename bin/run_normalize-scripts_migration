@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -eux
+export FILE=$1
+bundle exec rake db:pg:terminate_connections db:drop db:create db:pg:structure_and_data:restore db:migrate

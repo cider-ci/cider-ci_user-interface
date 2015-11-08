@@ -462,6 +462,36 @@ CREATE TABLE schema_migrations (
 
 
 --
+-- Name: scripts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE TABLE scripts (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    trial_id uuid NOT NULL,
+    key character varying NOT NULL,
+    state character varying DEFAULT 'pending'::character varying NOT NULL,
+    name character varying NOT NULL,
+    stdout character varying(10485760) DEFAULT ''::character varying NOT NULL,
+    stderr character varying(10485760) DEFAULT ''::character varying NOT NULL,
+    body character varying(10240) DEFAULT ''::character varying NOT NULL,
+    error character varying(1048576),
+    timeout character varying,
+    exclusive_executor_resource character varying,
+    started_at timestamp without time zone,
+    finished_at timestamp without time zone,
+    start_when jsonb DEFAULT '[]'::jsonb NOT NULL,
+    terminate_when jsonb DEFAULT '[]'::jsonb NOT NULL,
+    environment_variables jsonb DEFAULT '{}'::jsonb NOT NULL,
+    ignore_abort boolean DEFAULT false NOT NULL,
+    ignore_state boolean DEFAULT false NOT NULL,
+    template_environment_variables boolean DEFAULT false NOT NULL,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'skipped'::character varying, 'passed'::character varying, 'waiting'::character varying])::text[])))
+);
+
+
+--
 -- Name: submodules; Type: TABLE; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -538,7 +568,6 @@ CREATE TABLE trials (
     executor_id uuid,
     error text,
     state character varying DEFAULT 'pending'::character varying NOT NULL,
-    scripts jsonb,
     result jsonb,
     started_at timestamp without time zone,
     finished_at timestamp without time zone,
@@ -648,6 +677,14 @@ ALTER TABLE ONLY jobs
 
 ALTER TABLE ONLY repositories
     ADD CONSTRAINT repositories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: scripts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+--
+
+ALTER TABLE ONLY scripts
+    ADD CONSTRAINT scripts_pkey PRIMARY KEY (id);
 
 
 --
@@ -954,6 +991,13 @@ CREATE INDEX index_repositories_on_updated_at ON repositories USING btree (updat
 
 
 --
+-- Name: index_scripts_on_trial_id_and_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+--
+
+CREATE UNIQUE INDEX index_scripts_on_trial_id_and_key ON scripts USING btree (trial_id, key);
+
+
+--
 -- Name: index_submodules_on_commit_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
 --
 
@@ -1160,6 +1204,13 @@ CREATE TRIGGER update_updated_at_column_of_repositories BEFORE UPDATE ON reposit
 
 
 --
+-- Name: update_updated_at_column_of_scripts; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_scripts BEFORE UPDATE ON scripts FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
 -- Name: update_updated_at_column_of_tasks; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1262,6 +1313,14 @@ ALTER TABLE ONLY branches
 
 ALTER TABLE ONLY email_addresses
     ADD CONSTRAINT fk_rails_de643267e7 FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_eb81826b6c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY scripts
+    ADD CONSTRAINT fk_rails_eb81826b6c FOREIGN KEY (trial_id) REFERENCES trials(id) ON DELETE CASCADE;
 
 
 --
@@ -1393,6 +1452,8 @@ INSERT INTO schema_migrations (version) VALUES ('45');
 INSERT INTO schema_migrations (version) VALUES ('46');
 
 INSERT INTO schema_migrations (version) VALUES ('5');
+
+INSERT INTO schema_migrations (version) VALUES ('51');
 
 INSERT INTO schema_migrations (version) VALUES ('6');
 

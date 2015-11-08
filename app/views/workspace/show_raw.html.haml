@@ -1,0 +1,35 @@
+:ruby
+  breadcrumbs=
+    if params[:breadcrumbs]
+      breadcrumbs = JSON.parse(params[:breadcrumbs]).with_indifferent_access
+    end
+
+- if breadcrumbs
+  .row
+    .col-md-8
+      %ol.breadcrumb.pull-left
+        =render breadcrumbs[:partial], breadcrumbs[:params]
+        %li.active
+          %icon.icon-raw-data
+          Raw
+
+    .col-md-4
+      %ol.breadcrumb.with-circle-separator.pull-right
+        %li
+          = link_to workspace_show_raw_path(params.slice(:where).merge(format: 'json')) do
+            %icon.icon-raw-data
+            JSON
+        %li
+          = link_to workspace_show_raw_path(params.slice(:where).merge(format: 'yaml')) do
+            %icon.icon-raw-data
+            YAML
+
+
+
+%h1
+  Show Raw Data in Table
+  %em= @table_name
+  Where
+  %code= @where_condition.inspect
+
+%pre.code= @attributes.to_yaml

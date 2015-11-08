@@ -7,18 +7,13 @@
 
   :ruby
 
-    scripts = trial.scripts.with_indifferent_access.map{|k,v| (v && v.merge(key: v[:key].presence || k)) || k
-    }.select{|s| (s[:started_at].presence || s[:skipped_at].presence)
-    }.map{ |s|
-      { key: s[:key],
-        state: s[:state],
-        name: s[:name] || s[:key],
-        started_at: Time.iso8601(s[:started_at].presence || s[:skipped_at].presence),
-        finished_at: Time.iso8601(s[:finished_at].presence || s[:aborted_at].presence || s[:skipped_at].presence || Time.now.iso8601)}
+    scripts = trial.scripts.select{|s| (s[:started_at].present?)
+    }.map(&:attributes).map(&:with_indifferent_access).map{|s|
+      s.merge(finished_at: s[:finished_at] || Time.zone.now)
     }.map{|s|
-      duration= [s[:finished_at] - s[:started_at],1].max
+      duration= [ s[:finished_at] - s[:started_at],1].max
       s.merge(duration: duration)
-    }.sort_by{|s| [s[:started_at],s[:finished_at]]}
+    }
 
     first_script_started_at = scripts.map{|s| s[:started_at]}.reduce{ |m, t| m < t ? m : t }
 
@@ -30,8 +25,7 @@
       finished_at: first_script_started_at,
       duration: first_script_started_at - trial[:started_at] }
 
-
-    scripts.sort_by!{|s| [s[:started_at],s[:finished_at]]}
+    scripts.sort_by!{|s| s[:started_at]}
 
     started_at = scripts.map{|s| s[:started_at]}.reduce{ |m, t| m < t ? m : t }
 
@@ -97,6 +91,6 @@
 
     - labels.each_with_index do |l,i|
       %text{l.to_h}
-        %a{'xlink:href': (workspace_trial_path(trial) + "##{l[:key]}"), 'xlink:show': 'replace'}
+        %a{'xlink:href': script_workspace_trial_path(trial, key: l[:key]), 'xlink:show': 'replace'}
           = l[:text]
 

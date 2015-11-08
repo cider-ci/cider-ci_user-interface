@@ -85,10 +85,17 @@
             Edit
 
       %h1
-        %span#header-label.reload.label{data: {cache_signature: job.state}, class: label_class_for_state(state)}<>
-          %i{class: icon_class_for_state(state)}<>
-        %span &nbsp; #{job.name}
+        Job
+        %em.name= job.name
 
+      %ul.enumeration.list-unstyled.list-inline
+        %li
+          %span<>= render "label_for_state", state: job.state
+          &nbsp;
+          %span>= job.state
+        %li
+          %span created
+          %b<>= render 'humanized_time_from_now', at: job.created_at
 
       - if job.description.present?
         .job-description= markdown(job.description.squish)

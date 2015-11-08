@@ -2,7 +2,9 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Script
-  DEFAULT_ORDER = 5
-  DEFAULT_TIMEOUT = 200
+class Script < ActiveRecord::Base
+  belongs_to :trial
+
+  default_scope { reorder(started_at: :asc, finished_at: :asc, key: :asc, name: :asc) }
+
 end
