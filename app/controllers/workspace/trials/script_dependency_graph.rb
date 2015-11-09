@@ -10,11 +10,11 @@ module ::Workspace::Trials::ScriptDependencyGraph
 
   def scripts_dependency_svg_graph_cache_signature(trial, type = :start)
     CacheSignature.signature type, trial.task.task_specification_id,
-      trial.scripts.reorder(key: :desc).select(:state).map(&:state)
+      trial.scripts.reorder(key: :asc).select(:state).map(&:state)
   end
 
   def scripts_dependency_svg_graph(trial, type = :start)
-    scripts = trial.scripts
+    scripts = trial.scripts.reorder(key: :asc).to_a
 
     sanitize = lambda do|str|
       str.gsub(/[^0-9A-Za-z.\-]/, '_') rescue ''
@@ -22,10 +22,11 @@ module ::Workspace::Trials::ScriptDependencyGraph
 
     build_arcs = lambda do|scripts, type|
         scripts.flat_map do |s|
-          s[type] && s[type].map { |k, v| v || k }.map do |dependency|
-            [sanitize.(dependency['script']),
-             sanitize.(s[:key]),
-             (dependency['states'] || ['passed']).map { |w| sanitize.(w) }]
+          s[type] && s[type].map { |k, v| v || k }.sort_by { |s| s[:key] } \
+            .map do |dependency|
+              [sanitize.(dependency['script']),
+               sanitize.(s[:key]),
+               (dependency['states'] || ['passed']).map { |w| sanitize.(w) }]
           end
         end.compact
     end
