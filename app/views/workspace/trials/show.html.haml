@@ -7,8 +7,8 @@
   scripts= trial.scripts.select(:key,:name,:state)
   issues = trial.trial_issues
   cache_signature = CacheSignature.signature trial.cache_signature,
-          trial.trial_attachments.collection_cache_signature, admin?
-
+    trial.trial_attachments.collection_cache_signature, admin?,
+    trial.scripts.reorder(key: :desc).select(:state).map(&:state)
 
 - cache cache_signature do
 
@@ -85,7 +85,8 @@
             on
             %b #{executor_name}
 
-      %section#overview
+
+      %section#overview.reload{data: { cache_signature: cache_signature}}
         %h2 Scripts Overview
         %ul.list-inline
           = render partial: 'script_label', collection: scripts,

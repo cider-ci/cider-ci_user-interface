@@ -1,7 +1,8 @@
 
 :ruby
   trial ||=  @trial || Trial.find(params[:id])
-  cache_signature = CacheSignature.signature(trial)
+  cache_signature ||= CacheSignature.signature trial.cache_signature,
+    trial.scripts.reorder(key: :desc).select(:state).map(&:state)
 
 - cache cache_signature do
 

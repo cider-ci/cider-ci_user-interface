@@ -10,7 +10,7 @@ module ::Workspace::Trials::ScriptDependencyGraph
 
   def scripts_dependency_svg_graph_cache_signature(trial, type = :start)
     CacheSignature.signature type, trial.task.task_specification_id,
-      trial.scripts.sort_by { |s| s[:key].presence }.map { |s| s[:state] }
+      trial.scripts.reorder(key: :desc).select(:state).map(&:state)
   end
 
   def scripts_dependency_svg_graph(trial, type = :start)
