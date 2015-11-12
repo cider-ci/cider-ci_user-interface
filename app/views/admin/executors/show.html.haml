@@ -74,8 +74,11 @@
 
 %h2 Accepted-Repositories
 
-- @executor.accepted_repositories.each do |ar|
-  %span.label.label-default= ar
+- if @executor.accepted_repositories.present?
+  - @executor.accepted_repositories.each do |ar|
+    %span.label.label-default= ar
+- else
+  This executor accepts trials for any project.
 
 
 

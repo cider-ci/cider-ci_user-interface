@@ -6,7 +6,15 @@
 
   - cache CacheSignature.signature(WelcomePageSettings.find.cache_signature) do
     #welcome_message
-      =markdown(WelcomePageSettings.find.welcome_message)
+      - if (welcome_page_settings = WelcomePageSettings.find) && welcome_page_settings.welcome_message.present?
+        =markdown(welcome_page_settings.welcome_message)
+      - else
+        :markdown
+          # Welcome to Cider-CI
+
+          This is the default welcome-message.
+
+          It can be customized via `Administration` → `Welcome page settings`!
 
   %hr
 
