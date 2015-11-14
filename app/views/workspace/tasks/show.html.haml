@@ -12,12 +12,11 @@
 
     %ol.breadcrumb.with-circle-separator.pull-right
       %li
-        = link_to api_browser_path("/tasks/#{task.id}")  do
+        %a.api{href: api_browser_path("/tasks/#{task.id}")}
           %icon.icon-raw-data
-          Task Data
-
+          Task-Data
       %li
-        = link_to api_browser_path("/task-specifications/#{task.task_specification_id}")  do
+        %a.api{href: api_browser_path("/task-specifications/#{task.task_specification_id}")}
           %icon.icon-raw-data
           Task-Specification Data
 

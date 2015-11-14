@@ -90,7 +90,8 @@ class Workspace::JobsController < WorkspaceController
 
   def show
     @job = Job.select(:id, :state, :created_at, :updated_at,
-      :name, :tree_id, :description, :result).find(params[:id])
+      :name, :tree_id, :description, :job_specification_id,
+      :result).find(params[:id])
     require_sign_in unless @job.public_view_permission?
     @link_params = params.slice(:branch, :page, :repository)
     @trials = Trial.joins(task: :job).where('jobs.id = ?', @job.id)

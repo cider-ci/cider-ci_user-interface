@@ -42,6 +42,16 @@
                   %span.text-danger= pluralize(jcs.job_issues_count,"Issue")
 
           %li
+            = link_to api_browser_path("/jobs/#{job.id}")  do
+              %icon.icon-raw-data
+              Job-Data
+
+          %li
+            = link_to api_browser_path("/job-specifications/#{job.job_specification_id}")  do
+              %icon.icon-raw-data
+              Job-Specification-Data
+
+          %li
             = link_to job_specification_workspace_job_path(job) do
               %i.icon-spec
               Specification
