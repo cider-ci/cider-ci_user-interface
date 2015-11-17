@@ -40,7 +40,7 @@ jobs:
           name: Code complexity with flog
           scripts:
             test:
-              body: bundle exec cider-ci_flog -l 60 app/ lib/
+              body: bundle exec cider-ci_flog -l 120 app/ lib/
 
         code_similarity:
           name: Code similarity with flay

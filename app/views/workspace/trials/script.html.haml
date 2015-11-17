@@ -1,6 +1,24 @@
 :ruby
   script ||= Script.find_by(trial_id: params[:id], key: params[:key])
   cache_signature = script.cache_signature
+  pre_elements = %w(body stderr stdout)
+
+- page_links = capture_haml do
+  - cache "workspace/trials#scripts page_links" do
+    .btn-group
+      %a.btn.btn-default.btn-sm{href: "#page"}
+        %icon.fa.fa-step-backward.fa-rotate-90
+        &nbsp;Page
+      //%a.btn.btn-default.btn-sm{href: "#page_bottom"}
+      //  %icon.fa.fa-step-backward.fa-rotate-270
+    - pre_elements.each do |property|
+      - end_anchor= "#{property}_bottom"
+      .btn-group
+        %a.btn.btn-default.btn-sm{href: "##{property}"}
+          %icon.fa.fa-step-backward.fa-rotate-90
+          &nbsp; #{property.camelize}
+        %a.btn.btn-default.btn-sm{href: "##{end_anchor}"}
+          %icon.fa.fa-step-backward.fa-rotate-270
 
 - cache cache_signature do
 
@@ -18,38 +36,44 @@
             %icon.icon-raw-data
             Data
 
+
+
   %h1
     Script
     %em.name= script.name
     = render 'for_task_header', task: script.trial.task
 
-  %ul.enumeration.list-unstyled.list-inline
-    %li
-      %span<>= render "label_for_state", state: script.state
-      &nbsp;
-      %span= script.state
-    - if script.started_at and script.finished_at
-      %li
-        - duration = script.finished_at - script.started_at
-        in
-        %span.humanize-duration{data: {duration: duration}} #{duration} seconds
-        %span (#{duration.round} #{"second".pluralize(duration.round)})
-    - elsif script.started_at
-      %li
-        - duration = Time.zone.now - script.started_at
-        since
-        %span.humanize-duration{data: {duration: duration}} #{duration} seconds
-        %span (#{duration.round} #{"second".pluralize(duration.round)})
-
-
   #reload-page{data: { cache_signature: cache_signature, reload_timeout: reload_timeout}}
 
-    - %w(body stderr stdout).each do |property|
+    %ul.enumeration.list-unstyled.list-inline
+      %li#state.reload{data: {cache_signature: script.state}}
+        %span<>= render "label_for_state", state: script.state
+        &nbsp;
+        %span= script.state
+      - if script.started_at and script.finished_at
+        - duration = script.finished_at - script.started_at
+        %li#duration.reload{data: {cache_signature: duration}}
+          in
+          %span.humanize-duration{data: {duration: duration}} #{duration} seconds
+          %span (#{duration.round} #{"second".pluralize(duration.round)})
+      - elsif script.started_at
+        - duration = Time.zone.now - script.started_at
+        %li#duration.reload{data: {cache_signature: duration}}
+          since
+          %span.humanize-duration{data: {duration: duration}} #{duration} seconds
+          %span (#{duration.round} #{"second".pluralize(duration.round)})
+
+    - pre_elements.each do |property|
       :ruby
         value = script[property]
         cache_signature= CacheSignature.signature(value)
       %section.reload{id: property, data: {cache_signature: cache_signature}}
-        -if value.present?
-          %h3= property.camelize
-          %pre=  value.is_a?(String) ? value : value.to_yaml
+        - end_anchor= "#{property}_bottom"
+        %h3
+          .pull-right= page_links
+          = property.camelize
+        %pre=  value.is_a?(String) ? value : value.to_yaml
+        .end{id: end_anchor}
 
+
+    .pull-right= page_links

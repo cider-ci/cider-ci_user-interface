@@ -19,7 +19,7 @@
       :sass
         .for-admin
           display: none !important
-  %body{data: {user: user?, admin: admin?, session: {reload: {strategy: session[:reload_strategy]}}}}
+  %body#page{data: {user: user?, admin: admin?, session: {reload: {strategy: session[:reload_strategy]}}}}
     .container-fluid
 
       = cache CacheSignature.signature("layouts/application", current_user, request.original_fullpath) do
@@ -33,7 +33,9 @@
               = msg
 
       %div#application{data: {env: Rails.env}}
-
         = yield
+      #page_bottom
+
+
 
 

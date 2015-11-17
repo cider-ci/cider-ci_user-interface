@@ -487,6 +487,7 @@ CREATE TABLE scripts (
     template_environment_variables boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    exit_status integer,
     CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'skipped'::character varying, 'passed'::character varying, 'waiting'::character varying])::text[])))
 );
 
@@ -1454,6 +1455,8 @@ INSERT INTO schema_migrations (version) VALUES ('46');
 INSERT INTO schema_migrations (version) VALUES ('5');
 
 INSERT INTO schema_migrations (version) VALUES ('51');
+
+INSERT INTO schema_migrations (version) VALUES ('52');
 
 INSERT INTO schema_migrations (version) VALUES ('6');
 

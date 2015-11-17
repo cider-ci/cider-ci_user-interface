@@ -48,6 +48,8 @@ $ ->
 
     $new= $("#reload-page",data)
 
+    $("#reload-page").trigger("before:replace-elements")
+
     $(".reload").each (i,el)->
       try
         $el= $(el)
@@ -60,6 +62,9 @@ $ ->
         $el.attr("data-cache-signature",newCacheTag)
       catch error
         logger.error error
+
+    $("#reload-page").trigger("after:replace-elements")
+
 
     setReloadTimeout readReloadTimeout($new)
     $("#reload-page").attr({'data-reloaded-at': moment().format()})
