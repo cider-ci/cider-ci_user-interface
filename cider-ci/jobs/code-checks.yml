@@ -46,7 +46,7 @@ jobs:
           name: Code similarity with flay
           scripts:
             test:
-              body: bundle exec cider-ci_flay -m 18 app/ lib/
+              body: bundle exec cider-ci_flay -m 164 app/ lib/
 
         lint_ruby:
           name: Lint/Stylecheck with Rubocop

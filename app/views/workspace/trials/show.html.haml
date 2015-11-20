@@ -65,11 +65,17 @@
           %pre.script= trial.error
 
 
-      %ul.enumeration.list-unstyled.list-inline
+      %ul#trial-info.enumeration.list-unstyled.list-inline
         %li
           %span<>= render "label_for_state", state: trial.state
           &nbsp;
           %span>= trial.state
+        %li.created
+          %span created
+          %b<= render 'humanized_time_from_now', at: trial.created_at
+          - if trial.created_by
+            %span by
+            %b= trial.creator
         -if trial.started_at
           %li
             %span started
@@ -80,11 +86,17 @@
             %b= distance_of_time_in_words(trial.started_at,trial.finished_at,
               include_seconds: true)
             (#{(trial.finished_at - trial.started_at).round(2)} seconds)
+        %li.aborted
+          - if trial.aborted_at
+            %span aborted
+            %b<= render 'humanized_time_from_now', at: trial.aborted_at
+          - if trial.aborted_by
+            %span by
+            %b= trial.aborter
         - if executor_name = trial.executor.try(:name)
           %li
             on
             %b #{executor_name}
-
 
       %section#overview.reload{data: { cache_signature: cache_signature}}
         %h2 Scripts Overview

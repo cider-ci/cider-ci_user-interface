@@ -21,7 +21,7 @@ module Concerns
     end
 
     def build_small_badge_params(job, repository_name,
-                                 branch_name, job_name)
+      branch_name, job_name)
 
       host_info_text = ('Cider-CI @ ' + ::Settings[:hostname]).squish
       git_info_text = (repository_name + ' / ' + branch_name).squish

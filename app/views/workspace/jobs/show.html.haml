@@ -98,14 +98,33 @@
         Job
         %em.name= job.name
 
-      %ul.enumeration.list-unstyled.list-inline
-        %li
+      %ul#job-info.reload.enumeration.list-unstyled.list-inline{data: {cache_signature: cache_signature}}
+        %li.state
           %span<>= render "label_for_state", state: job.state
           &nbsp;
           %span>= job.state
-        %li
+        %li.created
           %span created
-          %b<>= render 'humanized_time_from_now', at: job.created_at
+          %b<= render 'humanized_time_from_now', at: job.created_at
+          - if job.created_by
+            %span by
+            %b= job.creator
+        %li.aborted
+          - if job.aborted_at
+            %span aborted
+            %b<= render 'humanized_time_from_now', at: job.aborted_at
+          - if job.aborted_by
+            %span by
+            %b= job.aborter
+        %li.resumed
+          - if job.resumed_at
+            %span retried /resumed
+            %b<= render 'humanized_time_from_now', at: job.resumed_at
+          - if job.resumed_by
+            %span by
+            %b= job.aborter
+
+
 
       - if job.description.present?
         .job-description= markdown(job.description.squish)

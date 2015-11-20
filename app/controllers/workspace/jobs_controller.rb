@@ -19,11 +19,6 @@ class Workspace::JobsController < WorkspaceController
     @_lookup_context.prefixes << 'workspace/tasks'
   end
 
-  def build_create_request_data
-    Job.new(params[:job].permit!).attributes \
-      .select { |k, v| v.present? }.instance_eval { Hash[self] }
-  end
-
   def request_create(data)
     url = service_base_url(::Settings.services.builder.http) + '/jobs/'
 
@@ -39,33 +34,39 @@ class Workspace::JobsController < WorkspaceController
   end
 
   def create
-    begin
-      resp = request_create(build_create_request_data).execute
-      redirect_to workspace_job_path(JSON.parse(resp.body).deep_symbolize_keys[:id])
-    rescue Exception => e
-      @alerts[:errors] << Formatter.exception_to_s(e)
-      render 'public/error', status: 500
+    url = service_base_url(Settings.services.builder.http) + '/jobs/'
+    response = http_do(:post, url) do |c|
+      c.headers['content-type'] = 'application/json'
+      c.body = params[:job].slice(:key, :tree_id) \
+        .merge(created_by: current_user.id).to_json
+    end
+    case response.status
+    when 300..600
+      redirect_to workspace_path,
+        flash: { errors: [
+          "The creation of a new job failed: #{response.status} #{response.body}"] }
+    else
+      redirect_to workspace_job_path(JSON.parse(response.body).deep_symbolize_keys[:id]),
+        flash: { successes: [
+          "#{response.status} A new job has been created. "] }
     end
   end
 
   def abort
-    request_dispatcher_custom_action 'abort', 'Abort'
-  end
-
-  def request_dispatcher_custom_action(action, name = action)
     job = Job.find(params[:id])
-    url = service_base_url(Settings.services.dispatcher.http) + "/jobs/#{job.id}/#{action}"
-    response = http_do(:post, url)
+    url = service_base_url(Settings.services.dispatcher.http) + "/jobs/#{job.id}/abort"
+    response = http_do(:post, url) do |c|
+      c.headers['content-type'] = 'application/json'
+      c.body = { aborted_by: current_user.id,
+                 aborted_at: Time.now.iso8601(4) }.to_json
+    end
     case response.status
     when 300..600
       redirect_to workspace_job_path(job.id),
-        flash: { errors: [" #{response.status} #{name}" \
-                          "request failed! #{response.body}"] }
+        flash: { errors: ["Abort failed: #{response.status} #{response.body}"] }
     else
       redirect_to workspace_job_path(job.id, @filter_params),
-        flash: { successes:
-                 ["#{response.status} #{name} " \
-                  "request succeeded. #{response.body}"] }
+        flash: { successes: ["#{response.status} Aborted! "] }
     end
   end
 
@@ -89,9 +90,7 @@ class Workspace::JobsController < WorkspaceController
   end
 
   def show
-    @job = Job.select(:id, :state, :created_at, :updated_at,
-      :name, :tree_id, :description, :job_specification_id,
-      :result).find(params[:id])
+    @job = Job.find(params[:id])
     require_sign_in unless @job.public_view_permission?
     @link_params = params.slice(:branch, :page, :repository)
     @trials = Trial.joins(task: :job).where('jobs.id = ?', @job.id)
@@ -121,7 +120,23 @@ class Workspace::JobsController < WorkspaceController
   end
 
   def retry_and_resume
-    request_dispatcher_custom_action 'retry-and-resume', 'Retry and resume'
+    job = Job.find(params[:id])
+    url = service_base_url(Settings.services.dispatcher.http) \
+      + "/jobs/#{job.id}/retry-and-resume"
+    response = http_do(:post, url) do |c|
+      c.headers['content-type'] = 'application/json'
+      c.body = { resumed_by: current_user.id,
+                 resumed_at: Time.now.iso8601(4) }.to_json
+    end
+    case response.status
+    when 300..600
+      redirect_to workspace_job_path(job.id),
+        flash: { errors: [
+          "Retry and resume retry failed: #{response.status} #{response.body}"] }
+    else
+      redirect_to workspace_job_path(job.id, @filter_params),
+        flash: { successes: ["#{response.status}  Retrying and resuming! "] }
+    end
   end
 
   def update

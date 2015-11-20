@@ -8,7 +8,7 @@ module Concerns
     }
 
     def build_summary_properties(reponame, branchname, job_names,
-                              options = {})
+      options = {})
 
       defaults = DEFAULT_OPTIONS.merge options
 

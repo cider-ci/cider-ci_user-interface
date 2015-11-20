@@ -8,6 +8,8 @@ class Job < ActiveRecord::Base
 
   has_one :job_stat
   has_one :job_cache_signature
+  belongs_to :creator, foreign_key: :created_by, class_name: 'User'
+  belongs_to :aborter, foreign_key: :aborted_by, class_name: 'User'
 
   before_create { self.id ||= SecureRandom.uuid }
 

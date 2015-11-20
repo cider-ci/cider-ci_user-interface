@@ -3,8 +3,9 @@ module Concerns
     extend ActiveSupport::Concern
 
     # TODO: disable RaiseError by default
-    def http_get(url, username = ::Settings.basic_auth.username,
-                 password = ::Settings.basic_auth.password, &block)
+    def http_get(url,
+      username: ::Settings.basic_auth.username,
+      password: ::Settings.basic_auth.password, &block)
 
       http_request = Faraday.new(url: url) do |f|
         f.basic_auth username, password
@@ -18,8 +19,10 @@ module Concerns
     end
 
     # NOTE this one doesn't raise!
-    def http_do(method, url, username = ::Settings.basic_auth.username,
-                 password = ::Settings.basic_auth.password, &block)
+    def http_do(method, url, body: nil,
+      headers: {},
+      username: ::Settings.basic_auth.username,
+      password: ::Settings.basic_auth.password, &block)
 
       http_request = Faraday.new(url: url) do |f|
         f.basic_auth username, password
@@ -29,7 +32,7 @@ module Concerns
         f.ssl.verify = false
       end
 
-      http_request.run_request method, url, nil, nil, &block
+      http_request.run_request method, url, body, headers, &block
     end
 
   end

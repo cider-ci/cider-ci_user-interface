@@ -13,7 +13,10 @@ class Workspace::TasksController < WorkspaceController
     set_task
     url = service_base_url(Settings.services.dispatcher.http) +
       "/tasks/#{@task.id}/retry"
-    response = http_do(:post, url)
+    response = http_do(:post, url) do |c|
+      c.headers['content-type'] = 'application/json'
+      c.body = { created_by: current_user.id }.to_json
+    end
     case response.status
     when 200..299
       redirect_to workspace_trial_path(JSON.parse(response.body)['id']),

@@ -5,6 +5,8 @@
 class Trial < ActiveRecord::Base
   belongs_to :task
   belongs_to :executor
+  belongs_to :creator, foreign_key: :created_by, class_name: 'User'
+  belongs_to :aborter, foreign_key: :aborted_by, class_name: 'User'
   has_many :trial_issues
   has_many :scripts
 

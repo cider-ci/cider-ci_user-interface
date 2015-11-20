@@ -40,7 +40,7 @@ module ServiceCheck
 
     def check_resource(url, basic_auth)
       begin
-        response = http_get(url, basic_auth.username, basic_auth.password)
+        response = http_get(url, username: basic_auth.username, password: basic_auth.password)
         res = OpenStruct.new
         if response.status.between?(200, 299)
           res.is_success = true

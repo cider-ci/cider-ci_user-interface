@@ -267,6 +267,11 @@ CREATE TABLE jobs (
     priority integer DEFAULT 0 NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_by uuid,
+    aborted_by uuid,
+    aborted_at timestamp without time zone,
+    resumed_by uuid,
+    resumed_at timestamp without time zone,
     CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -574,6 +579,9 @@ CREATE TABLE trials (
     finished_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_by uuid,
+    aborted_by uuid,
+    aborted_at timestamp without time zone,
     CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -1269,6 +1277,38 @@ ALTER TABLE ONLY trial_attachments
 
 
 --
+-- Name: fk_rails_3bfb7b73f7; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY trials
+    ADD CONSTRAINT fk_rails_3bfb7b73f7 FOREIGN KEY (aborted_by) REFERENCES users(id);
+
+
+--
+-- Name: fk_rails_3ccf965e25; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT fk_rails_3ccf965e25 FOREIGN KEY (created_by) REFERENCES users(id);
+
+
+--
+-- Name: fk_rails_3e557ab362; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY trials
+    ADD CONSTRAINT fk_rails_3e557ab362 FOREIGN KEY (created_by) REFERENCES users(id);
+
+
+--
+-- Name: fk_rails_5056f0a1f0; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT fk_rails_5056f0a1f0 FOREIGN KEY (aborted_by) REFERENCES users(id);
+
+
+--
 -- Name: fk_rails_637f302c5b; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1306,6 +1346,14 @@ ALTER TABLE ONLY branches_commits
 
 ALTER TABLE ONLY branches
     ADD CONSTRAINT fk_rails_ce3c7008c0 FOREIGN KEY (repository_id) REFERENCES repositories(id);
+
+
+--
+-- Name: fk_rails_cf50105b6a; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY jobs
+    ADD CONSTRAINT fk_rails_cf50105b6a FOREIGN KEY (resumed_by) REFERENCES users(id);
 
 
 --
@@ -1457,6 +1505,8 @@ INSERT INTO schema_migrations (version) VALUES ('5');
 INSERT INTO schema_migrations (version) VALUES ('51');
 
 INSERT INTO schema_migrations (version) VALUES ('52');
+
+INSERT INTO schema_migrations (version) VALUES ('53');
 
 INSERT INTO schema_migrations (version) VALUES ('6');
 

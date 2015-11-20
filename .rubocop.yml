@@ -53,6 +53,10 @@ Metrics/LineLength:
 Metrics/MethodLength:
   Max: 124
 
+# Configuration parameters: CountKeywordArgs.
+Metrics/ParameterLists:
+  Max: 7
+
 Metrics/PerceivedComplexity:
   Max: 11
 
