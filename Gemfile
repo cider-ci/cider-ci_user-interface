@@ -36,7 +36,7 @@ gem 'bcrypt-ruby'
 gem 'bootswatch-rails'
 gem 'bunny', '>= 1.3'
 gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
-gem 'configuration_management_backdoor', '>= 1.1.0', '< 2.0'
+gem 'configuration_management_backdoor', '>= 2.0.0', '< 3.0'
 gem 'faraday'
 gem 'kaminari'
 gem 'newrelic_rpm'
@@ -54,7 +54,6 @@ gem 'uuidtools'
 
 gem 'addressable', group: [:test]
 gem 'capybara', group: [:test]
-gem 'cider_ci-rspec_support', '>= 1.0.3', '< 2.0.0', group: [:development, :test]
 gem 'cider_ci-support', '~> 1.2.0', group: [:development, :test]
 gem 'factory_girl', group: [:development, :test]
 gem 'factory_girl_rails', group: [:development, :test]
@@ -65,8 +64,6 @@ gem 'rspec-rails', group: [:development, :test]
 gem 'rubocop', group: [:development, :test]
 gem 'sdoc', group: [:doc], require: false
 gem 'selenium-webdriver', group: [:test]
-gem 'simplecov', require: false, group: :test
-gem 'simplecov-html', require: false, group: ['test'], git: 'https://github.com/eins78/simplecov-html.git', ref: '3fac7b20bbe3967d1f9d55c3166f348d620a2005'
 
 
 # TODO, find unused views and partials after we have some tests
