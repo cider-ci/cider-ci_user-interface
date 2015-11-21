@@ -66,7 +66,7 @@
 
 
       %ul#trial-info.enumeration.list-unstyled.list-inline
-        %li
+        %li.state{data: {state: trial.state}}
           %span<>= render "label_for_state", state: trial.state
           &nbsp;
           %span>= trial.state
