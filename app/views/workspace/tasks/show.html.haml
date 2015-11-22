@@ -47,6 +47,12 @@
     %span created
     %b<>= render 'humanized_time_from_now', at: task.created_at
 
+%section#errors
+  -unless task.entity_errors.empty?
+    %h2 Errors
+    - task.entity_errors.each do |error|
+      .error.alert.alert-danger
+        =markdown(error)
 
 %section#trials
 

@@ -419,10 +419,10 @@ CREATE TABLE tasks (
     task_specification_id uuid NOT NULL,
     priority integer DEFAULT 0 NOT NULL,
     traits character varying[] DEFAULT '{}'::character varying[] NOT NULL,
-    error text DEFAULT ''::text NOT NULL,
     exclusive_global_resources character varying[] DEFAULT '{}'::character varying[] NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    entity_errors jsonb DEFAULT '[]'::jsonb,
     CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -1507,6 +1507,8 @@ INSERT INTO schema_migrations (version) VALUES ('51');
 INSERT INTO schema_migrations (version) VALUES ('52');
 
 INSERT INTO schema_migrations (version) VALUES ('53');
+
+INSERT INTO schema_migrations (version) VALUES ('54');
 
 INSERT INTO schema_migrations (version) VALUES ('6');
 
