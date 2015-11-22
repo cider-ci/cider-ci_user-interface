@@ -38,8 +38,8 @@
 %h1
   = render 'for_task_header', task: task, start: "Task"
 
-%ul.enumeration.list-unstyled.list-inline
-  %li
+%ul#task-info.enumeration.list-unstyled.list-inline
+  %li.state
     %span<>= render "label_for_state", state: task.state
     &nbsp;
     %span>= task.state
