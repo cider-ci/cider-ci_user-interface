@@ -1,3 +1,5 @@
+require 'active_support/core_ext/numeric/bytes'
+
 CiderCI::Application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
@@ -56,6 +58,7 @@ CiderCI::Application.configure do
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
+  config.cache_store = :memory_store, {size: (Settings.user_interface_cache_size_megabytes.presence || 128).megabytes}
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.action_controller.asset_host = "http://assets.example.com"

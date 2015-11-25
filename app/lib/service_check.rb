@@ -50,7 +50,7 @@ module ServiceCheck
           res.content = { message: response.body }
         end
         res
-      rescue StandardError => e
+      rescue Exception => e
         Rails.logger.warn Formatter.exception_to_log_s(e)
         res = OpenStruct.new
         res.is_success = false
