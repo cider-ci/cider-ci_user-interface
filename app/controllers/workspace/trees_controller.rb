@@ -14,8 +14,14 @@ class Workspace::TreesController < WorkspaceController
   def show
     @tree_id = params[:id]
     @attachments = TreeAttachment.where(tree_id: @tree_id)
-    @commits = Commit.where(tree_id: @tree_id)
-    @jobs = Job.where(tree_id: @tree_id)
+    @commits = Commit.where(
+      " id IN ( WITH RECURSIVE recursive_commits(id) AS
+          ( SELECT id FROM commits WHERE tree_id = ?
+           UNION ALL SELECT submodule_commit_id
+           FROM submodules, recursive_commits
+           WHERE submodules.commit_id = recursive_commits.id )
+        SELECT id FROM recursive_commits) ", @tree_id)
+    @jobs = Job.where(tree_id: @commits.map(&:tree_id))
   end
 
   def get_project_configuration(tree_id)

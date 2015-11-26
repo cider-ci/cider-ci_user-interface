@@ -1,3 +1,35 @@
+
+SELECT id FROM commits WHERE tree_id = 'df7ca91946dd93944cbd5a2371c20b4f1360c27a';
+
+SELECT submodule_commit_id FROM submodules WHERE commit_id = '5f685b7b58557226ffa19589083448e66f487c08';
+
+WITH RECURSIVE recursive_commits(id) AS
+  ( SELECT id
+   FROM commits
+   WHERE tree_id = 'df7ca91946dd93944cbd5a2371c20b4f1360c27a'
+   UNION ALL SELECT submodule_commit_id
+   FROM submodules,
+        recursive_commits
+   WHERE submodules.commit_id = recursive_commits.id )
+SELECT id
+FROM recursive_commits;
+
+
+
+
+
+WITH RECURSIVE recursive_commits(id) AS (
+    SELECT id FROM commits WHERE tree_id = 'df7ca91946dd93944cbd5a2371c20b4f1360c27a'
+  -- UNION ALL
+  --  SELECT p.sub_part, p.part, p.quantity
+  --  FROM included_parts pr, parts p
+  --  WHERE p.part = pr.sub_part
+  )
+SELECT id FROM recursive_commits;
+
+
+
+
 SELECT "commits".*
 FROM "commits"
 INNER JOIN "branches_commits" ON "branches_commits"."commit_id" = "commits"."id"

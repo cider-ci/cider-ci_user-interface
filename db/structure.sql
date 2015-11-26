@@ -502,9 +502,9 @@ CREATE TABLE scripts (
 --
 
 CREATE TABLE submodules (
-    submodule_commit_id character varying NOT NULL,
+    submodule_commit_id character varying(40) NOT NULL,
     path text NOT NULL,
-    commit_id character varying NOT NULL
+    commit_id character varying(40) NOT NULL
 );
 
 
@@ -1509,6 +1509,8 @@ INSERT INTO schema_migrations (version) VALUES ('52');
 INSERT INTO schema_migrations (version) VALUES ('53');
 
 INSERT INTO schema_migrations (version) VALUES ('54');
+
+INSERT INTO schema_migrations (version) VALUES ('55');
 
 INSERT INTO schema_migrations (version) VALUES ('6');
 
