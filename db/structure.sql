@@ -493,6 +493,10 @@ CREATE TABLE scripts (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     exit_status integer,
+    command jsonb,
+    working_dir character varying(2048),
+    script_file character varying(2048),
+    wrapper_file character varying(2048),
     CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'skipped'::character varying, 'passed'::character varying, 'waiting'::character varying])::text[])))
 );
 
@@ -1345,7 +1349,7 @@ ALTER TABLE ONLY branches_commits
 --
 
 ALTER TABLE ONLY branches
-    ADD CONSTRAINT fk_rails_ce3c7008c0 FOREIGN KEY (repository_id) REFERENCES repositories(id);
+    ADD CONSTRAINT fk_rails_ce3c7008c0 FOREIGN KEY (repository_id) REFERENCES repositories(id) ON DELETE CASCADE;
 
 
 --
@@ -1511,6 +1515,10 @@ INSERT INTO schema_migrations (version) VALUES ('53');
 INSERT INTO schema_migrations (version) VALUES ('54');
 
 INSERT INTO schema_migrations (version) VALUES ('55');
+
+INSERT INTO schema_migrations (version) VALUES ('56');
+
+INSERT INTO schema_migrations (version) VALUES ('57');
 
 INSERT INTO schema_migrations (version) VALUES ('6');
 

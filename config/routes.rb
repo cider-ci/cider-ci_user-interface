@@ -51,6 +51,7 @@ CiderCI::Application.routes.draw do
         get 'scripts-start-dependency-graph'
         get 'scripts-terminate-dependency-graph'
         get 'scripts/:key', action: :script, as: :script
+        get 'scripts/:key/debug', action: :debug_script, as: :debug_script
       end
     end
 
