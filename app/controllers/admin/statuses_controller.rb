@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Admin::StatiController < AdminController
+class Admin::StatusesController < AdminController
 
   def show
   end
