@@ -25,8 +25,6 @@ CiderCI::Application.routes.draw do
         as: 'primary_email_address'
     end
 
-    resource :session, only: [:edit, :update]
-
     # TODO: doesn't work if the tag contains dots o_O
     resources :tags, only: [:index, :show]
 

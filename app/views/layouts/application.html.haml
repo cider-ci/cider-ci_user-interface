@@ -6,10 +6,17 @@
 %html
   %head
     %title Cider-CI
-    = stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true
+    - case (current_user && current_user.ui_theme) || :default
+    - when 'cider'
+      = stylesheet_link_tag "cider", media: "all"
+    - when 'darkly'
+      = stylesheet_link_tag "darkly", media: "all"
+    - when 'bootstrap'
+      = stylesheet_link_tag "bootstrap-plain", media: "all"
+    - else
+      = stylesheet_link_tag "bootstrap-plain", media: "all"
+
     = javascript_include_tag "application", "data-turbolinks-track" => true
-    - if Rails.env == 'development'
-      = javascript_include_tag "try", "data-turbolinks-track" => true
     = csrf_meta_tags
     - unless user?
       :sass
@@ -19,7 +26,7 @@
       :sass
         .for-admin
           display: none !important
-  %body#page{data: {user: user?, admin: admin?, session: {reload: {strategy: session[:reload_strategy]}}}}
+  %body#page{data: {user: user?, admin: admin? }}
     .container-fluid
 
       = cache CacheSignature.signature("layouts/application", current_user, request.original_fullpath) do

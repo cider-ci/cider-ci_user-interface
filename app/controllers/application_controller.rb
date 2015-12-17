@@ -21,8 +21,12 @@ class ApplicationController < ActionController::Base
   end
 
   before_action do
-    if session[:mini_profiler_enabled] and defined?(Rack::MiniProfiler)
-      Rack::MiniProfiler.authorize_request
+    if defined?(Rack::MiniProfiler)
+      if current_user && current_user.mini_profiler_is_enabled
+        Rack::MiniProfiler.authorize_request
+      else
+        Rack::MiniProfiler.deauthorize_request
+      end
     end
   end
 

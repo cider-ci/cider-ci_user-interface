@@ -5,14 +5,14 @@
 !!!
 %html
   %head
-    %title Cider-CI Badge 
-    = stylesheet_link_tag    "application", media: "all", "data-turbolinks-track" => true
+    %title Cider-CI Badge
+    = stylesheet_link_tag "bootstrap-plain", media: "all", "data-turbolinks-track" => true
     = javascript_include_tag "application", "data-turbolinks-track" => true
     - if Rails.env == 'development'
       = javascript_include_tag "try", "data-turbolinks-track" => true
     = csrf_meta_tags
   %body{data: {session: session.to_hash}}
     %div#application{data: {env: Rails.env}}
-      = yield 
+      = yield
 
 

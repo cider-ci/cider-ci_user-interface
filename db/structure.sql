@@ -603,7 +603,10 @@ CREATE TABLE users (
     is_admin boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    workspace_filters jsonb
+    workspace_filters jsonb,
+    mini_profiler_is_enabled boolean DEFAULT false,
+    reload_frequency character varying,
+    ui_theme character varying
 );
 
 
@@ -1519,6 +1522,8 @@ INSERT INTO schema_migrations (version) VALUES ('55');
 INSERT INTO schema_migrations (version) VALUES ('56');
 
 INSERT INTO schema_migrations (version) VALUES ('57');
+
+INSERT INTO schema_migrations (version) VALUES ('58');
 
 INSERT INTO schema_migrations (version) VALUES ('6');
 

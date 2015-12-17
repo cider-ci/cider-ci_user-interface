@@ -9,13 +9,6 @@ $ ->
 
   $("#reload-page").attr({'data-reloaded-at': moment().format()})
 
-  switch $("body").attr("data-session-reload-strategy")
-    when "disabled"
-      isReloadEnabled= false
-      replacePageWith= (data)-> #noop
-    else
-      # default nothing to do here
-
 
 
   #### Reload timeout ##########################################################
