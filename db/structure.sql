@@ -290,7 +290,8 @@ CREATE TABLE repositories (
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     update_notification_token uuid DEFAULT uuid_generate_v4(),
     github_authtoken text,
-    use_default_github_authtoken boolean DEFAULT false NOT NULL
+    use_default_github_authtoken boolean DEFAULT false NOT NULL,
+    proxy_id uuid DEFAULT uuid_generate_v4() NOT NULL
 );
 
 
@@ -586,6 +587,7 @@ CREATE TABLE trials (
     created_by uuid,
     aborted_by uuid,
     aborted_at timestamp without time zone,
+    token uuid DEFAULT uuid_generate_v4() NOT NULL,
     CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -1524,6 +1526,8 @@ INSERT INTO schema_migrations (version) VALUES ('56');
 INSERT INTO schema_migrations (version) VALUES ('57');
 
 INSERT INTO schema_migrations (version) VALUES ('58');
+
+INSERT INTO schema_migrations (version) VALUES ('59');
 
 INSERT INTO schema_migrations (version) VALUES ('6');
 
