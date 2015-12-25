@@ -337,8 +337,7 @@ CREATE TABLE executors (
     last_ping_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    accepted_repositories character varying[] DEFAULT '{}'::character varying[],
-    CONSTRAINT executors_name_constraints CHECK (((name)::text ~* '^[A-Za-z0-9\-\_]+$'::text))
+    accepted_repositories character varying[] DEFAULT '{}'::character varying[]
 );
 
 
@@ -1530,6 +1529,8 @@ INSERT INTO schema_migrations (version) VALUES ('58');
 INSERT INTO schema_migrations (version) VALUES ('59');
 
 INSERT INTO schema_migrations (version) VALUES ('6');
+
+INSERT INTO schema_migrations (version) VALUES ('60');
 
 INSERT INTO schema_migrations (version) VALUES ('7');
 
