@@ -2,7 +2,7 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
-.well 
+.well
 
   = form_group "Name", control_id: 'executor_name', cols_control: 4 do
     = text_field :executor, :name, value: executor.name, autofocus: true, class: 'form-control'
@@ -13,5 +13,15 @@
   = form_group "Enabled", control_id: 'executor_enabled' do
     .checkbox
       = check_box :executor, :enabled, value: executor.enabled
+
+  = form_group "Upload trial attachments", control_id: 'upload_tree_attachments' do
+    .checkbox
+      = check_box :executor, :upload_trial_attachments, value: executor.upload_tree_attachments
+
+  = form_group "Upload tree attachments", control_id: 'upload_tree_attachments' do
+    .checkbox
+      = check_box :executor, :upload_tree_attachments, value: executor.upload_tree_attachments
+
+
 
 

@@ -337,7 +337,9 @@ CREATE TABLE executors (
     last_ping_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
-    accepted_repositories character varying[] DEFAULT '{}'::character varying[]
+    accepted_repositories character varying[] DEFAULT '{}'::character varying[],
+    upload_tree_attachments boolean DEFAULT false NOT NULL,
+    upload_trial_attachments boolean DEFAULT true NOT NULL
 );
 
 
@@ -356,6 +358,8 @@ CREATE TABLE executors_with_load (
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
     accepted_repositories character varying[],
+    upload_tree_attachments boolean,
+    upload_trial_attachments boolean,
     current_load bigint,
     relative_load double precision
 );
@@ -1131,28 +1135,6 @@ CREATE INDEX user_lower_login_idx ON users USING btree (lower((login)::text));
 --
 
 CREATE RULE "_RETURN" AS
-    ON SELECT TO executors_with_load DO INSTEAD  SELECT executors.id,
-    executors.name,
-    executors.max_load,
-    executors.enabled,
-    executors.traits,
-    executors.base_url,
-    executors.last_ping_at,
-    executors.created_at,
-    executors.updated_at,
-    executors.accepted_repositories,
-    count(trials.executor_id) AS current_load,
-    ((count(trials.executor_id))::double precision / (executors.max_load)::double precision) AS relative_load
-   FROM (executors
-     LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY ((ARRAY['dispatching'::character varying, 'executing'::character varying])::text[])))))
-  GROUP BY executors.id;
-
-
---
--- Name: _RETURN; Type: RULE; Schema: public; Owner: -
---
-
-CREATE RULE "_RETURN" AS
     ON SELECT TO job_cache_signatures DO INSTEAD  SELECT jobs.id AS job_id,
     md5(string_agg(DISTINCT (branches.updated_at)::text, ',
                '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
@@ -1176,6 +1158,30 @@ CREATE RULE "_RETURN" AS
      LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
      LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
   GROUP BY jobs.id;
+
+
+--
+-- Name: _RETURN; Type: RULE; Schema: public; Owner: -
+--
+
+CREATE RULE "_RETURN" AS
+    ON SELECT TO executors_with_load DO INSTEAD  SELECT executors.id,
+    executors.name,
+    executors.max_load,
+    executors.enabled,
+    executors.traits,
+    executors.base_url,
+    executors.last_ping_at,
+    executors.created_at,
+    executors.updated_at,
+    executors.accepted_repositories,
+    executors.upload_tree_attachments,
+    executors.upload_trial_attachments,
+    count(trials.executor_id) AS current_load,
+    ((count(trials.executor_id))::double precision / (executors.max_load)::double precision) AS relative_load
+   FROM (executors
+     LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY ((ARRAY['dispatching'::character varying, 'executing'::character varying])::text[])))))
+  GROUP BY executors.id;
 
 
 --
@@ -1531,6 +1537,8 @@ INSERT INTO schema_migrations (version) VALUES ('59');
 INSERT INTO schema_migrations (version) VALUES ('6');
 
 INSERT INTO schema_migrations (version) VALUES ('60');
+
+INSERT INTO schema_migrations (version) VALUES ('61');
 
 INSERT INTO schema_migrations (version) VALUES ('7');
 

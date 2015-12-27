@@ -66,6 +66,26 @@
       %td Auth. Password
       %td= @executor.auth_password
 
+%h2 Permissions
+
+%table.table.table-striped
+  %thead
+  %tbody
+    %tr
+      %td Upload trial attachments
+      %td.upload_trial_attachments
+        - if @executor.upload_trial_attachments
+          %i.success.fa.fa-check
+        - else
+          %i.icon-unchecked
+    %tr
+      %td Upload tree attachments
+      %td.upload_tree_attachments
+        - if @executor.upload_tree_attachments
+          %i.success.fa.fa-check
+        - else
+          %i.icon-unchecked
+
 
 %h2 Traits
 
