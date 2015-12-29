@@ -5,11 +5,12 @@ module Concerns
     # TODO: disable RaiseError by default
     def http_get(url,
       username: ::Settings.basic_auth.username,
-      password: ::Settings.basic_auth.password, &block)
+      password: ::Settings.basic_auth.password,
+      raise_error: true, &block)
 
       http_request = Faraday.new(url: url) do |f|
         f.basic_auth username, password
-        f.use Faraday::Response::RaiseError
+        f.use Faraday::Response::RaiseError if raise_error
         f.request :retry
         f.adapter Faraday.default_adapter
         f.ssl.verify = false
