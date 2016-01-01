@@ -44,10 +44,10 @@ module ServiceCheck
                                  password: basic_auth.password, raise_error: false)
         res = OpenStruct.new
         if response.status.between?(200, 299)
-          res.is_success = true
+          res.is_ok = true
           res.content = JSON.parse(response.body)
         else
-          res.is_success = false
+          res.is_ok = false
           res.content =
             if response.headers['content-type'] =~ /json/
               JSON.parse(response.body)
@@ -59,7 +59,7 @@ module ServiceCheck
       rescue Exception => e
         Rails.logger.warn Formatter.exception_to_log_s(e)
         res = OpenStruct.new
-        res.is_success = false
+        res.is_ok = false
         res.content = { error: e.to_s }
         res
       end

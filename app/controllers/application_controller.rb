@@ -61,4 +61,9 @@ class ApplicationController < ActionController::Base
     current_user.try(:workspace_filters) || {}
   end
 
+  def status
+    memory_status = Status::Memory.status
+    render json: { memory: memory_status.content }, status: memory_status.is_ok ? 200 : 499
+  end
+
 end

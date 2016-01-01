@@ -5,6 +5,8 @@ CiderCI::Application.routes.draw do
   match '/workspace/filter', via: [:get, :post],
                              controller: 'workspace', action: 'filter', as: 'workspace_filter'
 
+  get :status, controller: :application, action: :status
+
   namespace 'workspace' do
 
     get 'show_raw/:table_name', action: :show_raw, as: :show_raw

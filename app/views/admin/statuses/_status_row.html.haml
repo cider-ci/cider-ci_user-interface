@@ -1,12 +1,12 @@
-%tr 
+%tr
   %td= name
-  %td 
-    - if result.is_success
+  %td
+    - if result.is_ok
       %i.success.icon-online.fa.fa-fw.fa-heart
-      OK 
+      OK
     - else
       %i.warning.fa.fa-fw.fa-heart-o
-      Failed 
+      Failed
   %td
     - if result.content.present?
       %pre.pre-scrollable= result.content.to_yaml

@@ -7,7 +7,11 @@
   .navbar-header
     = link_to public_path, class: "navbar-brand" do
       %b<>
-        Cider-CI&nbsp;
+        %span
+          Cider-CI
+        %span.edition
+          = Settings.edition
+          &nbsp;
         %span{class:  Settings.releases[0].version_pre.present? ? "text-warning" : ""}<
           - if release_name = Settings.releases[0].name
             %em

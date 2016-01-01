@@ -14,7 +14,5 @@
     = render 'status_row', result: ServiceCheck.check_notifier, name: "Notifier Service"
     = render 'status_row', result: ServiceCheck.check_repository, name: "Repository Service"
     = render 'status_row', result: ServiceCheck.check_storage, name: "Storage Service"
-
-
-
+    = render 'status_row', result: Status::Memory.status, name: "UI"
 
