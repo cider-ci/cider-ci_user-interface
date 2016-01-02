@@ -6,6 +6,9 @@
 %html
   %head
     %title Cider-CI
+
+    = stylesheet_link_tag stylesheet_chooser(), media: "all"
+
     - case (current_user && current_user.ui_theme) || :default
     - when 'cider'
       = stylesheet_link_tag "cider", media: "all"
@@ -14,7 +17,6 @@
     - when 'bootstrap'
       = stylesheet_link_tag "bootstrap-plain", media: "all"
     - else
-      = stylesheet_link_tag "bootstrap-plain", media: "all"
 
     = javascript_include_tag "application", "data-turbolinks-track" => true
     = csrf_meta_tags

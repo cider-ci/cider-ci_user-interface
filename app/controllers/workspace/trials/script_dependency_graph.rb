@@ -1,6 +1,7 @@
 require 'open3'
 
 module ::Workspace::Trials::ScriptDependencyGraph
+  include ApplicationHelper
   extend ActiveSupport::Concern
 
   included do
@@ -78,7 +79,7 @@ module ::Workspace::Trials::ScriptDependencyGraph
 
     graphviz = %(
       digraph "Scripts Dependency Graph" {
-        stylesheet="#{ActionController::Base.helpers.stylesheet_path('application')}"
+        stylesheet="#{ActionController::Base.helpers.stylesheet_path(stylesheet_chooser)}"
         id = "scripts-dependency-graph"
         #{graphviz_nodes.join("\n    ")}
         #{graphviz_start_arcs.join("\n    ")}

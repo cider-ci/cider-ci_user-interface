@@ -103,4 +103,17 @@ module ApplicationHelper
     )
   end
 
+  def stylesheet_chooser
+    case (current_user && current_user.ui_theme)
+    when 'cider'
+      'cider'
+    when 'darkly'
+      'darkly'
+    when 'bootstrap'
+      'bootstrap-plain'
+    else
+      'bootstrap-plain'
+    end
+  end
+
 end
