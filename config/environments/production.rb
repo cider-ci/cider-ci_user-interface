@@ -58,7 +58,7 @@ CiderCI::Application.configure do
 
   # Use a different cache store in production.
   # config.cache_store = :mem_cache_store
-  config.cache_store = :memory_store, {size: (Settings.user_interface_cache_size_megabytes.presence || 128).megabytes}
+  config.cache_store = :memory_store, {size: ((ENV['CACHE_STORE_SIZE_MB'].presence.try(&:to_i) || 128 ).megabytes rescue 128.megabytes)}
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.action_controller.asset_host = "http://assets.example.com"
