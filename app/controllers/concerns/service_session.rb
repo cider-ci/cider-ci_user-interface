@@ -21,7 +21,7 @@ module Concerns
         validate_user_signature!(user, session_object[:signature])
         user
       rescue Exception => e
-        Rails.logger.warn e
+        Rails.logger.info e
         reset_session
         cookies.delete 'cider-ci_services-session'
         nil
