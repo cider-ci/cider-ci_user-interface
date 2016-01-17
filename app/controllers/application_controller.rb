@@ -1,6 +1,8 @@
 #  Copyright (C) 2013, 2014, 2015 Dr. Thomas Schank  (DrTom@schank.ch, Thomas.Schank@algocon.ch)
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
+#
+require 'inshape'
 
 class ApplicationController < ActionController::Base
   # Prevent CSRF attacks by raising an exception.
@@ -62,7 +64,7 @@ class ApplicationController < ActionController::Base
   end
 
   def status
-    memory_status = Status::Memory.status
+    memory_status = InShape::Memory.status
     render json: { memory: memory_status.content }, status: memory_status.is_ok ? 200 : 499
   end
 
