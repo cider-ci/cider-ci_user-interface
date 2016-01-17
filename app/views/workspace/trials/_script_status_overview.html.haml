@@ -1,0 +1,19 @@
+%ul.enumeration.list-unstyled.list-inline
+  %li.reload{id: ["state",script.id].join('_'), data: {cache_signature: script.state}}
+    %span<>= render "label_for_state", state: script.state
+    &nbsp;
+    %span= script.state
+  - if script.started_at and script.finished_at
+    - duration = script.finished_at - script.started_at
+    %li#duration.reload{data: {cache_signature: duration}}
+      in
+      %span.humanize-duration{data: {duration: duration}} #{duration} seconds
+      %span (#{duration.round} #{"second".pluralize(duration.round)})
+  - elsif script.started_at
+    - duration = Time.zone.now - script.started_at
+    %li#duration.reload{data: {cache_signature: duration}}
+      since
+      %span.humanize-duration{data: {duration: duration}} #{duration} seconds
+      %span (#{duration.round} #{"second".pluralize(duration.round)})
+
+

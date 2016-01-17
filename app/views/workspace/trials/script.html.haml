@@ -33,15 +33,9 @@
     .col-md-2
       %ol.breadcrumb.with-circle-separator.pull-right
         %li
-          = link_to debug_script_workspace_trial_path(id: script.trial.id, key: script.key) do
-            %icon.fa.fa-bug
-            Debug
-        %li
           = link_to api_browser_path("/scripts/#{script.id}")  do
             %icon.icon-raw-data
             Data
-
-
 
   %h1
     Script
@@ -50,23 +44,7 @@
 
   #reload-page{data: { cache_signature: cache_signature, reload_timeout: reload_timeout}}
 
-    %ul.enumeration.list-unstyled.list-inline
-      %li#state.reload{data: {cache_signature: script.state}}
-        %span<>= render "label_for_state", state: script.state
-        &nbsp;
-        %span= script.state
-      - if script.started_at and script.finished_at
-        - duration = script.finished_at - script.started_at
-        %li#duration.reload{data: {cache_signature: duration}}
-          in
-          %span.humanize-duration{data: {duration: duration}} #{duration} seconds
-          %span (#{duration.round} #{"second".pluralize(duration.round)})
-      - elsif script.started_at
-        - duration = Time.zone.now - script.started_at
-        %li#duration.reload{data: {cache_signature: duration}}
-          since
-          %span.humanize-duration{data: {duration: duration}} #{duration} seconds
-          %span (#{duration.round} #{"second".pluralize(duration.round)})
+    = render 'script_status_overview', script: script
 
     - pre_elements.each do |property|
       :ruby

@@ -25,6 +25,11 @@
           %ol.breadcrumb.with-circle-separator.pull-right
             = render 'breadcrumbs/items/trial_attachments', trial: trial
 
+            %li
+              = link_to debug_workspace_trial_path(id: trial.id) do
+                %icon.fa.fa-bug
+                Debug
+
             - if issues.count > 0
               %li#issues-link.reload{data: {cache_signature: issues.count}}
                 = link_to issues_workspace_trial_path(trial) do

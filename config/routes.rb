@@ -43,6 +43,7 @@ CiderCI::Application.routes.draw do
     resources :trials do
       member do
         post 'set_failed'
+        get 'debug'
         get 'attachments'
         get 'result'
         get :issues, action: 'issues'
@@ -51,7 +52,6 @@ CiderCI::Application.routes.draw do
         get 'scripts-start-dependency-graph'
         get 'scripts-terminate-dependency-graph'
         get 'scripts/:key', action: :script, as: :script
-        get 'scripts/:key/debug', action: :debug_script, as: :debug_script
       end
     end
 

@@ -1,0 +1,106 @@
+:ruby
+  trial ||= Trial.find(params[:id])
+
+  scripts= trial.scripts.select(:key,:name,:state)
+
+  cache_signature = CacheSignature.signature trial.cache_signature,
+     admin?, trial.executor.to_s, trial.scripts
+
+.row
+  .col-md-10
+    %ol.breadcrumb.pull-left
+      =render '/breadcrumbs/trial', trial: trial
+      %li
+        %icon.fa.fa-bug
+        Debug
+
+
+%h1{style: "margin-top: 10px"}
+  Debug trial
+  = render 'for_task_header', task: trial.task
+
+%p
+  This page provides information how the scripts are run.
+  It aids in debugging problems and reproducing behavior on
+  the executors.
+
+
+- cache cache_signature do
+
+  - reload_timeout= session_adjust_reload_timeout(%w(aborted failed passed).include?(trial.state) ? 30 : 3)
+  #reload-page{data: { cache_signature: cache_signature, reload_timeout: reload_timeout}}
+
+    %h2 General Properties
+
+    - if (executor = trial.executor)
+      %section#executor.reload{data: {cache_signature: executor}}
+        %h3 Executor
+        %p
+          Executor:
+          %code= trial.executor
+          - if trial.executor.base_url.present?
+            @
+            %code= trial.executor.base_url
+
+    - if (wd = trial.scripts.map(&:working_dir).compact.first)
+      %section#executor.reload{data: {cache_signature: wd}}
+        %h3 Working Directory
+        %p
+          Working directory
+          %code= wd
+        %p
+          The working directory will be removed after some time.  It can be marked to
+          be kept by creating the file
+          %code _cider-ci_keep
+          within.
+          %span.text-warning
+            The directory well be nevertheless removed when the executor service is restarted!
+          In Unix like operating
+          systems issue the following command.
+
+
+      %code
+        touch #{wd}/_cider-ci_keep
+
+    %h2 Scripts
+
+    - trial.scripts.reorder(:started_at).each do |script|
+
+      %section.reload{id: script.id, data: {cache_signature: CacheSignature.signature(script)}}
+
+        %hr
+
+        %h3
+          = link_to script_workspace_trial_path(id: script.trial.id,key: script.key) do
+            Script
+            %em.name= script.name
+            = render 'for_task_header', task: script.trial.task
+
+        = render 'script_status_overview', script: script
+
+        - if script.body.present?
+          %h4 Body
+          %pre= script.body
+
+        %h4 Set Environment Variables on Linux
+
+        :ruby
+          env_vars = script[:environment_variables] \
+            .map{|k,v| "export #{Shellwords.escape(k)}=#{Shellwords.escape(v)}"}
+            .join("\n")
+
+        %pre= env_vars
+
+        - if script.script_file.present?
+          %p
+            %h4 Script file
+            %code= script.script_file
+
+        - if script.wrapper_file.present?
+          %p
+            %h4 Wrapper file
+            %code= script.wrapper_file
+
+        - if script.command.present?
+          %h4 Wrapper Execution Command
+          %pre= script.command.join(" ")
