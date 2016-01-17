@@ -37,7 +37,7 @@ gem 'bunny', '>= 1.3'
 gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
 gem 'configuration_management_backdoor', '>= 2.1.0', '< 3.0.0' #path: '/Users/thomas/Programming/ROR/ConfigurationManagementBackdoor'
 gem 'faraday'
-gem 'inshape', '>= 1.0', '< 2.0'
+gem 'inshape', '>= 1.0.1', '< 2.0'
 gem 'kaminari'
 gem 'newrelic_rpm'
 gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
