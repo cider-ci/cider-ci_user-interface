@@ -28,7 +28,7 @@
       :sass
         .for-admin
           display: none !important
-  %body#page{data: {user: user?, admin: admin? }}
+  %body#page{data: {autoscroll: !!@autoscroll, user: user?, admin: admin? }}
     .container-fluid
 
       = cache CacheSignature.signature("layouts/application", current_user, request.original_fullpath) do

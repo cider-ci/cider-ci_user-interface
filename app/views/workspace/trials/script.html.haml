@@ -1,4 +1,5 @@
 :ruby
+  @autoscroll = true
   script ||= Script.find_by(trial_id: params[:id], key: params[:key])
   cache_signature = script.cache_signature
   pre_elements = %w(body stderr stdout)
