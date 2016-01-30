@@ -26,6 +26,22 @@ module Concerns
       end
     end
 
+    def build_my_commits_filter(user, do_apply)
+      lambda do |commits|
+        if do_apply
+          commits.where(
+            "lower(commits.author_email) IN
+              (SELECT lower(email_address) FROM email_addresses
+                 WHERE email_addresses.user_id = :user_id)
+              OR lower(commits.committer_email) IN
+                (SELECT lower(email_address) FROM email_addresses
+                  WHERE email_addresses.user_id = :user_id)", user_id: user.id)
+        else
+          commits
+        end
+      end
+    end
+
     def build_commits_by_branch_name_filter(branch_name)
       lambda do |commits|
         if branch_name.present?

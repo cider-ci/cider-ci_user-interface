@@ -5,10 +5,11 @@ module Concerns
     included do
       helper_method \
         :branch_name_param,
+        :commits_per_page_param,
         :commits_text_search_param,
         :depth_param,
         :git_ref_param,
-        :commits_per_page_param,
+        :my_commits?,
         :repository_name_param
     end
 
@@ -34,6 +35,10 @@ module Concerns
 
     def per_page_param
       integer_param :per_page, Kaminari.config.default_per_page
+    end
+
+    def my_commits?
+      params[:my_commits].presence == 'true'
     end
 
     def depth_param

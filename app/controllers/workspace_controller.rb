@@ -44,6 +44,7 @@ class WorkspaceController < ApplicationController
     .apply(build_commits_by_branch_name_filter(branch_name_param))
     .apply(build_text_search_filter(commits_text_search_param))
     .apply(build_git_ref_filter(git_ref_param))
+    .apply(build_my_commits_filter(current_user, my_commits?))
     .apply(build_commits_by_depth_filter(integer_param(:depth, 0)))
     .apply(build_commits_by_page(params[:page], commits_per_page_param))
     .distinct.reorder(committer_date: :desc, depth: :desc)
@@ -58,6 +59,7 @@ class WorkspaceController < ApplicationController
       git_ref: git_ref_param,
       commits_text_search: commits_text_search_param,
       depth: depth_param,
+      my_commits: my_commits?,
       per_page: commits_per_page_param
     }
   end

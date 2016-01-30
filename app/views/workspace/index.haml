@@ -10,8 +10,26 @@
 
   .col-md-4
     .pull-right
-      = paginate @commits, theme: 'efficient'
+      %ul.list-inline.list-unstyled
+        %li
+          = link_to workspace_filter_path(params.merge(my_commits: "true",depth: -1)),
+            method: 'POST',  class: 'btn btn-info' do
+            %i.fa.fa-user
+            My work
+            %i.icon-filter
 
+        %li
+          = link_to workspace_filter_path(params.merge(my_commits: "false",depth: 0)),
+            method: 'POST',  class: 'btn btn-info' do
+            %i.fa.fa-users
+            All heads
+            %i.icon-filter
+        %li
+          = link_to workspace_filter_path, method: 'POST',
+            class: 'btn btn-warning' do
+            %i.icon-reset
+            Reset
+            %i.icon-filter
 
 .well
   .filters.container-fluid
@@ -39,14 +57,17 @@
             tabindex: 3,
             class: "form-control"
       .row{style: 'margin-bottom: -10px'}
-        .form-group.col-sm-5
+        .form-group.col-sm-4
           %label.sr-only{for: "commits_text_search"}
           =text_field_tag :commits_text_search, commits_text_search_param,
             placeholder: "Text search (subject, author, commiter, ...) ",
             tabindex: 4,
             class: "text-warning form-control"
-        .col-sm-7
+        .col-sm-8
           .row
+            .col-sm-3{style: "margin: 10px 0"}
+              = check_box_tag :my_commits, "true", my_commits? , tabindex: 5
+              My Commits
             .form-group.col-sm-3
               %label.sr-only{for: :depth}
               = select_tag :depth,
@@ -54,26 +75,20 @@
                   ["Max 1 down",1], ["Max 3 down",3],
                   ["Any depth",-1]],
                   depth_param),
-                tabindex: 5,
+                tabindex: 6,
                 class: "form-control"
-
             .form-group.col-sm-3
               %label.sr-only{for: "per_page"}
               = select_tag :per_page,
                 options_for_select([5,12,25,50].map{|pp| ["#{pp} Per page",pp]}, commits_per_page_param),
-                tabindex: 6,
+                tabindex: 7,
                 class: "form-control"
-            .form-group.col-sm-6
+            .form-group.col-sm-3
               .pull-right
                 %span.form-button-container
-                  = link_to workspace_filter_path, method: 'POST',  class: 'btn btn-warning', tabindex: 7 do
-                    %i.icon-reset
-                    Reset
-                %span.form-button-container
-                  = button_tag type: 'submit', class: 'btn btn-primary', tabindex: 8 do
+                  = button_tag type: 'submit', class: 'btn btn-primary', tabindex: 7 do
                     %i.icon-filter
                     Filter
-
 :ruby
 
   @commits_cache_signatures = CommitCacheSignature.where(
@@ -87,6 +102,18 @@
 = cache cache_signature do
 
   #reload-page.jobs-page{data: {cache_signature: cache_signature, reload_timeout: session_adjust_reload_timeout(10)}}
+
+    - if @commits.empty? && my_commits? && current_user
+
+      .alert.alert-warning
+        You are filtering by commits authored or committed by you.  This
+        feature depends on matching the email-addresses associated in this
+        Cider-CI application with your account with those given in the commits.
+
+        %p
+          You can manage associated email-addresses on
+          %a{href: edit_workspace_account_path(current_user)}
+            your account page.
 
     = render 'commits_table', commits: @commits
 
