@@ -1,0 +1,25 @@
+
+%h1.text-danger
+  %i.fa.fa-bomb
+  422 Workspace Query Timeout
+
+%p
+  %span.text-warning
+    A required query to show this page has timed out.
+  %span.text-info
+    This is a feature to protect your Cider-CI server.
+
+%p
+  Some filter combinations can result in slow queries. You can reset the filters below.
+
+%p
+  You can also ask your server administrator to test and improve IOPS performance, or to increase the timeout.
+
+
+.clearfix
+
+
+= link_to workspace_filter_path, method: 'POST',  class: 'btn btn-warning' do
+  %i.icon-reset
+  Reset your workspace query parameters
+

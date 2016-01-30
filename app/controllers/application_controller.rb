@@ -9,6 +9,14 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   # protect_from_forgery with: :exception
 
+  rescue_from ActiveRecord::StatementInvalid, with: :active_record_statement_invalid
+
+  def active_record_statement_invalid(error)
+    Rails.logger.warn error
+    @error = error
+    render :active_record_statement_invalid, status: 500
+  end
+
   include Concerns::ServiceSession
   include Concerns::SessionHelper
   include Concerns::UrlBuilder

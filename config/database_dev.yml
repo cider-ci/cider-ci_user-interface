@@ -6,6 +6,8 @@ default: &default
   username: cider-ci
   password: secret
   database: cider-ci_v3_development
+  variables:
+    statement_timeout: 3000
 
 development:
   <<: *default

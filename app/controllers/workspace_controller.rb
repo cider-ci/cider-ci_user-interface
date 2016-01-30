@@ -10,9 +10,21 @@ class WorkspaceController < ApplicationController
   before_action :require_sign_in
 
   def index
-    @my = my_workspace?
-    set_commits_for_index
-    @jobs = Job.where(tree_id: @commits.map(&:tree_id)).reorder(created_at: :desc)
+    begin
+      ActiveRecord::Base.transaction do
+        @my = my_workspace?
+        set_commits_for_index
+        @jobs = Job.where(tree_id: @commits.map(&:tree_id)).reorder(created_at: :desc)
+      end
+    rescue ActiveRecord::StatementInvalid => error
+      if error.message =~ /statement timeout/
+        Rails.logger.warn error
+        @error = error
+        render :statement_timeout, status: 422
+      else
+        raise error
+      end
+    end
   end
 
   def my_workspace?
