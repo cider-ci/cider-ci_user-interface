@@ -5,15 +5,30 @@
 
 %p
   %span.text-warning
-    A required query to show this page has timed out.
+    A required query to show this page has been aborted because it timed out.
   %span.text-info
     This is a feature to protect your Cider-CI server.
 
-%p
-  Some filter combinations can result in slow queries. You can reset the filters below.
+%ul
 
-%p
-  You can also ask your server administrator to test and improve IOPS performance, or to increase the timeout.
+  %li
+    %p You can try to reload the page. This might work if the server was under unusual high load.
+
+
+  %li
+    %p
+      You can reset the filters below.
+      Some filter combinations can result in slow queries.
+      You can read more about this
+      %a{href: 'http://cider-ci.info/articles/my-workspace/index.html#keeping-filtering-fast'}
+        here
+        %i.fa.fa-link
+        ='.'
+
+  %li
+    %p
+      You can also ask your server administrator to
+      test and improve IOPS performance, or to increase the timeout.
 
 
 .clearfix

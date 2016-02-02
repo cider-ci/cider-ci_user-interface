@@ -30,7 +30,7 @@ module Concerns
     end
 
     def commits_per_page_param
-      integer_param :per_page, 5
+      integer_param :per_page, 7
     end
 
     def per_page_param

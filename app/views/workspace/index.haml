@@ -22,7 +22,7 @@
           = link_to workspace_filter_path(params.merge(my_commits: "false",depth: 0)),
             method: 'POST',  class: 'btn btn-info' do
             %i.fa.fa-users
-            All heads
+            All branches
             %i.icon-filter
         %li
           = link_to workspace_filter_path, method: 'POST',
@@ -80,7 +80,7 @@
             .form-group.col-sm-3
               %label.sr-only{for: "per_page"}
               = select_tag :per_page,
-                options_for_select([5,12,25,50].map{|pp| ["#{pp} Per page",pp]}, commits_per_page_param),
+                options_for_select([3,7,12,25,50].map{|pp| ["#{pp} Per page",pp]}, commits_per_page_param),
                 tabindex: 7,
                 class: "form-control"
             .form-group.col-sm-3
