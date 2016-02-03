@@ -38,7 +38,7 @@ class Workspace::JobsController < WorkspaceController
     response = http_do(:post, url) do |c|
       c.headers['content-type'] = 'application/json'
       c.body = params[:job].slice(:key, :tree_id) \
-        .merge(created_by: current_user.id).to_json
+                           .merge(created_by: current_user.id).to_json
     end
     case response.status
     when 300..600

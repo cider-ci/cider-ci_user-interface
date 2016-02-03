@@ -26,12 +26,10 @@ class Public::BadgesController < PublicController
       else
         render status: 403
       end
+    elsif @job or params.key?(:respond_with_200)
+      render
     else
-      if @job or params.key?(:respond_with_200)
-        render
-      else
-        render status: 404
-      end
+      render status: 404
     end
   end
 

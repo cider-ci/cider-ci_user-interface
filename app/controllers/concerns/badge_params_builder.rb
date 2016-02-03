@@ -74,16 +74,16 @@ module Concerns
 
     def find_branch_by_name_and_repository(branch_name, repository)
       repository && repository.branches
-      .where('lower(branches.name) = ?',
-        branch_name.downcase).first
+                              .where('lower(branches.name) = ?',
+                                branch_name.downcase).first
     end
 
     def find_job_by_name_and_branch(job_name, branch)
       if branch
         Job.where('jobs.tree_id = ?',
           branch.current_commit.tree_id) \
-        .where('lower(jobs.name) = ?',
-          job_name.downcase).first
+           .where('lower(jobs.name) = ?',
+             job_name.downcase).first
       end
     end
 

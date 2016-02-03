@@ -30,9 +30,9 @@ class Job < ActiveRecord::Base
 
   def self.find_by_repo_branch_name(repo_name, branch_name, job_name)
     Job.joins(commits: { head_of_branches: :repository }) \
-      .where('lower(jobs.name) = ?', job_name.downcase)
-      .where('lower(branches.name) = ?', branch_name.downcase)
-      .find_by('lower(repositories.name) =? ', repo_name.downcase)
+       .where('lower(jobs.name) = ?', job_name.downcase)
+       .where('lower(branches.name) = ?', branch_name.downcase)
+       .find_by('lower(repositories.name) =? ', repo_name.downcase)
   end
 
   def public_view_permission?
@@ -45,14 +45,14 @@ class Job < ActiveRecord::Base
 
   def accumulated_time
     trials.where.not(started_at: nil).where.not(finished_at: nil) \
-      .select("date_part('epoch', SUM(finished_at - started_at)) as acc_time") \
-      .reorder('').group('tasks.job_id').first[:acc_time]
+          .select("date_part('epoch', SUM(finished_at - started_at)) as acc_time") \
+          .reorder('').group('tasks.job_id').first[:acc_time]
   end
 
   def duration
     trials.reorder('') \
-      .select("date_part('epoch', MAX(finished_at) - MIN(started_at)) duration") \
-      .group('tasks.job_id').first[:duration]
+          .select("date_part('epoch', MAX(finished_at) - MIN(started_at)) duration") \
+          .group('tasks.job_id').first[:duration]
   end
 
   def create_tasks_and_trials

@@ -5,7 +5,7 @@ module Concerns
     DEFAULT_OPTIONS = {
       orientation: :horizontal,
       embedded: true
-    }
+    }.freeze
 
     def build_summary_properties(reponame, branchname, job_names,
       options = {})
@@ -41,7 +41,7 @@ module Concerns
     end
 
     def build_200_summary_properties(branch, jobs)
-      { host_info_text: "#{host_info_text}",
+      { host_info_text: host_info_text.to_s,
         git_info_text: git_info_text(branch.repository, branch),
         jobs: jobs.map { |e| job_info(e) } }
     end
@@ -72,15 +72,15 @@ module Concerns
 
     def find_branch_by_reponame_and_branchname(repository_name, branch_name)
       Branch.joins(:repository)
-      .where('lower(branches.name) = ?', branch_name.downcase)
-      .where('lower(repositories.name) = ?', repository_name.downcase)
-      .first
+            .where('lower(branches.name) = ?', branch_name.downcase)
+            .where('lower(repositories.name) = ?', repository_name.downcase)
+            .first
     end
 
     def find_jobs_by_branch_and_names(branch, names)
       canonicalize_job_names(names).map do |name|
         branch.jobs \
-        .where('lower(jobs.name) = ?', name.downcase).first or name
+              .where('lower(jobs.name) = ?', name.downcase).first or name
       end
     end
 

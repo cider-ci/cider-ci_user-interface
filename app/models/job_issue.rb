@@ -1,6 +1,6 @@
 class JobIssue < ActiveRecord::Base
 
-  TYPE_BS_MAP = { error: :danger, warning: :warning }
+  TYPE_BS_MAP = { error: :danger, warning: :warning }.freeze
 
   self.inheritance_column = false
   belongs_to :job

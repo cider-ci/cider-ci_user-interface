@@ -14,22 +14,24 @@ module Concerns
     end
 
     def validate_services_session_cookie_and_get_user
-      begin
-        session_object = CiderCi::OpenSession::Encryptor.decrypt(
-          secret, session_cookie).deep_symbolize_keys
-        user = User.find session_object[:user_id]
-        validate_user_signature!(user, session_object[:signature])
-        user
-      rescue Exception => e
-        Rails.logger.info e
-        reset_session
-        cookies.delete 'cider-ci_services-session'
-        nil
+      if session_cookie
+        begin
+          session_object = CiderCi::OpenSession::Encryptor.decrypt(
+            secret, session_cookie).deep_symbolize_keys
+          user = User.find session_object[:user_id]
+          validate_user_signature!(user, session_object[:signature])
+          user
+        rescue Exception => e
+          Rails.logger.info e
+          reset_session
+          cookies.delete 'cider-ci_services-session'
+          nil
+        end
       end
     end
 
     def session_cookie
-      cookies['cider-ci_services-session'] || raise('Service cookie not found.')
+      @session_cookie ||= cookies['cider-ci_services-session']
     end
 
     def secret

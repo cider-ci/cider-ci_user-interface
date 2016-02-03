@@ -6,7 +6,12 @@ AllCops:
     - 'config/initializers/backtrace_silencers.rb'
       #    - 'config/routes.rb'
     - 'db/**/*'
-  RunRailsCops: true
+
+  TargetRubyVersion: 2.2
+
+Rails:
+  Enabled: true
+
 Lint/AmbiguousOperator:
   Enabled: false
 
@@ -21,6 +26,10 @@ Lint/Eval:
 
 Lint/DeprecatedClassMethods:
   Enabled: false
+
+Lint/DuplicateMethods:
+  Exclude:
+    - 'app/lib/font_metrics.rb'
 
 Lint/ParenthesesAsGroupedExpression:
   Enabled: false
@@ -132,6 +141,11 @@ Style/MultilineBlockChain:
 # Configuration parameters: EnforcedStyle, SupportedStyles.
 Style/MultilineOperationIndentation:
   Enabled: false
+
+Style/NestedParenthesizedCalls:
+  Exclude:
+    - 'app/helpers/application_helper.rb'
+    - 'spec/spec_helper_feature_shared.rb'
 
 # Cop supports --auto-correct.
 Style/Not:

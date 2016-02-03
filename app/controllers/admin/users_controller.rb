@@ -35,7 +35,7 @@ class Admin::UsersController < AdminController
       @users = \
         @users.joins('LEFT OUTER JOIN email_addresses
                      ON email_addresses.user_id = users.id'.squish) \
-        .basic_search(search_options, false).reorder(:last_name, :first_name).uniq
+              .basic_search(search_options, false).reorder(:last_name, :first_name).uniq
     end
   end
 

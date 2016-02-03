@@ -8,7 +8,7 @@ class Workspace::TreesController < WorkspaceController
 
   def attachments
     @tree_attachments = TreeAttachment \
-      .where(tree_id: params[:tree_id]).page(params[:page])
+                        .where(tree_id: params[:tree_id]).page(params[:page])
   end
 
   def show

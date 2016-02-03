@@ -24,7 +24,7 @@ module ::Workspace::Trials::ScriptDependencyGraph
     build_arcs = lambda do|scripts, type|
         scripts.flat_map do |s|
           s[type] && s[type].map { |k, v| v || k }.sort_by { |s| s[:key] } \
-            .map do |dependency|
+                            .map do |dependency|
               [sanitize.(dependency['script']),
                sanitize.(s[:key]),
                (dependency['states'] || ['passed']).map { |w| sanitize.(w) }]
@@ -60,11 +60,11 @@ module ::Workspace::Trials::ScriptDependencyGraph
     end
 
     graphviz_nodes = scripts.map { |s| s.slice(:key, :name) }
-      .map do |n|
+                            .map do |n|
         id = sanitize.(n[:key])
         label = sanitize.(n[:name])
         %( "#{id}" [id="#{id}", label="#{label}"];)
-      end
+    end
 
     case type
     when :start

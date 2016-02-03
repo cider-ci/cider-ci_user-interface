@@ -1,6 +1,6 @@
 module FontMetrics
 
-  DEFAULT_FONT = ['DejaVu Sans', 0, 12]
+  DEFAULT_FONT = ['DejaVu Sans', 0, 12].freeze
 
   case RUBY_ENGINE
 

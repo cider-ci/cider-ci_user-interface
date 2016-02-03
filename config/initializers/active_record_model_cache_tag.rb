@@ -1,7 +1,7 @@
 class ActiveRecord::Base
-  def cache_signature(&block)
+  def cache_signature(&_block)
     if block_given?
-      block.call(self)
+      yield self
     else
       self
     end.instance_eval do

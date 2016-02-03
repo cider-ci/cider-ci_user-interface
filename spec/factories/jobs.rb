@@ -61,7 +61,7 @@ FactoryGirl.define do
     state 'passed'
     tree_id { Digest::SHA1.hexdigest rand.to_s }
     name { Faker::App.name }
-    result ({ value: 42, summary: '42 OK' })
+    result { { value: 42, summary: '42 OK' } }
     after(:create) do |job|
       task = FactoryGirl.create :passed_task,
         job_id: job.id,
