@@ -24,12 +24,6 @@
             %i.fa.fa-users
             All branches
             %i.icon-filter
-        %li
-          = link_to workspace_filter_path, method: 'POST',
-            class: 'btn btn-warning' do
-            %i.icon-reset
-            Reset
-            %i.icon-filter
 
 .well
   .filters.container-fluid
@@ -85,6 +79,11 @@
                 class: "form-control"
             .form-group.col-sm-3
               .pull-right
+                %span.form-button-container
+                  = link_to workspace_filter_path, method: 'POST',
+                    class: 'btn btn-warning' do
+                    %i.icon-reset
+                    Reset
                 %span.form-button-container
                   = button_tag type: 'submit', class: 'btn btn-primary', tabindex: 7 do
                     %i.icon-filter
