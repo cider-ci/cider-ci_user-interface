@@ -1,3 +1,6 @@
 [submodule "vendor"]
 	path = vendor
 	url = https://github.com/cider-ci/cider-ci_user-interface_vendor.git
+[submodule "public/assets"]
+	path = public/assets
+	url = https://github.com/cider-ci/cider-ci_user-interface_assets.git
