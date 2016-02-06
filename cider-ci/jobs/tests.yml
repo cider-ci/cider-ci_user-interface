@@ -17,6 +17,7 @@ jobs:
         timeout: 300
 
       task-defaults:
+        _cider-ci_include: 'cider-ci/shared/rails-defaults.yml'
         environment-variables:
           RAILS_ENV: test
           LANG: "en_US.UTF-8"
@@ -27,46 +28,13 @@ jobs:
         ruby: true
 
       tasks:
-
         specs:
-
           scripts:
-
-            configure-database:
-              body: |
-                #!/usr/bin/env ruby
-                require 'yaml'
-                config = \
-                  { 'test' =>
-                    { 'adapter' => 'postgresql',
-                      'encoding' => 'unicode',
-                      'host' => 'localhost',
-                      'pool' => 3,
-                      'username' => ENV['PGUSER'],
-                      'password' =>  ENV['PGPASSWORD'],
-                      'database' => "cider-ci_v3_test_#{ENV['CIDER_CI_TRIAL_ID']}"}}
-                File.open('config/database.yml','w') { |file| file.write config.to_yaml }
-
-            bundle-mri:
-              exclusive-executor-resource: bundler_2.1
-              body: bundle
-
-            create-database:
-              body: bundle exec rake db:reset
-              start-when:
-              - script: bundle-mri
-              - script: configure-database
-
             test:
               start-when:
               - script: bundle-mri
               - script: create-database
               body: bundle exec rspec spec/
 
-            delete-database:
-              body:  bundle exec rake db:pg:terminate_connections db:drop
-              ignore-state: true
-              start-when:
-              - script: test
-                states: [aborted, passed, failed, skipped]
+
 

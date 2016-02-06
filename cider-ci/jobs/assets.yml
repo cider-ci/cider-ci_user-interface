@@ -1,0 +1,30 @@
+jobs:
+  assets:
+    name: Assets
+    run-on:
+    - type: branch
+      include-match: ^.*$
+    task-defaults:
+      git-options:
+        submodules:
+          clone: True
+      environment-variables:
+          RAILS_ENV: production
+    tasks:
+      assets_present:
+        name: Assets are there?
+        body: |
+          set -eux
+          test -f public/assets/application*js
+      assets_up_to_date:
+        name: Assets are up to date?
+        _cider-ci_include: 'cider-ci/shared/rails-defaults.yml'
+        scripts:
+          test:
+            start-when:
+            - script: bundle-mri
+            - script: create-database
+            body: |
+              set -eux
+              cd public/assets
+              git diff --quiet --exit-code

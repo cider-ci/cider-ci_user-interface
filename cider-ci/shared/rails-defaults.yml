@@ -1,0 +1,26 @@
+traits:
+  postgresql: true
+  rbenv: true
+  ruby: true
+
+templates:
+  - src: [cider-ci, templates, database.yml]
+    dest: [config, database.yml]
+
+scripts:
+  bundle-mri:
+    exclusive-executor-resource: bundler_2.1
+    body: bundle
+
+  create-database:
+    body: bundle exec rake db:reset
+    start-when:
+    - script: bundle-mri
+
+  delete-database:
+    body:  bundle exec rake db:pg:terminate_connections db:drop
+    ignore-state: true
+    start-when:
+    - script: test
+      states: [aborted, passed, failed, skipped]
+
