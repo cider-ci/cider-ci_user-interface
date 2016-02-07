@@ -18,7 +18,7 @@ gem 'textacular', git:  'https://github.com/DrTom/textacular.git', ref: '778fd09
 # FRONTEND
 gem 'bootstrap-sass'
 gem 'coffee-rails'
-gem 'font-awesome-sass', '~> 4.2'
+gem 'font-awesome-sass', '= 4.4.0'
 gem 'haml-contrib'
 gem 'haml-rails'
 gem 'jquery-rails'
