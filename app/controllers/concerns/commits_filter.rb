@@ -47,10 +47,10 @@ module Concerns
         if branch_name.present?
           if branch_name =~ /^\^.+/
             commits.joins(:branches) \
-                   .where('branches.name ~* ?', branch_name)
+              .where('branches.name ~* ?', branch_name)
           else
             commits.joins(:branches) \
-                   .where(branches: { name: branch_name.split(',').map(&:strip) })
+              .where(branches: { name: branch_name.split(',').map(&:strip) })
           end
         else
           commits
@@ -63,10 +63,10 @@ module Concerns
         if repository_name.present?
           if repository_name =~ /^\^.+/
             commits.joins(branches: :repository) \
-                   .where('repositories.name ~* ?', repository_name)
+              .where('repositories.name ~* ?', repository_name)
           else
             commits.joins(branches: :repository) \
-                   .where(repositories: { name: repository_name.split(',').map(&:strip) })
+              .where(repositories: { name: repository_name.split(',').map(&:strip) })
           end
         else
           commits
@@ -95,8 +95,8 @@ module Concerns
           # a bit ugly but actually faster then the recursive with query we used before
           # if the depth is limited; the form offers only up to depth 3
           query = commits \
-                  .joins('JOIN branches AS heads ON commits.id = heads.current_commit_id') \
-                  .reorder('').distinct .select('commits.id AS id, commits.depth AS depth' \
+            .joins('JOIN branches AS heads ON commits.id = heads.current_commit_id') \
+            .reorder('').distinct .select('commits.id AS id, commits.depth AS depth' \
                                         ', heads.id AS branch_id ')
           sub_cs = query.map.with_index do |h, i|
             "(SELECT cs#{i}.id FROM commits AS cs#{i} " \

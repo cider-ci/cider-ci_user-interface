@@ -3,20 +3,28 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - unless current_user
-  =form_tag public_sign_in_path, method: 'POST', class: "navbar-form navbar-right", role: "form" do
-    = hidden_field_tag :authenticity_token, form_authenticity_token
-    = hidden_field_tag :current_fullpath, request.original_fullpath
-    .form-group
-      =text_field :sign_in, :login, placeholder: "Login or email", autofocus: 'autofocus', class: "form-control"
-    .form-group
-      =password_field :sign_in, :password, placeholder: "Password", class: "form-control"
-    =button_tag type: 'submit' , class: "btn btn-primary" do
+
+  = form_tag public_sign_in_path, method: 'GET', class: "navbar-form navbar-right", role: "form" do
+    = link_to public_sign_in_path(fullpath: request.original_fullpath), class: "btn btn-info" do
       %i.icon-sign-in
-      Sign me in
+      Sign in with
+      %b password
+
+  - (Settings.authentication_providers || {}).each do |key, config|
+    - if true
+      = form_tag public_auth_provider_path, method: 'POST', class: "navbar-form navbar-right", role: "form" do
+        = hidden_field_tag :authenticity_token, form_authenticity_token
+        = hidden_field_tag :current_fullpath, request.original_fullpath
+        = hidden_field_tag :provider, key
+        = button_tag type: 'submit' , class: "btn btn-info" do
+          %i.icon-sign-in
+          Sign in via
+          %b= config.name
+
 - else
   %ul.nav.navbar-nav.navbar-right
-    %li 
-      %a.dropdown-toggle#user-actions{data: {toggle: :dropdown}, href: workspace_user_path } 
+    %li
+      %a.dropdown-toggle#user-actions{data: {toggle: :dropdown}, href: workspace_user_path }
         - if admin?
           %i.icon-admin
         - else

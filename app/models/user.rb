@@ -7,26 +7,14 @@ class User < ActiveRecord::Base
   has_many :email_addresses, -> { order(email_address: :asc) }
 
   def to_s
-    "#{first_name} #{last_name} [#{login}]".squish
+    "#{name} [#{login}]".squish
   end
-
-  after_save { User.check_last_admin_not_gone! }
-  after_destroy { User.check_last_admin_not_gone! }
 
   validates :login, presence: true
 
-  validates :login, format: { with: /\A[\w\d]+\z/,
-                              message: 'Only alphanumic characters allowed' }
-
-  default_scope { order(:last_name, :first_name) }
+  default_scope { order(:login) }
 
   scope :most_recent, -> { reorder(updated_at: :desc) }
-
-  def self.check_last_admin_not_gone!
-    if User.users? and not User.admins?
-      raise 'There must be at least one administrator!'
-    end
-  end
 
   def self.users?
     User.count > 0

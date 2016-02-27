@@ -47,7 +47,6 @@ Lint/UnusedBlockArgument:
 Metrics/AbcSize:
   Max: 136
 
-# Configuration parameters: CountComments.
 Metrics/ClassLength:
   Max: 150
 
@@ -58,9 +57,13 @@ Metrics/CyclomaticComplexity:
 Metrics/LineLength:
   Max: 96
 
+# Offense count: 1
 # Configuration parameters: CountComments.
 Metrics/MethodLength:
-  Max: 124
+  Max: 60
+
+Metrics/ModuleLength:
+  Max: 150
 
 # Configuration parameters: CountKeywordArgs.
 Metrics/ParameterLists:
@@ -128,14 +131,15 @@ Style/LambdaCall:
 Style/ModuleFunction:
   Enabled: false
 
-Metrics/ModuleLength:
-  Max: 120
-
 Style/AlignParameters:
   EnforcedStyle: 'with_fixed_indentation'
 
 Style/MultilineBlockChain:
   Enabled: false
+
+Style/MultilineMethodCallIndentation:
+  EnforcedStyle: indented
+  Enabled: yes
 
 # Cop supports --auto-correct.
 # Configuration parameters: EnforcedStyle, SupportedStyles.

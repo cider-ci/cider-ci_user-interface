@@ -21,54 +21,6 @@ class PublicController < ApplicationController
     end
   end
 
-  def find_user_by_login
-    login = params.require(:sign_in)[:login].downcase
-    error_msg = 'Neither login nor email address found!'
-    begin
-      User.where('lower(login) = lower(?)', login).first ||
-        EmailAddress.where('lower(email_address) = lower(?)', login).first.user ||
-        raise(error_msg)
-    rescue
-      raise error_msg
-    end
-  end
-
-  def current_path
-    params[:current_fullpath] || public_path
-  end
-
-  def sign_in
-    begin
-      user = find_user_by_login
-      if user.authenticate(params.require(:sign_in)[:password])
-        create_services_session_cookie user
-        post_sign_in_path =
-          if current_path == '/cider-ci/ui/public'
-            workspace_filter_path
-          else
-            current_path
-          end
-        redirect_to post_sign_in_path,
-          flash: { successes: ['You have been signed in!'] }
-      else
-        reset_session
-        cookies.delete 'cider-ci_services-session'
-        raise 'Password authentication failed!'
-      end
-    rescue Exception => e
-      reset_session
-      cookies.delete 'cider-ci_services-session'
-      redirect_to (current_path || public_path), flash: { errors: [e.to_s] }
-    end
-  end
-
-  def sign_out
-    reset_session
-    cookies.delete 'cider-ci_services-session'
-    redirect_to current_path,
-      flash: { successes: ['You have been signed out!'] }
-  end
-
   def redirect_to_job
     if @job = Job.find_by_repo_branch_name(params[:repository_name],
       params[:branch_name],
@@ -84,7 +36,7 @@ class PublicController < ApplicationController
       params[:branch_name],
       params[:job_name])
       if tree_attachment = TreeAttachment \
-         .find_by(path: "/#{@job.tree_id}/#{params[:path]}")
+          .find_by(path: "/#{@job.tree_id}/#{params[:path]}")
         redirect_to workspace_attachment_path('tree_attachment', tree_attachment.path)
       else
         render_404 "You are looking for the attchment `#{params[:path]}`
@@ -101,6 +53,13 @@ class PublicController < ApplicationController
           of the branch #{params[:branch_name]}
           and the repository #{params[:repository_name]}
           It doesn't exist at this time. You can try again later.".squish
+  end
+
+  def sign_out
+    reset_session
+    cookies.delete 'cider-ci_services-session'
+    redirect_to current_path,
+      flash: { successes: ['You have been signed out!'] }
   end
 
 end

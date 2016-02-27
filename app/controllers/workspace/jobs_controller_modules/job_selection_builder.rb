@@ -8,7 +8,7 @@ module Workspace::JobsControllerModules
     def set_runnable_jobs(id)
       all_jobs = fetch_project_configuration_jobs(id)
       @runnable_jobs = all_jobs.select { |j| j[:runnable] } \
-                               .map { |j| j.except(:runnable, :reasons) }
+        .map { |j| j.except(:runnable, :reasons) }
       @un_runnable_jobs = all_jobs.reject { |j| j[:runnable] }
     end
 

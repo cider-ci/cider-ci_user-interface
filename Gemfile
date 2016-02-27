@@ -30,16 +30,17 @@ gem 'sass-rails'
 
 
 # The rest
-gem "nilify_blanks"
 gem 'bcrypt-ruby'
 gem 'bootswatch-rails'
 gem 'bunny', '>= 1.3'
+gem 'chronic_duration'
 gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
 gem 'configuration_management_backdoor', '>= 3.0.0', '< 4.0.0' #path: '/Users/thomas/Programming/ROR/ConfigurationManagementBackdoor'
 gem 'faraday'
 gem 'inshape', '>= 1.0.1', '< 2.0'
 gem 'kaminari'
 gem 'newrelic_rpm'
+gem 'nilify_blanks'
 gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
 gem 'puma'
 gem 'rack-mini-profiler'
@@ -65,7 +66,7 @@ gem 'rspec-rails', group: [:development, :test]
 gem 'rubocop', group: [:development, :test]
 gem 'sdoc', group: [:doc], require: false
 gem 'selenium-webdriver', group: [:test]
-
+gem 'timecop', group: [:development, :test]
 
 # TODO, find unused views and partials after we have some tests
 # https://github.com/vinibaggio/discover-unused-partials

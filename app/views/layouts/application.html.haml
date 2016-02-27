@@ -31,8 +31,7 @@
   %body#page{data: {autoscroll: !!@autoscroll, user: user?, admin: admin? }}
     .container-fluid
 
-      = cache CacheSignature.signature("layouts/application", current_user, request.original_fullpath) do
-        = render partial: "navbar/navbar"
+      = render partial: "navbar/navbar"
 
       #messages
         - {success: :successes, info: :infos, warning: :warnings, danger: :errors}.each do |bs_type, msg_key|

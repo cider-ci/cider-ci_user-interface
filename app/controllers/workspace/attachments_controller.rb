@@ -26,11 +26,11 @@ class Workspace::AttachmentsController < WorkspaceController
     case attachment
     when TreeAttachment
       Job.where(tree_id: @attachment.tree_id) \
-         .limit(1).first.public_view_permission?
+        .limit(1).first.public_view_permission?
     when TrialAttachment
       Job.joins(tasks: :trials) \
-         .where('trials.id = ? ', @attachment.trial_id) \
-         .limit(1).first.public_view_permission?
+        .where('trials.id = ? ', @attachment.trial_id) \
+        .limit(1).first.public_view_permission?
     end
   end
 

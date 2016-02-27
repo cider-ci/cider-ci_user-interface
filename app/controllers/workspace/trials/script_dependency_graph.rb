@@ -17,14 +17,14 @@ module ::Workspace::Trials::ScriptDependencyGraph
   def scripts_dependency_svg_graph(trial, type = :start)
     scripts = trial.scripts.reorder(key: :asc).to_a
 
-    sanitize = lambda do|str|
+    sanitize = lambda do |str|
       str.gsub(/[^0-9A-Za-z.\-]/, '_') rescue ''
     end
 
-    build_arcs = lambda do|scripts, type|
+    build_arcs = lambda do |scripts, type|
         scripts.flat_map do |s|
           s[type] && s[type].map { |k, v| v || k }.sort_by { |s| s[:key] } \
-                            .map do |dependency|
+            .map do |dependency|
               [sanitize.(dependency['script']),
                sanitize.(s[:key]),
                (dependency['states'] || ['passed']).map { |w| sanitize.(w) }]
@@ -32,14 +32,14 @@ module ::Workspace::Trials::ScriptDependencyGraph
         end.compact
     end
 
-    arcs2graphviz = lambda do|arcs, color|
-      arcs.map do|a|
+    arcs2graphviz = lambda do |arcs, color|
+      arcs.map do |a|
         %("#{a[0]}" -> "#{a[1]}"  [id="#{a[0]}_#{a[1]}", ) +
         %( color="#{color}", label=" #{a[2].join('\\n')}"];)
       end
     end
 
-    add_node_classes = lambda do|svg|
+    add_node_classes = lambda do |svg|
       xml = Nokogiri::XML(svg)
       xml.css('.node').each do |node|
         id = node.attr('id')
@@ -49,7 +49,7 @@ module ::Workspace::Trials::ScriptDependencyGraph
       _svg = xml.to_s
     end
 
-    adjust_size_params = lambda do|svg|
+    adjust_size_params = lambda do |svg|
       xml = Nokogiri::XML(svg)
       outer_svg_node = xml.css('svg').first
       outer_svg_node['max-height'] = outer_svg_node['height']
@@ -60,7 +60,7 @@ module ::Workspace::Trials::ScriptDependencyGraph
     end
 
     graphviz_nodes = scripts.map { |s| s.slice(:key, :name) }
-                            .map do |n|
+      .map do |n|
         id = sanitize.(n[:key])
         label = sanitize.(n[:name])
         %( "#{id}" [id="#{id}", label="#{label}"];)

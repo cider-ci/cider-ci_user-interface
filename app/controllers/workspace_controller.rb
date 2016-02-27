@@ -40,17 +40,17 @@ class WorkspaceController < ApplicationController
 
   def set_commits_for_index
     @commits = Commit.all
-                     .apply(build_commits_by_repository_name_filter(repository_name_param))
-                     .apply(build_commits_by_branch_name_filter(branch_name_param))
-                     .apply(build_text_search_filter(commits_text_search_param))
-                     .apply(build_git_ref_filter(git_ref_param))
-                     .apply(build_my_commits_filter(current_user, my_commits?))
-                     .apply(build_commits_by_depth_filter(integer_param(:depth, 0)))
-                     .apply(build_commits_by_page(params[:page], commits_per_page_param))
-                     .distinct.reorder(committer_date: :desc, depth: :desc)
-                     .select(:author_email, :committer_email, :author_date, :author_name,
-                       :committer_date, :committer_name,
-                       :depth, :id, :subject, :tree_id, :updated_at)
+      .apply(build_commits_by_repository_name_filter(repository_name_param))
+      .apply(build_commits_by_branch_name_filter(branch_name_param))
+      .apply(build_text_search_filter(commits_text_search_param))
+      .apply(build_git_ref_filter(git_ref_param))
+      .apply(build_my_commits_filter(current_user, my_commits?))
+      .apply(build_commits_by_depth_filter(integer_param(:depth, 0)))
+      .apply(build_commits_by_page(params[:page], commits_per_page_param))
+      .distinct.reorder(committer_date: :desc, depth: :desc)
+      .select(:author_email, :committer_email, :author_date, :author_name,
+        :committer_date, :committer_name,
+        :depth, :id, :subject, :tree_id, :updated_at)
   end
 
   def get_filter_params
@@ -88,7 +88,7 @@ class WorkspaceController < ApplicationController
     @table_name = params[:table_name]
     @where_condition = JSON.parse(params['where']).with_indifferent_access
     @attributes = @table_name.singularize.camelize\
-                             .constantize.find_by(@where_condition).attributes
+      .constantize.find_by(@where_condition).attributes
 
     unless SHOW_RAW_PERMITTED_TABLES.include? @table_name
       render 'public/403', status: :forbidden

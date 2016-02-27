@@ -8,7 +8,7 @@ module Concerns
         EmailAddress.where(user_id: @user.id).update_all primary: false
         EmailAddress.find_by(user_id: @user.id,
                              email_address: params[:email_address])\
-                    .update_attributes! primary: true
+          .update_attributes! primary: true
         { successes: ['A new primary email address has been set.'] }
       end
     end

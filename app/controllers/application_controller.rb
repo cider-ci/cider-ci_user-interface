@@ -40,11 +40,14 @@ class ApplicationController < ActionController::Base
 
   def redirect
     if current_user
-
       redirect_to workspace_path(user_workspace_filter)
     else
       redirect_to public_path
     end
+  end
+
+  def current_path
+    params[:current_fullpath] || public_path
   end
 
   def current_user

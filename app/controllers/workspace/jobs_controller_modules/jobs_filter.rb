@@ -16,7 +16,7 @@ module Workspace::JobsControllerModules::JobsFilter
 
   def build_jobs_initial_scope
     Job.reorder(created_at: :desc).page(params[:page]) \
-       .select(:id, :created_at, :tree_id, :state, :name, :updated_at)
+      .select(:id, :created_at, :tree_id, :state, :name, :updated_at)
   end
 
   def filter_jobs_for_tree_id(jobs)
@@ -30,7 +30,7 @@ module Workspace::JobsControllerModules::JobsFilter
   def filter_by_repository_names(jobs)
     unless repository_name_param.empty?
       jobs.joins(commits: { branches: :repository }) \
-          .distinct.where(repositories: { name: repository_name_param })
+        .distinct.where(repositories: { name: repository_name_param })
     else
       jobs
     end
@@ -39,7 +39,7 @@ module Workspace::JobsControllerModules::JobsFilter
   def filter_jobs_for_branch_name(jobs)
     unless branch_name_param.empty?
       jobs.joins(commits: :branches) \
-          .where(branches: { name: branch_name_param })
+        .where(branches: { name: branch_name_param })
     else
       jobs
     end

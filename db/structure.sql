@@ -603,15 +603,19 @@ CREATE TABLE users (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     password_digest character varying,
     login character varying NOT NULL,
-    last_name character varying DEFAULT ''::character varying NOT NULL,
-    first_name character varying DEFAULT ''::character varying NOT NULL,
     is_admin boolean DEFAULT false NOT NULL,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     workspace_filters jsonb,
     mini_profiler_is_enabled boolean DEFAULT false,
     reload_frequency character varying,
-    ui_theme character varying
+    ui_theme character varying,
+    name character varying,
+    github_access_token character varying,
+    github_id integer,
+    account_enabled boolean DEFAULT true NOT NULL,
+    password_sign_in_allowed boolean DEFAULT true NOT NULL,
+    max_session_lifetime character varying DEFAULT '7 days'::character varying
 );
 
 
@@ -1539,6 +1543,8 @@ INSERT INTO schema_migrations (version) VALUES ('6');
 INSERT INTO schema_migrations (version) VALUES ('60');
 
 INSERT INTO schema_migrations (version) VALUES ('61');
+
+INSERT INTO schema_migrations (version) VALUES ('62');
 
 INSERT INTO schema_migrations (version) VALUES ('7');
 

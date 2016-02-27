@@ -2,102 +2,104 @@
 -#  Licensed under the terms of the GNU Affero General Public License v3.
 -#  See the LICENSE.txt file provided with this software.
 
+.row
 
-.panel.panel-info
-  .panel-heading
-    %h3 Customization
+  .col-md-6
 
-  .panel-body
-    = form_for :user, url: workspace_account_path, method: 'PUT', html: {class: "form-horizontal"} do |form|
+    .panel.panel-info
+      .panel-heading
+        %h3 User Interface Behavior
 
-      = form_group "Reload frequency", control_id: "reload_frequency" do
+      .panel-body
+        = form_for :user, url: workspace_account_path, method: 'PUT', html: {class: "form-horizontal"} do |form|
 
-        = form.select :reload_frequency,
-          options_for_select( [["Aggressive",:aggressive],
-            ["Default",:default], ["Slow",:slow]],
-            current_user.reload_frequency || :default),
-          class: "form-control"
+          = form_group "Reload frequency", control_id: "reload_frequency" do
 
-      = form_group "UI Theme", control_id: :ui_theme do
+            = form.select :reload_frequency,
+              options_for_select( [["Aggressive",:aggressive],
+                ["Default",:default], ["Slow",:slow]],
+                current_user.reload_frequency || :default),
+              class: "form-control"
 
-        = form.select :ui_theme,
-          options_for_select([ ["Cider",:cider],
-            ["Darkly",:darkly], ["Boostrap",:bootstrap]],
-            current_user.ui_theme || :default),
-          class: "form-control"
+          = form_group "UI Theme", control_id: :ui_theme do
 
-      = form_group "Enable Mini Profiler", control_id: "mini_profiler_is_enabled" do
-        .checkbox
-          %label<
-            = form.check_box :mini_profiler_is_enabled, class: ""
+            = form.select :ui_theme,
+              options_for_select([ ["Cider",:cider],
+                ["Darkly",:darkly], ["Boostrap",:bootstrap]],
+                current_user.ui_theme || :default),
+              class: "form-control"
 
+          = form_group "Enable Mini Profiler", control_id: "mini_profiler_is_enabled" do
+            .checkbox
+              %label<
+                = form.check_box :mini_profiler_is_enabled, class: ""
 
+          = form_group "" do
+            .pull-right
+              = button_tag type: 'submit', class: "btn btn-primary" do
+                Save
 
-      = form_group "" do
-        .pull-right
-          = button_tag type: 'submit', class: "btn btn-primary" do
-            Save
+    .panel.panel-danger
+      .panel-heading
+        %h3 Password
+      .panel-body
 
-
-
-.panel.panel-primary
-  .panel-heading
-    %h3 Basic account settings
-
-  .panel-body
-    = form_for :user, url: workspace_account_path, method: 'PUT', html: {class: "form-horizontal"} do |form|
-
-      = form_group "Login / nick name", control_id: "user_login" do
-        = form.text_field :login, required: true, class: "form-control"
-
-      = form_group "First name", control_id: "user_first_name" do
-        = form.text_field :first_name, required: true, class: "form-control"
-
-      = form_group "Last name", control_id: "user_last_name"  do
-        = form.text_field :last_name, required: true, class: "form-control"
-
-      = form_group "" do
-        .pull-right
-          = button_tag type: 'submit', class: "btn btn-primary" do
-            Save
-
-.panel.panel-danger
-  .panel-heading
-    %h3 Password
-
-  .panel-body
-    = form_for :user, url: workspace_account_path, method: 'PUT', html: { class: "form-inline", style: "text-align: center;"} do |form|
-
-      .form-group
-        %label.sr-only{for: 'user_password'}
-        = form.password_field :password, class: "form-control", placeholder: "New password", style: "width: 20em"
-
-      = button_tag type: 'submit', class: "btn btn-danger" do
-        Change
+        %p.text-warning
+          If you change your password all your
+          %b session cookies
+          will become
+          %b invalid immediately.
+          It depends on the configuration of your server if passwords can be used to sign in.
 
 
-.panel.panel-info
-  .panel-heading
-    %h3 Email addresses
+        = form_for :user, url: workspace_account_path, method: 'PUT', html: { class: "form-inline", style: "text-align: center;"} do |form|
 
-  .panel-body
+          .form-group
+            %label.sr-only{for: 'user_password'}
+            = form.password_field :password, class: "form-control", placeholder: "New password", style: "width: 20em"
+
+          = button_tag type: 'submit', class: "btn btn-danger" do
+            Change
 
 
-    %table.table.table-striped
-      %thead
-      %tbody
-        = render partial: 'email_address', collection: @user.email_addresses
 
-    .row
+  .col-md-6
 
-      =form_tag email_addresses_workspace_account_path, method: 'POST', class: 'form-inline', style: "text-align: center;" do
+    .panel.panel-info
+      .panel-heading
+        %h3 Email addresses
 
-        .form-group
-          %label.sr-only{for: 'email_address'}
-          = text_field_tag 'email_address', nil, placeholder: "Email address", type: 'email', class: "form-control", style: "width: 30em"
+      .panel-body
 
-        = button_tag type: 'submit', class: "btn btn-info" do
-          %i.icon-add
-          Add email address
+        %p
+          Email addresses are used to match your work on the
+          = link_to workspace_path do
+            workspace page.
+          Make sure
+          %b every email address
+          you use to
+          %b create commits
+          is listed here.
+
+
+        %table.table.table-striped
+          %thead
+          %tbody
+            = render partial: 'email_address', collection: @user.email_addresses
+
+        .row
+
+          =form_tag email_addresses_workspace_account_path, method: 'POST', class: 'form-inline', style: "text-align: center;" do
+
+            .form-group
+              %label.sr-only{for: 'email_address'}
+              = text_field_tag 'email_address', nil, placeholder: "Email address", type: 'email', class: "form-control", style: "width: 30em"
+
+            = button_tag type: 'submit', class: "btn btn-info" do
+              %i.icon-add
+              Add email address
+
+
+
 
 

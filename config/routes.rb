@@ -148,8 +148,19 @@ CiderCI::Application.routes.draw do
   resource :public, only: [:show], controller: 'public'
 
   namespace 'public' do
-    post 'sign_in'
+
+    namespace 'auth_provider' do
+      post '/', action: :request_authentication
+      get '/:provider/sign_in', action: :sign_in
+    end
+
+    namespace 'auth_local' do
+      post 'sign_in', as: :sign_in
+    end
+
     post 'sign_out'
+
+    get 'sign_in'
 
     get 'attachments/:repository_name/:branch_name/:job_name/*path',
       action: :redirect_to_tree_attachment_content,

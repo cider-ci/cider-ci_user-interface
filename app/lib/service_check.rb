@@ -10,38 +10,46 @@ module ServiceCheck
     include Concerns::UrlBuilder
 
     def check_api
-      check_service Settings.services.api.http, Settings.basic_auth
+      check_service Settings.services.api.http
     end
 
     def check_builder
-      check_service Settings.services.builder.http, Settings.basic_auth
+      check_service Settings.services.builder.http
     end
 
     def check_dispatcher
-      check_service Settings.services.dispatcher.http, Settings.basic_auth
+      check_service Settings.services.dispatcher.http
     end
 
     def check_notifier
-      check_service Settings.services.notifier.http, Settings.basic_auth
+      check_service Settings.services.notifier.http
     end
 
     def check_repository
-      check_service Settings.services.repository.http, Settings.basic_auth
+      check_service Settings.services.repository.http
     end
 
     def check_storage
-      check_service Settings.services.storage.http, Settings.basic_auth
+      check_service Settings.services.storage.http
     end
 
-    def check_service(http_opts, basic_auth)
+    def check_service(http_opts)
       url = service_base_url(http_opts) + '/status'
-      check_resource url, basic_auth
+      check_resource url
     end
 
-    def check_resource(url, basic_auth)
+    def basic_auth_password(username)
+      OpenSSL::HMAC.hexdigest(
+        OpenSSL::Digest.new('sha1'),
+        Settings.secret, username)
+    end
+
+    def check_resource(url)
       begin
-        response = http_get(url, username: basic_auth.username,
-                                 password: basic_auth.password, raise_error: false)
+        response = http_get(url,
+          username: 'ui-service',
+          password: basic_auth_password('ui-service'),
+          raise_error: false)
         res = OpenStruct.new
         if response.status.between?(200, 299)
           res.is_ok = true

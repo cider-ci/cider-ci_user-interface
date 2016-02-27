@@ -19,12 +19,6 @@ def accept_alert_dialog
   end
 end
 
-def accept_usage_terms
-  if all('h3', text: 'Nutzungsbedingungen').size > 0
-    click_button 'Akzeptieren'
-  end
-end
-
 def assert_alert_dialog
   expect(page.driver.browser.switch_to.alert.text).not_to be_blank
 end
