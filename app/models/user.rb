@@ -6,6 +6,8 @@ class User < ActiveRecord::Base
   has_secure_password validations: false
   has_many :email_addresses, -> { order(email_address: :asc) }
 
+  after_create :create_password_if_blank
+
   def to_s
     "#{name} [#{login}]".squish
   end
@@ -22,6 +24,13 @@ class User < ActiveRecord::Base
 
   def self.admins?
     User.where(is_admin: true).count > 0
+  end
+
+  def create_password_if_blank
+    if self.password_digest.blank?
+      self.password = SecureRandom.base64(24)
+      self.save
+    end
   end
 
 end
