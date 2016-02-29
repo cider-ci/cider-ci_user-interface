@@ -26,5 +26,6 @@ jobs:
             - script: create-database
             body: |
               set -eux
+              bundle exec rake assets:precompile
               cd public/assets
-              git diff --quiet --exit-code
+              git diff --stat --exit-code -- *
