@@ -1,15 +1,25 @@
+def create_and_or_update(entity, primary_attribute_name,
+  primary_attribute, config)
 
-User.find_or_initialize_by(login: 'admin')  \
-  .update_attributes! is_admin: true, password: 'secret'
+  primary_map = { primary_attribute_name => primary_attribute }
 
-Repository.find_or_initialize_by(name: 'Cider-CI Bash Demo Project') \
-  .update_attributes!(
-    git_url: Rails.root.join("..","demo-project-bash").to_s,
-    git_fetch_and_update_interval: 5,
-    public_view_permission: true)
+  instance = entity.find_by(primary_map)
 
+  create_attributes = config['create-attributes'].presence || {}
 
-Executor.find_or_initialize_by(name: "DemoExecutor",
-   id: "35cff40c-b4f8-4ca3-9217-d49c9c35f375") \
- .update_attributes!(base_url: 'http://localhost:8883')
+  instance ||= entity.create! primary_map.merge(create_attributes.to_h)
 
+  update_attributes = config['update-attributes'].presence
+
+  if (instance && update_attributes)
+    instance.update_attributes! update_attributes.to_h
+  end
+end
+
+Settings.managed_users.try(:each) do |login, config|
+  create_and_or_update User, 'login', login, config
+end
+
+Settings.managed_repositories.try(:each) do |git_url, config|
+  create_and_or_update Repository, 'git_url', git_url, config
+end
