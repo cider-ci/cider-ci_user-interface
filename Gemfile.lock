@@ -6,14 +6,6 @@ GIT
     rails_config (0.5.0.beta1)
       activesupport (>= 3.0)
 
-GIT
-  remote: https://github.com/DrTom/textacular.git
-  revision: 778fd0952f949f64eba3ff03e6b97b247dc54d40
-  ref: 778fd0952f949f64eba3ff03e6b97b247dc54d40
-  specs:
-    textacular (3.2.1)
-      activerecord (>= 3.0, < 5.0)
-
 GEM
   remote: https://rubygems.org/
   specs:
@@ -114,6 +106,8 @@ GEM
     docile (1.1.5)
     domain_name (0.5.20160128)
       unf (>= 0.0.5, < 1.0.0)
+    drtom-textacular (4.0.0.alpha.20160302)
+      activerecord (>= 3.0, <= 5.0)
     erubis (2.7.0)
     execjs (2.6.0)
     factory_girl (4.5.0)
@@ -364,6 +358,7 @@ DEPENDENCIES
   cider_ci-support (~> 1.2.0)
   coffee-rails
   configuration_management_backdoor (>= 3.0.0, < 4.0.0)
+  drtom-textacular (= 4.0.0.alpha.20160302)
   factory_girl
   factory_girl_rails
   faker
@@ -396,7 +391,6 @@ DEPENDENCIES
   sass-rails
   sdoc
   selenium-webdriver
-  textacular!
   therubyrhino
   timecop
   uglifier

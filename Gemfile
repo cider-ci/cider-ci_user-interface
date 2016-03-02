@@ -12,7 +12,7 @@ gem 'activerecord-jdbcpostgresql-adapter',  platform: :jruby
 gem 'jdbc-postgres', platform: :jruby
 gem 'pg', platform: 'mri'
 gem 'pg_tasks', '>= 1.3.0', '< 2.0.0'
-gem 'textacular', git:  'https://github.com/DrTom/textacular.git', ref: '778fd0952f949f64eba3ff03e6b97b247dc54d40'
+gem 'drtom-textacular', '= 4.0.0.alpha.20160302'
 
 
 # FRONTEND
