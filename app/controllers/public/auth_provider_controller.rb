@@ -91,7 +91,7 @@ class Public::AuthProviderController < ApplicationController
   end
 
   def get_provider_config(id)
-    (Settings.authentication_providers || {})[id.to_s]
+    (Settings[:authentication_providers] || {})[id.to_s]
   end
 
 end

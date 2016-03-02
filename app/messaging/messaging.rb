@@ -14,7 +14,7 @@ class Messaging
         @memoized_created_exchanges = {}
 
         Rails.logger.info 'Initializing messaging...'
-        @conn = Bunny.new Settings.messaging.connection.to_hash
+        @conn = Bunny.new Settings[:messaging][:connection]
         @conn.start
         @ch = @conn.create_channel
 

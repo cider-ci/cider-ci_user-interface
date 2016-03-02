@@ -23,7 +23,7 @@
         = link_to workspace_job_path(job)  do
           %span<>= job.id[0..5]
 
-    - if Settings.constants.STATES.FINISHED.include? job.state
+    - if Settings[:constants][:STATES][:FINISHED].include? job.state
       %td.created-at= render 'humanized_time_from_now', at: job.created_at, format: 'short'
 
       %td.stats

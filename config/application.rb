@@ -1,3 +1,4 @@
+
 require 'active_support/core_ext/numeric/bytes'
 
 require File.expand_path('../boot', __FILE__)
@@ -20,6 +21,25 @@ if RUBY_PLATFORM == 'java'
   rescue Exception => e
   end
 end
+
+######################################################################
+
+Settings = {}.with_indifferent_access
+[ '../config/config_default.yml',
+  'config/settings.yml',
+  '../config/config.yml',
+  '../config/releases.yml',
+  'config/settings.local.yml',
+].each do |config_file|
+  if File.exists? config_file
+    config = YAML.load_file(config_file).to_h.with_indifferent_access
+    Settings.deep_merge! config
+  end
+end
+
+
+#####################################################################
+
 
 module CiderCI
   class Application < Rails::Application
@@ -61,7 +81,7 @@ module CiderCI
 
     config.action_controller.relative_url_root = '/cider-ci/ui'
 
-    config.cache_store = :memory_store, {size: (Settings.ui_cache_size_megabytes.presence || 128).megabytes}
+    config.cache_store = :memory_store, {size: (Settings[:ui_cache_size_megabytes].presence || 128).megabytes}
 
     config.assets.precompile += ['cider.css', 'darkly.css', 'bootstrap-plain.css']
 

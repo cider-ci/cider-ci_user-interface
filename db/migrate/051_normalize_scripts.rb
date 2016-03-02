@@ -46,13 +46,13 @@ class NormalizeScripts < ActiveRecord::Migration
 
     execute %[
       ALTER TABLE scripts ADD CONSTRAINT check_trials_valid_state CHECK
-      ( state IN (#{Settings.constants.STATES.SCRIPT.map{|s|"'#{s}'"}.join(', ')}));]
+      ( state IN (#{Settings[:constants][:STATES][:SCRIPT].map{|s|"'#{s}'"}.join(', ')}));]
 
 
     def new_state old_state
       if old_state == 'waiting'
         'pending'
-      elsif (Settings.constants.STATES.SCRIPT.include? old_state )
+      elsif (Settings[:constants][:STATES][:SCRIPT].include? old_state)
         old_state
       else
         'skipped'

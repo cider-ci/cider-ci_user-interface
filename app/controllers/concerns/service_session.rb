@@ -41,7 +41,7 @@ module Concerns
     end
 
     def secret
-      Settings.session.secret
+      Settings[:session][:secret]
     end
 
     def create_user_signature(user)
@@ -65,7 +65,7 @@ module Concerns
       lifetime = Time.zone.now - issued_at
       validate_lifetime_duration! lifetime, user.max_session_lifetime
       validate_lifetime_duration! lifetime,
-        Settings.session.max_lifetime.presence || '7 Days'
+        Settings[:session][:max_lifetime].presence || '7 Days'
     end
 
     def validate_lifetime_duration!(lifetime, duration)

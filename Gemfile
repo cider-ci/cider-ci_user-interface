@@ -44,7 +44,6 @@ gem 'nilify_blanks'
 gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
 gem 'puma'
 gem 'rack-mini-profiler'
-gem 'rails_config', git: 'https://github.com/DrTom/rails_config.git', ref: 'master'
 gem 'rest-client'
 gem 'therubyrhino', platform: :jruby
 gem 'uglifier'

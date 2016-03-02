@@ -46,7 +46,7 @@ class CreateJobs < ActiveRecord::Migration
     reversible  do |dir|
       dir.up do
         execute %[ALTER TABLE jobs ADD CONSTRAINT check_jobs_valid_state CHECK
-          (state IN (#{Settings.constants.STATES.JOB.map{|s|"'#{s}'"}.join(', ')}));]
+          (state IN (#{Settings[:constants][:STATES][:JOB].map{|s|"'#{s}'"}.join(', ')}));]
       end
     end
 

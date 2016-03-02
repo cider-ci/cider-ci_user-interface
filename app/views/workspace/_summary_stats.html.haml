@@ -16,7 +16,7 @@
       %thead
       %tbody
         %tr
-          - Settings.constants.STATES.JOB.each do |state|
+          - Settings[:constants][:STATES][:JOB].each do |state|
             - if _stat[state] > 0
               - fraction= _stat[state]/_stat[:total].to_f
               %td{class: state,data:{ fraction: fraction },style: "width: #{fraction*100}%"}

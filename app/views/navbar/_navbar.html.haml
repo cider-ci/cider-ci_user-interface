@@ -10,10 +10,10 @@
         %span
           Cider-CI
         %span.edition
-          = Settings.edition
+          = Settings[:edition]
           &nbsp;
-        %span{class:  Settings.releases[0].version_pre.present? ? "text-warning" : ""}<
-          - if release_name = Settings.releases[0].name
+        %span{class:  Settings[:releases][0][:version_pre].present? ? "text-warning" : ""}<
+          - if release_name = Settings[:releases][0][:name]
             %em
               #{release_name}
           = render partial: 'application/semantic_version',

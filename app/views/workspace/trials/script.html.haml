@@ -24,7 +24,7 @@
 - cache cache_signature do
 
   :ruby
-    reload_timeout = Settings.constants.STATES.FINISHED.include?(script.state) ? 60 : 3
+    reload_timeout = Settings[:constants][:STATES][:FINISHED].include?(script.state) ? 60 : 3
 
   .row
     .col-md-10

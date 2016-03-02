@@ -23,7 +23,7 @@
   %hr
 
 
-  - cache Settings.releases[0] do
+  - cache Settings[:releases][0] do
 
     .row
       .col-md-3
@@ -40,7 +40,7 @@
             = render partial: 'application/semantic_version',
               locals: { semver: Semver.get }
 
-            - if release_name = Settings.releases[0].name
+            - if release_name = Settings[:releases][0][:name]
               %em "#{release_name}"
 
         :markdown
@@ -48,8 +48,8 @@
           and **resilient integration testing**.  Read more about Cider-CI at
           [cider-ci.info](http://cider-ci.info/).
 
-        - if Settings.releases[0]['about-name']
-          %p.about-name= markdown(Settings.releases[0]['about-name'])
+        - if Settings[:releases][0]['about-name']
+          %p.about-name= markdown(Settings[:releases][0]['about-name'])
 
       .col-md-3
 

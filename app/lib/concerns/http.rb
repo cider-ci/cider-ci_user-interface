@@ -41,7 +41,7 @@ module Concerns
     def compute_password(username = USER_NAME)
       OpenSSL::HMAC.hexdigest(
         OpenSSL::Digest.new('sha1'),
-        Settings.secret, username)
+        Settings[:secret], username)
     end
 
   end

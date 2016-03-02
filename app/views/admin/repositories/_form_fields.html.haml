@@ -24,7 +24,7 @@
 =form_group "Use the Default Github Authentication Token", control_id: "repository_user_default_github_authtoken" do
   .checkbox
     %label<
-      = f.check_box :use_default_github_authtoken, disabled: (! Settings.github_authtoken), class: ""
+      = f.check_box :use_default_github_authtoken, disabled: (! Settings[:github_authtoken]), class: ""
   %span.help-block
     :markdown
       If the repository is hosted on GitHub (or on a GitHub API compatible

@@ -16,10 +16,10 @@ def create_and_or_update(entity, primary_attribute_name,
   end
 end
 
-Settings.managed_users.try(:each) do |login, config|
+Settings[:managed_users].try(:each) do |login, config|
   create_and_or_update User, 'login', login, config
 end
 
-Settings.managed_repositories.try(:each) do |git_url, config|
+Settings[:managed_repositories].try(:each) do |git_url, config|
   create_and_or_update Repository, 'git_url', git_url, config
 end

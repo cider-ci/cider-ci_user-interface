@@ -7,7 +7,9 @@
 # Ignore bundler config.
 
 #config/secrets.yml
+
 .mux.yml
+.rubocop_todo.yml
 /.bundle
 /.ruby-version
 /.sass-cache
@@ -15,7 +17,9 @@
 /db/*.sqlite3
 /db/*.sqlite3-journal
 /log/*.log
+/node_modules
 /public/assets/*
+/public/dev-assets/
 /repositories/*
 /tmp
 config/database.yml
@@ -23,6 +27,3 @@ config/environments/*.local.yml
 config/settings.local.yml
 config/settings/*.local.yml
 result.json
-/node_modules
-.rubocop_todo.yml
-/public/dev-assets/

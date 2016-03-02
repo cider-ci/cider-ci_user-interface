@@ -2,8 +2,8 @@ module Concerns::AuthProvider::GitHub
   extend ActiveSupport::Concern
 
   def github_get_token(config)
-    uri = Addressable::URI.parse("#{config.oauth_base_url}/access_token")
-    uri.query_values = { client_id: config.client_id, client_secret: config.client_secret,
+    uri = Addressable::URI.parse("#{config[:oauth_base_url]}/access_token")
+    uri.query_values = { client_id: config[:client_id], client_secret: config[:client_secret],
                          code: params[:code], state: params[:state] }
     JSON.parse(Faraday.new(uri.to_s) do |f|
       f.use Faraday::Response::RaiseError
@@ -15,7 +15,7 @@ module Concerns::AuthProvider::GitHub
   end
 
   def github_get_email_addresses(config, token)
-    url = "#{config.api_endpoint}/user/emails?access_token=#{token}"
+    url = "#{config[:api_endpoint]}/user/emails?access_token=#{token}"
     JSON.parse(Faraday.new(url) do |f|
       f.use Faraday::Response::RaiseError
       f.request :retry
@@ -25,7 +25,7 @@ module Concerns::AuthProvider::GitHub
   end
 
   def github_get_user(config, token)
-    url = "#{config.api_endpoint}/user?access_token=#{token}"
+    url = "#{config[:api_endpoint]}/user?access_token=#{token}"
     JSON.parse(Faraday.new(url) do |f|
       f.use Faraday::Response::RaiseError
       f.request :retry
@@ -74,10 +74,10 @@ module Concerns::AuthProvider::GitHub
 
   def github_satisfies_organization_membership_strategy?(config, strategy,
     github_user_properties, github_user_access_token)
-    url = "#{config.api_endpoint}/orgs/" \
+    url = "#{config[:api_endpoint]}/orgs/" \
       << strategy['organization-login'] \
       << '/members/' << github_user_properties['login'] \
-      << "?access_token=#{strategy.access_token.presence || github_user_access_token}"
+      << "?access_token=#{strategy[:access_token].presence || github_user_access_token}"
     [204, 302].include?(
       Faraday.new(url) do |f|
         f.request :retry
@@ -87,10 +87,10 @@ module Concerns::AuthProvider::GitHub
 
   def github_satisfies_team_membership_strategy?(config, strategy,
     github_user_access_token, github_user_properties)
-    team_id_query_url = "#{config.api_endpoint}/orgs/" \
+    team_id_query_url = "#{config[:api_endpoint]}/orgs/" \
       << strategy['organization-login'] << '/teams' \
       << '?per_page=100&access_token=' \
-      << (strategy.access_token.presence || github_user_access_token)
+      << (strategy[:access_token].presence || github_user_access_token)
     # TODO: handle pagination properly; (are there orgs with +100 teams?)
     team_id_response = Faraday.new(team_id_query_url) do |f|
       f.request :retry
@@ -100,9 +100,9 @@ module Concerns::AuthProvider::GitHub
       if team_id = JSON.parse(team_id_response.body) \
           .detect { |t| t['name'] == strategy['team-name'] } \
           .try(:[], 'id')
-        membership_query =  "#{config.api_endpoint}/teams/" \
+        membership_query =  "#{config[:api_endpoint]}/teams/" \
           << team_id.to_s << '/memberships/' << github_user_properties['login'] \
-          << "?access_token=#{strategy.access_token.presence || github_user_access_token}"
+          << "?access_token=#{strategy[:access_token].presence || github_user_access_token}"
         membership_response = Faraday.new(membership_query) do |f|
           f.request :retry
           f.adapter Faraday.default_adapter
@@ -114,11 +114,11 @@ module Concerns::AuthProvider::GitHub
 
   def github_request_authentication
     config = get_provider_config(:github)
-    uri = Addressable::URI.parse("#{config.oauth_base_url}/authorize")
+    uri = Addressable::URI.parse("#{config[:oauth_base_url]}/authorize")
     secret = Rails.application.secrets.secret_key_base
     state = CiderCi::OpenSession::Encryptor.encrypt(secret,
       full_path: params[:current_fullpath])
-    uri.query_values = { client_id: config.client_id,
+    uri.query_values = { client_id: config[:client_id],
                          scope: 'user:email,read_org',
                          state: state }
     redirect_to uri.to_s

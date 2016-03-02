@@ -10,27 +10,27 @@ module ServiceCheck
     include Concerns::UrlBuilder
 
     def check_api
-      check_service Settings.services.api.http
+      check_service Settings[:services][:api][:http]
     end
 
     def check_builder
-      check_service Settings.services.builder.http
+      check_service Settings[:services][:builder][:http]
     end
 
     def check_dispatcher
-      check_service Settings.services.dispatcher.http
+      check_service Settings[:services][:dispatcher][:http]
     end
 
     def check_notifier
-      check_service Settings.services.notifier.http
+      check_service Settings[:services][:notifier][:http]
     end
 
     def check_repository
-      check_service Settings.services.repository.http
+      check_service Settings[:services][:repository][:http]
     end
 
     def check_storage
-      check_service Settings.services.storage.http
+      check_service Settings[:services][:storage][:http]
     end
 
     def check_service(http_opts)
@@ -41,7 +41,7 @@ module ServiceCheck
     def basic_auth_password(username)
       OpenSSL::HMAC.hexdigest(
         OpenSSL::Digest.new('sha1'),
-        Settings.secret, username)
+        Settings[:secret], username)
     end
 
     def check_resource(url)

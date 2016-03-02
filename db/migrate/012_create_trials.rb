@@ -30,7 +30,7 @@ class CreateTrials < ActiveRecord::Migration
     add_foreign_key :trials, :tasks, name: "trials_tasks_fkey", on_delete: :cascade
 
     execute %[ALTER TABLE trials ADD CONSTRAINT valid_state CHECK
-      ( state IN (#{Settings.constants.STATES.TRIAL.map{|s|"'#{s}'"}.join(', ')}));]
+      ( state IN (#{Settings[:constants][:STATES][:TRIAL].map{|s|"'#{s}'"}.join(', ')}));]
 
   end
 

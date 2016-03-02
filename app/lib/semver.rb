@@ -1,5 +1,5 @@
 module Semver
   def self.get
-    @release ||= Settings.releases[0]
+    @release ||= Settings[:releases][0]
   end
 end

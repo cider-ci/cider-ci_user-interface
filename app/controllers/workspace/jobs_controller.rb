@@ -20,13 +20,13 @@ class Workspace::JobsController < WorkspaceController
   end
 
   def request_create(data)
-    url = service_base_url(::Settings.services.builder.http) + '/jobs/'
+    url = service_base_url(Settings[:services][:builder][:http]) + '/jobs/'
 
     RestClient::Request.new(
       method: :post,
       url: url,
-      user: ::Settings.basic_auth.username,
-      password: ::Settings.basic_auth.password,
+      user: Settings[:basic_auth][:username],
+      password: Settings[:basic_auth][:password],
       verify_ssl: false,
       payload: data.to_json,
       headers: { accept: :json,
@@ -34,7 +34,7 @@ class Workspace::JobsController < WorkspaceController
   end
 
   def create
-    url = service_base_url(Settings.services.builder.http) + '/jobs/'
+    url = service_base_url(Settings[:services][:builder][:http]) + '/jobs/'
     response = http_do(:post, url) do |c|
       c.headers['content-type'] = 'application/json'
       c.body = params[:job].slice(:key, :tree_id) \
@@ -54,7 +54,7 @@ class Workspace::JobsController < WorkspaceController
 
   def abort
     job = Job.find(params[:id])
-    url = service_base_url(Settings.services.dispatcher.http) + "/jobs/#{job.id}/abort"
+    url = service_base_url(Settings[:services][:dispatcher][:http]) + "/jobs/#{job.id}/abort"
     response = http_do(:post, url) do |c|
       c.headers['content-type'] = 'application/json'
       c.body = { aborted_by: current_user.id,
@@ -121,7 +121,7 @@ class Workspace::JobsController < WorkspaceController
 
   def retry_and_resume
     job = Job.find(params[:id])
-    url = service_base_url(Settings.services.dispatcher.http) \
+    url = service_base_url(Settings[:services][:dispatcher][:http]) \
       + "/jobs/#{job.id}/retry-and-resume"
     response = http_do(:post, url) do |c|
       c.headers['content-type'] = 'application/json'

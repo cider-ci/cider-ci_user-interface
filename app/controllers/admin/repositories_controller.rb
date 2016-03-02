@@ -54,7 +54,7 @@ class Admin::RepositoriesController < AdminController
   end
 
   def update_notification_url(repository)
-    service_base_url(Settings.services.repository.http) +
+    service_base_url(Settings[:services][:repository][:http]) +
       '/update-notification/' + repository.update_notification_token
   end
 

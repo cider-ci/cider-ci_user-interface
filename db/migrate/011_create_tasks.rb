@@ -42,7 +42,7 @@ class CreateTasks < ActiveRecord::Migration
     reversible  do |dir|
       dir.up do
         execute %[ALTER TABLE tasks ADD CONSTRAINT check_tasks_valid_state CHECK
-          (state IN (#{Settings.constants.STATES.TASK.map{|s|"'#{s}'"}.join(', ')}));]
+          (state IN (#{Settings[:constants][:STATES][:TASK].map{|s|"'#{s}'"}.join(', ')}));]
       end
     end
 

@@ -22,7 +22,7 @@ class Executor < ActiveRecord::Base
 
   def auth_password
     OpenSSL::HMAC.hexdigest(
-      OpenSSL::Digest.new('sha1'), Settings.secret, id)
+      OpenSSL::Digest.new('sha1'), Settings[:secret], id)
   end
 
   delegate :to_s, to: :name
