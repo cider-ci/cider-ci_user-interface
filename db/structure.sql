@@ -427,6 +427,7 @@ CREATE TABLE tasks (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     entity_errors jsonb DEFAULT '[]'::jsonb,
+    bootstorm_delay_seconds integer DEFAULT 5 NOT NULL,
     CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -1547,6 +1548,8 @@ INSERT INTO schema_migrations (version) VALUES ('61');
 INSERT INTO schema_migrations (version) VALUES ('62');
 
 INSERT INTO schema_migrations (version) VALUES ('63');
+
+INSERT INTO schema_migrations (version) VALUES ('64');
 
 INSERT INTO schema_migrations (version) VALUES ('7');
 

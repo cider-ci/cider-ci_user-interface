@@ -1,4 +1,47 @@
 
+SELECT trials.id,
+       exs.id AS executor_id
+FROM trials
+INNER JOIN tasks ON tasks.id = trials.task_id
+INNER JOIN executors_with_load exs ON (tasks.traits <@ exs.traits)
+INNER JOIN jobs ON tasks.job_id = jobs.id
+INNER JOIN commits ON jobs.tree_id = commits.tree_id
+INNER JOIN branches_commits bcts ON commits.id = bcts.commit_id
+INNER JOIN branches ON bcts.branch_id = branches.id
+INNER JOIN repositories ON branches.repository_id = repositories.id
+WHERE ((((((((trials.state = 'pending'
+              AND exs.relative_load < 1)
+             AND exs.enabled = TRUE)
+            AND (exs.last_ping_at > (now() - interval '1 Minutes')))
+           AND NOT EXISTS(
+                            (SELECT 1
+                             FROM trials bootstorm_trials
+                             INNER JOIN tasks bootstorm_tasks ON bootstorm_tasks.id = bootstorm_trials.task_id
+                             WHERE (((bootstorm_trials.state IN ('executing','dispatching')
+                                      AND bootstorm_trials.started_at IS NOT NULL)
+                                     AND bootstorm_trials.executor_id = exs.id)
+                                    AND (bootstorm_trials.started_at + interval '1 second' * bootstorm_tasks.bootstorm_delay) < now()))))
+          AND NOT EXISTS(
+                           (SELECT 1
+                            FROM trials active_trials
+                            INNER JOIN tasks active_tasks ON active_tasks.id = active_trials.task_id
+                            WHERE (active_trials.state IN ('executing','dispatching')
+                                   AND active_tasks.exclusive_global_resources && tasks.exclusive_global_resources))))
+         AND ((exs.accepted_repositories = '{}')
+              OR repositories.git_url = ANY(exs.accepted_repositories)))
+        AND base_url <> '')
+       AND base_url IS NOT NULL)
+ORDER BY jobs.priority DESC ,
+         jobs.created_at ASC,
+         tasks.priority DESC,
+         tasks.created_at ASC,
+         trials.created_at ASC,
+         exs.relative_load ASC,
+         exs.last_ping_at LIMIT 1
+        ;
+
+--#############################################################################
+
 SELECT id FROM commits WHERE tree_id = 'df7ca91946dd93944cbd5a2371c20b4f1360c27a';
 
 SELECT submodule_commit_id FROM submodules WHERE commit_id = '5f685b7b58557226ffa19589083448e66f487c08';
