@@ -427,7 +427,7 @@ CREATE TABLE tasks (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     entity_errors jsonb DEFAULT '[]'::jsonb,
-    bootstorm_delay_seconds integer DEFAULT 5 NOT NULL,
+    dispatch_storm_delay_seconds integer DEFAULT 5 NOT NULL,
     CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -592,6 +592,7 @@ CREATE TABLE trials (
     aborted_by uuid,
     aborted_at timestamp without time zone,
     token uuid DEFAULT uuid_generate_v4() NOT NULL,
+    dispatched_at timestamp without time zone,
     CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
