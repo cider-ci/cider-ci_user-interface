@@ -43,6 +43,8 @@ module ApplicationHelper
       'icon-aborted'
     when 'aborting'
       'icon-aborting'
+    when 'defective'
+      'icon-defective'
     when 'executing', 'dispatching'
       'icon-executing'
     when 'failed'
@@ -76,7 +78,7 @@ module ApplicationHelper
       'label-pending'
     when 'executing', 'dispatched'
       'label-executing'
-    when 'aborting', 'skipped', 'aborted'
+    when 'aborted', 'aborting', 'defective', 'skipped'
       'label-warning'
     else
       'label-default'

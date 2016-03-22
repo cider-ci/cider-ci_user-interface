@@ -7,9 +7,6 @@
   = form_group "Name", control_id: 'executor_name', cols_control: 4 do
     = text_field :executor, :name, value: executor.name, autofocus: true, class: 'form-control'
 
-  = form_group "Base URL", control_id: 'executor_base_url', cols_control: 6 do
-    = text_field :executor, :base_url, value: executor.base_url, class: 'form-control'
-
   = form_group "Enabled", control_id: 'executor_enabled' do
     .checkbox
       = check_box :executor, :enabled, value: executor.enabled

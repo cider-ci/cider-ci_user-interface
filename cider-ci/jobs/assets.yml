@@ -22,7 +22,7 @@ jobs:
         scripts:
           test:
             start-when:
-            - script: bundle-mri
+            - script: bundle
             - script: create-database
             body: |
               set -eux

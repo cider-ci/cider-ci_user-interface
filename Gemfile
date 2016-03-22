@@ -62,7 +62,7 @@ gem 'faker', group: [:development, :test]
 gem 'poltergeist', group: [:test]
 gem 'pry', group: [:development, :test]
 gem 'rspec-rails', group: [:development, :test]
-gem 'rubocop', group: [:development, :test]
+gem 'rubocop', group: [:development, :test], require: false
 gem 'sdoc', group: [:doc], require: false
 gem 'selenium-webdriver', group: [:test]
 gem 'timecop', group: [:development, :test]

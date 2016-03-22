@@ -14,6 +14,8 @@ module Concerns
         f.basic_auth username, password
         f.use Faraday::Response::RaiseError if raise_error
         f.request :retry
+        f.options[:timeout] = 3
+        f.options[:open_timeout] = 3
         f.adapter Faraday.default_adapter
         f.ssl.verify = false
       end
@@ -31,6 +33,8 @@ module Concerns
         f.basic_auth username, password
         # f.use Faraday::Response::RaiseError
         f.request :retry
+        f.options[:timeout] = 3
+        f.options[:open_timeout] = 3
         f.adapter Faraday.default_adapter
         f.ssl.verify = false
       end

@@ -33,26 +33,20 @@
               %i.icon-analytics
               Analytics
 
-          -if jcs.job_issues_count > 0
-            %li#issues-link.reload{data: {cache_signature: jcs.job_issues_count}}
-              - if jcs.job_issues_count <= 0
-                %span.text-muted Issues
-              - else
-                = link_to issues_workspace_job_path(job) do
-                  %span.text-danger= pluralize(jcs.job_issues_count,"Issue")
-
           %li
             = link_to api_browser_path("/jobs/#{job.id}")  do
               %icon.icon-raw-data
               Job-Data
 
           %li
-            = link_to api_browser_path("/job-specifications/#{job.job_specification_id}")  do
+            = link_to api_browser_path("/job-specifications/#{job.job_specification_id}"),
+                class: "api"  do
               %icon.icon-raw-data
               Job-Specification-Data
 
           %li
-            = link_to job_specification_workspace_job_path(job) do
+            = link_to job_specification_workspace_job_path(job),
+                class: "spec" do
               %i.icon-spec
               Specification
 
@@ -67,12 +61,8 @@
           -if jcs.tree_attachments_count > 0 then
             = render '/breadcrumbs/items/tree_attachments', tree_id: job.tree_id
 
-
-    #issues-alert.reload{data: {cache_signature: jcs.job_issues_count}}
-      - if jcs.job_issues_count >= 1
-        .alert.alert-danger
-          %p This job has #{pluralize(jcs.job_issues_count,"issue")}!
-
+    %ul#job-issues.list-unstyled
+      = render partial: 'issue', collection: job.job_issues, as: :issue
 
     #job.job{data: {id: job.id, name: job.name, state: job.state}}
 

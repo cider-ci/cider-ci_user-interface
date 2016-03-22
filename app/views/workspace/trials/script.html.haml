@@ -37,6 +37,14 @@
             %icon.icon-raw-data
             Data
 
+  - if script.issues != {}
+    %section.issues
+      - script.issues.map{|k,v| v.with_indifferent_access}.sort_by{|i| i[:created_at]}.reverse.each do |issue|
+        .alert{class: bootstrap_alert_type(issue)}
+          %b= issue[:title]
+          #{issue[:description]}
+
+
   %h1
     Script
     %em.name= script.name

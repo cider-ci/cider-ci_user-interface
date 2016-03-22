@@ -276,7 +276,7 @@ CREATE TABLE jobs (
     aborted_at timestamp without time zone,
     resumed_by uuid,
     resumed_at timestamp without time zone,
-    CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
+    CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 
@@ -288,35 +288,14 @@ CREATE TABLE repositories (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     git_url text NOT NULL,
     name character varying,
+    git_fetch_and_update_interval integer DEFAULT 60,
     public_view_permission boolean DEFAULT false,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     update_notification_token uuid DEFAULT uuid_generate_v4(),
-    proxy_id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    branch_trigger_include_match text DEFAULT '^.*$'::text NOT NULL,
-    branch_trigger_exclude_match text DEFAULT ''::text NOT NULL,
-    foreign_api_endpoint text DEFAULT ''::text NOT NULL,
-    foreign_api_authtoken text DEFAULT ''::text NOT NULL,
-    foreign_api_owner text DEFAULT ''::text NOT NULL,
-    foreign_api_repo text DEFAULT ''::text NOT NULL,
-    foreign_api_type text DEFAULT 'github'::text NOT NULL,
-    git_fetch_and_update_interval text DEFAULT '1 Minute'::text NOT NULL,
-    CONSTRAINT check_valid_foreign_api_type CHECK ((foreign_api_type = 'github'::text))
-);
-
-
---
--- Name: tree_issues; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE tree_issues (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    title text,
-    description text,
-    type character varying DEFAULT 'error'::character varying NOT NULL,
-    tree_id text NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    github_authtoken text,
+    use_default_github_authtoken boolean DEFAULT false NOT NULL,
+    proxy_id uuid DEFAULT uuid_generate_v4() NOT NULL
 );
 
 
@@ -326,16 +305,14 @@ CREATE TABLE tree_issues (
 
 CREATE VIEW commit_cache_signatures AS
  SELECT commits.id AS commit_id,
-    (count(tree_issues.*) > 0) AS has_tree_issues,
     md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
     md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
     md5(string_agg(DISTINCT (jobs.updated_at)::text, ', '::text ORDER BY (jobs.updated_at)::text)) AS jobs_signature
-   FROM (((((commits
+   FROM ((((commits
      LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
      LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
      LEFT JOIN jobs ON (((jobs.tree_id)::text = (commits.tree_id)::text)))
      LEFT JOIN repositories ON ((branches.repository_id = repositories.id)))
-     LEFT JOIN tree_issues ON ((tree_issues.tree_id = (commits.tree_id)::text)))
   GROUP BY commits.id;
 
 
@@ -351,21 +328,6 @@ CREATE TABLE email_addresses (
 
 
 --
--- Name: executor_issues; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE executor_issues (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    title text,
-    description text,
-    type character varying DEFAULT 'error'::character varying NOT NULL,
-    executor_id uuid NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
---
 -- Name: executors; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -375,13 +337,13 @@ CREATE TABLE executors (
     max_load integer DEFAULT 1 NOT NULL,
     enabled boolean DEFAULT true NOT NULL,
     traits character varying[] DEFAULT '{}'::character varying[],
+    base_url text,
     last_ping_at timestamp without time zone,
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     accepted_repositories character varying[] DEFAULT '{}'::character varying[],
-    upload_tree_attachments boolean DEFAULT true NOT NULL,
-    upload_trial_attachments boolean DEFAULT true NOT NULL,
-    version text
+    upload_tree_attachments boolean DEFAULT false NOT NULL,
+    upload_trial_attachments boolean DEFAULT true NOT NULL
 );
 
 
@@ -395,6 +357,7 @@ CREATE TABLE executors_with_load (
     max_load integer,
     enabled boolean,
     traits character varying[],
+    base_url text,
     last_ping_at timestamp without time zone,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
@@ -469,7 +432,7 @@ CREATE TABLE tasks (
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     entity_errors jsonb DEFAULT '[]'::jsonb,
     dispatch_storm_delay_seconds integer DEFAULT 1 NOT NULL,
-    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
+    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 
@@ -484,25 +447,22 @@ CREATE VIEW job_stats AS
           WHERE (tasks.job_id = jobs.id)) AS total,
     ( SELECT count(*) AS count
            FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'failed'::text))) AS failed,
+    ( SELECT count(*) AS count
+           FROM tasks
           WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'aborted'::text))) AS aborted,
     ( SELECT count(*) AS count
            FROM tasks
           WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'aborting'::text))) AS aborting,
     ( SELECT count(*) AS count
            FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'defective'::text))) AS defective,
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'pending'::text))) AS pending,
     ( SELECT count(*) AS count
            FROM tasks
           WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'executing'::text))) AS executing,
     ( SELECT count(*) AS count
            FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'failed'::text))) AS failed,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'passed'::text))) AS passed,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'pending'::text))) AS pending
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'passed'::text))) AS passed
    FROM jobs;
 
 
@@ -510,9 +470,9 @@ CREATE VIEW job_stats AS
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE schema_migrations (
-    version character varying NOT NULL
-);
+--CREATE TABLE schema_migrations (
+--    version character varying NOT NULL
+--);
 
 
 --
@@ -528,6 +488,7 @@ CREATE TABLE scripts (
     stdout character varying(10485760) DEFAULT ''::character varying NOT NULL,
     stderr character varying(10485760) DEFAULT ''::character varying NOT NULL,
     body character varying(10240) DEFAULT ''::character varying NOT NULL,
+    error character varying(1048576),
     timeout character varying,
     exclusive_executor_resource character varying,
     started_at timestamp without time zone,
@@ -545,8 +506,7 @@ CREATE TABLE scripts (
     working_dir character varying(2048),
     script_file character varying(2048),
     wrapper_file character varying(2048),
-    issues jsonb DEFAULT '{}'::jsonb NOT NULL,
-    CONSTRAINT check_scripts_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying, 'skipped'::character varying, 'waiting'::character varying])::text[])))
+    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'pending'::character varying, 'executing'::character varying, 'skipped'::character varying, 'passed'::character varying, 'waiting'::character varying])::text[])))
 );
 
 
@@ -637,7 +597,7 @@ CREATE TABLE trials (
     aborted_at timestamp without time zone,
     token uuid DEFAULT uuid_generate_v4() NOT NULL,
     dispatched_at timestamp without time zone,
-    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
+    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
 
@@ -708,14 +668,6 @@ ALTER TABLE ONLY commits
 
 ALTER TABLE ONLY email_addresses
     ADD CONSTRAINT email_addresses_pkey PRIMARY KEY (email_address);
-
-
---
--- Name: executor_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY executor_issues
-    ADD CONSTRAINT executor_issues_pkey PRIMARY KEY (id);
 
 
 --
@@ -796,14 +748,6 @@ ALTER TABLE ONLY tasks
 
 ALTER TABLE ONLY tree_attachments
     ADD CONSTRAINT tree_attachments_pkey PRIMARY KEY (id);
-
-
---
--- Name: tree_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY tree_issues
-    ADD CONSTRAINT tree_issues_pkey PRIMARY KEY (id);
 
 
 --
@@ -994,13 +938,6 @@ CREATE INDEX index_email_addresses_on_user_id ON email_addresses USING btree (us
 
 
 --
--- Name: index_executor_issues_on_executor_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_executor_issues_on_executor_id ON executor_issues USING btree (executor_id);
-
-
---
 -- Name: index_executors_on_accepted_repositories; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1085,13 +1022,6 @@ CREATE INDEX index_repositories_on_updated_at ON repositories USING btree (updat
 
 
 --
--- Name: index_scripts_on_issues; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_scripts_on_issues ON scripts USING btree (issues);
-
-
---
 -- Name: index_scripts_on_trial_id_and_key; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1162,13 +1092,6 @@ CREATE UNIQUE INDEX index_tree_attachments_on_tree_id_and_path ON tree_attachmen
 
 
 --
--- Name: index_tree_issues_on_tree_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_tree_issues_on_tree_id ON tree_issues USING btree (tree_id);
-
-
---
 -- Name: index_trial_attachments_on_trial_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1207,7 +1130,7 @@ CREATE INDEX index_trials_on_task_id ON trials USING btree (task_id);
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
+-- CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
 
 
 --
@@ -1257,6 +1180,7 @@ CREATE RULE "_RETURN" AS
     executors.max_load,
     executors.enabled,
     executors.traits,
+    executors.base_url,
     executors.last_ping_at,
     executors.created_at,
     executors.updated_at,
@@ -1282,13 +1206,6 @@ CREATE TRIGGER update_updated_at_column_of_branches BEFORE UPDATE ON branches FO
 --
 
 CREATE TRIGGER update_updated_at_column_of_commits BEFORE UPDATE ON commits FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
-
-
---
--- Name: update_updated_at_column_of_executor_issues; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_executor_issues BEFORE UPDATE ON executor_issues FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1338,13 +1255,6 @@ CREATE TRIGGER update_updated_at_column_of_tasks BEFORE UPDATE ON tasks FOR EACH
 --
 
 CREATE TRIGGER update_updated_at_column_of_tree_attachments BEFORE UPDATE ON tree_attachments FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
-
-
---
--- Name: update_updated_at_column_of_tree_issues; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_tree_issues BEFORE UPDATE ON tree_issues FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1444,14 +1354,6 @@ ALTER TABLE ONLY submodules
 
 ALTER TABLE ONLY branches
     ADD CONSTRAINT fk_rails_741467517e FOREIGN KEY (current_commit_id) REFERENCES commits(id) ON DELETE CASCADE;
-
-
---
--- Name: fk_rails_880255918f; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY executor_issues
-    ADD CONSTRAINT fk_rails_880255918f FOREIGN KEY (executor_id) REFERENCES executors(id) ON DELETE CASCADE;
 
 
 --
@@ -1612,29 +1514,7 @@ INSERT INTO schema_migrations (version) VALUES ('39');
 
 INSERT INTO schema_migrations (version) VALUES ('40');
 
-INSERT INTO schema_migrations (version) VALUES ('400');
-
-INSERT INTO schema_migrations (version) VALUES ('401');
-
-INSERT INTO schema_migrations (version) VALUES ('402');
-
-INSERT INTO schema_migrations (version) VALUES ('403');
-
-INSERT INTO schema_migrations (version) VALUES ('404');
-
-INSERT INTO schema_migrations (version) VALUES ('405');
-
-INSERT INTO schema_migrations (version) VALUES ('406');
-
-INSERT INTO schema_migrations (version) VALUES ('407');
-
-INSERT INTO schema_migrations (version) VALUES ('408');
-
-INSERT INTO schema_migrations (version) VALUES ('409');
-
 INSERT INTO schema_migrations (version) VALUES ('41');
-
-INSERT INTO schema_migrations (version) VALUES ('410');
 
 INSERT INTO schema_migrations (version) VALUES ('42');
 

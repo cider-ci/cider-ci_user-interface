@@ -7,15 +7,26 @@ templates:
   - src: [cider-ci, templates, database.yml]
     dest: [config, database.yml]
 
+environment-variables:
+  RBENV_VERSION:  2.2.4
+
 scripts:
-  bundle-mri:
-    exclusive-executor-resource: bundler_2.1
-    body: bundle
+  bundle:
+    exclusive-executor-resource: rbenv
+    timeout: 10 Minutes
+    body: |
+      if [ ! -d ${HOME}/.rbenv/versions/${RBENV_VERSION} ]; then
+        rbenv install ${RBENV_VERSION}
+        gem install bundler
+      fi
+      cd user-interface
+      rm .bundle/config
+      bundle
 
   create-database:
     body: bundle exec rake db:reset
     start-when:
-    - script: bundle-mri
+    - script: bundle
 
   delete-database:
     body:  bundle exec rake db:pg:terminate_connections db:drop

@@ -6,6 +6,7 @@ class Executor < ActiveRecord::Base
   ONLINE_SQL_CONDITION = "last_ping_at > (now() - interval '3 Minutes')".freeze
 
   has_many :trials
+  has_many :executor_issues
   has_one :executor_with_load, primary_key: 'id', foreign_key: 'id'
 
   self.primary_key = 'id'
@@ -22,7 +23,7 @@ class Executor < ActiveRecord::Base
 
   def auth_password
     OpenSSL::HMAC.hexdigest(
-      OpenSSL::Digest.new('sha1'), Settings[:secret], id)
+      OpenSSL::Digest.new('sha1'), Settings[:secret], name)
   end
 
   delegate :to_s, to: :name

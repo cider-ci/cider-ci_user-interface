@@ -6,16 +6,16 @@ module MigrationHelper
   end
 
   def create_text_index(t, c)
-    reversible do |dir| 
-      dir.up do 
+    reversible do |dir|
+      dir.up do
         execute "CREATE INDEX ON #{t} USING gin(to_tsvector('english',#{c}));"
       end
     end
   end
 
   def add_auto_timestamps(table_name)
-    reversible do |dir| 
-      dir.up do 
+    reversible do |dir|
+      dir.up do
         add_timestamps table_name, null: false
 
         execute "ALTER TABLE #{table_name} ALTER COLUMN created_at SET DEFAULT now()"
@@ -27,18 +27,18 @@ module MigrationHelper
           CREATE OR REPLACE FUNCTION update_updated_at_column()
           RETURNS TRIGGER AS $$
           BEGIN
-             NEW.updated_at = now(); 
+             NEW.updated_at = now();
              RETURN NEW;
           END;
           $$ language 'plpgsql';
         }
 
         execute "
-          CREATE TRIGGER update_updated_at_column_of_#{table_name} 
-          BEFORE UPDATE ON #{table_name} FOR EACH ROW 
+          CREATE TRIGGER update_updated_at_column_of_#{table_name}
+          BEFORE UPDATE ON #{table_name} FOR EACH ROW
           WHEN (OLD.* IS DISTINCT FROM NEW.*)
-          EXECUTE PROCEDURE 
-          update_updated_at_column(); 
+          EXECUTE PROCEDURE
+          update_updated_at_column();
         "
       end
 

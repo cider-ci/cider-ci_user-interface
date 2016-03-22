@@ -7,7 +7,9 @@
 
   commit ||= @commit
   cs = @commit_cache_signatures ? @commit_cache_signatures.select{|cs| cs.commit_id == commit.id}.first : commit.commit_cache_signature
-  cache_signature = CacheSignature.signature "_commit_tr", commit.cache_signature, cs.branches_signature, cs.jobs_signature, cs.repositories_signature
+  cache_signature = CacheSignature.signature "_commit_tr",
+    commit.cache_signature, commit.tree_issues.count > 0,
+    cs.branches_signature, cs.jobs_signature, cs.repositories_signature
 
 - cache  cache_signature do
 
@@ -33,6 +35,10 @@
         %span.nowrap
           %i.icon-tree.text-muted
           %span.id= commit.tree_id[0..5]
+        - if (commit.tree_issues.count > 0)
+          %sup.tree-issue-warning.text-danger
+            %i.icon-warning
+
 
     %td.commit
       - if commit_base_url
@@ -42,7 +48,6 @@
             %span.commit-id<>= commit.id[0..5]
       - else
         %span.text-warning.nowrap
-          %i.icon-warning
           orphaned
 
     %td.committer-date=render 'humanized_time_from_now', at: commit.committer_date, format: 'short'

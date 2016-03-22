@@ -4,7 +4,7 @@
 
 :ruby
   trial ||= @trial
-  scripts= trial.scripts.select(:key,:name,:state)
+  scripts= trial.scripts.select(:key,:name,:state,:issues)
   issues = trial.trial_issues
   cache_signature = CacheSignature.signature trial.cache_signature,
     trial.trial_attachments.collection_cache_signature, admin?,

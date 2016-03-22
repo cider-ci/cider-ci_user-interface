@@ -13,6 +13,7 @@ class Workspace::TreesController < WorkspaceController
 
   def show
     @tree_id = params[:id]
+    @tree_issues = TreeIssue.where(tree_id: @tree_id)
     @attachments = TreeAttachment.where(tree_id: @tree_id)
     @commits = Commit.where(
       " id IN ( WITH RECURSIVE recursive_commits(id) AS

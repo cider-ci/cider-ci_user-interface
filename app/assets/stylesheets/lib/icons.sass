@@ -6,6 +6,8 @@
 
   .nav &, .navbar &
     @extend .fa-fw // fixed-width icons
+  .label &
+    @extend .fa-fw // fixed-width icons
 
 .icon-add
   @extend .fa-plus-circle
@@ -57,8 +59,8 @@
 .icon-edit
   @extend .fa-pencil
 
-.icon-job, .icon-jobs
-  @extend .fa-suitcase
+.icon-defective
+  @extend .fa-bolt
 
 .icon-executing,
   @include spin-clockwise
@@ -81,6 +83,9 @@
 
 .icon-home
   @extend .fa-home
+
+.icon-job, .icon-jobs
+  @extend .fa-suitcase
 
 .icon-offline
   @extend .fa-heart-o

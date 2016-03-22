@@ -30,6 +30,7 @@ Settings = {}.with_indifferent_access
   '../config/config.yml',
   '../config/releases.yml',
   'config/settings.local.yml',
+  '/cider-ci/data/config/config.yml'
 ].each do |config_file|
   if File.exists? config_file
     config = YAML.load_file(config_file).to_h.with_indifferent_access

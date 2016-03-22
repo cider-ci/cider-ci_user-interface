@@ -22,12 +22,14 @@
       %span.nowrap.job-id
         = link_to workspace_job_path(job)  do
           %span<>= job.id[0..5]
+          - if job.job_issues.count > 0
+            %sup.job-issue-warning.text-danger
+              %i.fa.fa-warning
 
     - if Settings[:constants][:STATES][:FINISHED].include? job.state
       %td.created-at= render 'humanized_time_from_now', at: job.created_at, format: 'short'
-
       %td.stats
-        = render "stats_summary", stats: job.job_stat
+        != render_stats_summary(job.job_stat)
     - else
       %td.summary_stats{colspan: 2}= render 'summary_stats', job: job, cache_signature: cs
 

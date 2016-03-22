@@ -23,4 +23,6 @@ class Commit < ActiveRecord::Base
 
   has_many :repositories, through: :branches
 
+  has_many :tree_issues, primary_key: 'tree_id', foreign_key: 'tree_id'
+
 end

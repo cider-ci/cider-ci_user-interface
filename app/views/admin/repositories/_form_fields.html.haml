@@ -8,40 +8,85 @@
 
 =form_group "Git URL", control_id: "repository_git_url" do
   = f.text_field 'git_url', class: "form-control"
+  %span.help-block
+    :markdown
+
+      This value is also used to identify repositories in the Cider-CI stack.
+      There are equivalent representations for the same URL.  We recommended to
+      use the canonical representation as shown by your git server.
+
+      Never setup **multiple repositories** within one Cider-CI instance which
+      effectively **point to the same repository**.  We recommend `https` over
+      `ssh` if possible. It tends to be less problematic and easier to debug.
+
+%hr
+
+=form_group "Fetch and update interval", control_id: "repository_git_fetch_and_update_interval"  do
+  = f.text_field :git_fetch_and_update_interval,  class: "form-control"
+  %span.help-block
+    :markdown
+      It is recommended to use so called "webhooks" to trigger fetch and
+      updates.  If so a value of `5 Minutes` or higher is recommended. For pull
+      only operation sensible values range from `5 Seconds`  to `3 Minutes`.
+
+=form_group "Update notification token", control_id: :update_notification_token do
+  = f.text_field :update_notification_token, class: 'form-control'
+  %span.help-block
+    The URL to send update notification from your git server to your Cider-CI
+    instance for this repository is based on this value. You can reset it here.
+    The string representing the value must be a valid UUID.
+
+%hr
+
+=form_group "Branch trigger include-match", control_id: :branch_trigger_include_match do
+  = f.text_field :branch_trigger_include_match, class: "form-control"
+
+=form_group "Branch trigger exclude-match", control_id: :branch_trigger_exclude_match do
+  = f.text_field :branch_trigger_exclude_match, class: "form-control"
+
+
+%hr
 
 =form_group "Public view permission", control_id: "repository_public_view_permission" do
   .checkbox
     %label<
       = f.check_box :public_view_permission, class: ""
-
-=form_group "Fetch and update interval (seconds) ", control_id: "repository_git_fetch_and_update_interval", cols_control: 4 do
-  = f.text_field :git_fetch_and_update_interval, type: 'number', class: "form-control"
   %span.help-block
-    It is recommended to Use webhooks to trigger fetch and updates if
-    available. In this case a value of 300 or higher is recommended. For pull
-    only operation sensible values range from 5 to 60.
+    You can allow unauthenticated users to view jobs and other related data
+    for this repository.
 
-=form_group "Use the Default Github Authentication Token", control_id: "repository_user_default_github_authtoken" do
-  .checkbox
-    %label<
-      = f.check_box :use_default_github_authtoken, disabled: (! Settings[:github_authtoken]), class: ""
+%hr
+
+=form_group "Foreign API endpoint", control_id: :foreign_api_endpoint do
+  = f.text_field :foreign_api_endpoint, class: "form-control"
   %span.help-block
     :markdown
-      If the repository is hosted on GitHub (or on a GitHub API compatible
-      service) an authentication token will enable status pushes.
-      See also ["Creating an access
-      token"](https://help.github.com/articles/creating-an-access-token-for-command-line-use/)
-      in the GitHub Help.
+      The API endpoint, e.g. `https://api.github.com`, to send job statutes.
 
-      This option will use the default token configured for your server. If
-      you can not select this option no token has been configured.
-
-
-=form_group "Github Authentication Token", control_id: "github_authtoken" do
-  = f.text_field 'github_authtoken', class: "form-control"
+=form_group "Foreign API authentication token", control_id: :foreign_api_authtoken do
+  = f.text_field :foreign_api_authtoken, class: "form-control"
   %span.help-block
     :markdown
-      This will use a custom token for this repository.
-      The previous option will be ignored if this field has a value.
+      The API token used to send job statuses.
+
+=form_group "Foreign API owner or organization part", control_id: :foreign_api_owner do
+  = f.text_field :foreign_api_owner, class: "form-control"
+  %span.help-block
+    :markdown
+      The owner or organization part of the repository as seen by the foreign API.
+
+      This and the following parameter can overlap with parts of the URL and
+      may seem to be redundant. However, specifying these parameters explicitly
+      decouples the URL from the notification target.
+
+=form_group "Foreign API repository part", control_id: :foreign_api_repo do
+  = f.text_field :foreign_api_repo, class: "form-control"
+  %span.help-block
+    :markdown
+      The repository part as seen by the foreign API.
+
+
+=form_group "Foreign API type", control_id: :foreign_api_type do
+  = f.text_field :foreign_api_type, class: "form-control", disabled: true
 
 

@@ -38,9 +38,6 @@
         %p
           Executor:
           %code= trial.executor
-          - if trial.executor.base_url.present?
-            @
-            %code= trial.executor.base_url
 
     - if (wd = trial.scripts.map(&:working_dir).compact.first)
       %section#executor.reload{data: {cache_signature: wd}}

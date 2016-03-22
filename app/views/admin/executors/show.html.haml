@@ -13,8 +13,11 @@
     %i.icon-edit
     Edit
 
-
 %h1 Executor "#{@executor.name}"
+
+.clearfix
+  %ul.list-unstyled
+    = render partial: 'issue', collection: executor.executor_issues, as: :issue
 
 %h2 Status
 
@@ -57,11 +60,8 @@
   %thead
   %tbody
     %tr
-      %td Base URL
-      %td= @executor.base_url
-    %tr
       %td Auth. User Name
-      %td= @executor.id
+      %td= @executor.name
     %tr
       %td Auth. Password
       %td= @executor.auth_password

@@ -3,8 +3,13 @@
 -#  See the LICENSE.txt file provided with this software.
 
 - block_output ||= nil
-%tr.executor.reload{id: executor.id,  data: {cache_signature: "#{executor.updated_at}  #{executor.current_load}"}}
-  %td.name #{executor.name}
+%tr.executor.reload{id: executor.id,  data: {cache_signature: "#{executor.updated_at}  #{executor.current_load} #{executor.executor_issues.map(&:id)}" }}
+  %td.name
+    = link_to  admin_executor_path(executor) do
+      #{executor.name}
+      - if (executor.executor_issues.count > 0)
+        %sup.executor-issue-warning.text-danger
+          %i.icon-warning
   %td.enabled
     - if executor.enabled
       %i.success.fa.fa-check

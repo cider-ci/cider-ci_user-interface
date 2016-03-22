@@ -4,8 +4,9 @@ AllCops:
     - 'config/application.rb'
     - 'config/environments/**/*'
     - 'config/initializers/backtrace_silencers.rb'
-      #    - 'config/routes.rb'
     - 'db/**/*'
+    - 'tmp/**/*'
+    - 'vendor/**/*'
 
   TargetRubyVersion: 2.2
 

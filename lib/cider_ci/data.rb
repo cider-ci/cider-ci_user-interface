@@ -2,24 +2,33 @@ module CiderCI
   module Data
     class << self
 
-      def dump_core
-        %w(users repositories).map do |entity|
-          Hash[entity, entity.singularize.camelize.constantize \
-            .all.map(&:attributes)]
+      def import(filename)
+        data = YAML.load_file(filename).with_indifferent_access
+
+        data[:managed_users].try(:each) do |login, config|
+          create_and_or_update User, 'login', login, config
+        end
+
+        data[:managed_repositories].try(:each) do |git_url, config|
+          create_and_or_update Repository, 'git_url', git_url, config
         end
       end
 
-      def import_core(data)
-        data = data.deep_symbolize_keys
-        Repository.destroy_all
-        data.each do |table_name, values|
-          model = table_name.to_s.singularize.camelize.constantize
-          values.each do |properties|
-            attribute_names = model.attribute_names.map(&:to_sym)
-            update_properties = properties.slice(*attribute_names)
-            model.find_or_initialize_by(id: update_properties[:id]) \
-              .update_attributes! update_properties
-          end
+      def create_and_or_update(entity, primary_attribute_name,
+        primary_attribute, config)
+
+        primary_map = { primary_attribute_name => primary_attribute }
+
+        instance = entity.find_by(primary_map)
+
+        create_attributes = config['create_attributes'].presence || {}
+
+        instance ||= entity.create! primary_map.merge(create_attributes.to_h)
+
+        update_attributes = config['update_attributes'].presence
+
+        if (instance && update_attributes)
+          instance.update_attributes! update_attributes.to_h
         end
       end
 

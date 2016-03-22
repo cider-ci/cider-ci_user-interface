@@ -8,6 +8,8 @@
 
 #config/secrets.yml
 
+*.tar
+*.tar.gz
 .mux.yml
 .rubocop_todo.yml
 /.bundle

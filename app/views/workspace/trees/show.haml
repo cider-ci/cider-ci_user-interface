@@ -12,6 +12,9 @@
         =link_to new_workspace_tree_job_path(tree_id: @tree_id), class: "btn  btn-primary run-a-job"  do
           %span Run job
 
+  %ul#tree-issues.list-unstyled
+    = render partial: 'issue', collection: @tree_issues, as: :issue
+
   .text-center
 
     %h1

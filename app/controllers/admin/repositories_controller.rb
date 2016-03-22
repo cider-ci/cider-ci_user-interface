@@ -8,16 +8,8 @@ class Admin::RepositoriesController < AdminController
 
   helper_method :update_notification_url
 
-  def permited_repository_params(params)
-    if params[:repository]
-      params[:repository].permit(:name, :github_authtoken, :use_default_github_authtoken,
-        :git_url, :git_fetch_and_update_interval,
-        :public_view_permission)
-    end
-  end
-
   def create
-    @repository = Repository.create! permited_repository_params(params)
+    @repository = Repository.create! params[:repository].permit!
     redirect_to \
       admin_repositories_path,
       flash: {
@@ -38,12 +30,12 @@ class Admin::RepositoriesController < AdminController
   end
 
   def new
-    @repository = Repository.new permited_repository_params(params)
+    @repository = Repository.new params[:repository].try(:permit!)
   end
 
   def update
     @repository = Repository.find(params[:id])
-    @repository.update_attributes! permited_repository_params(params)
+    @repository.update_attributes! params[:repository].permit!
     redirect_to \
       admin_repository_path(@repository),
       flash: { successes: ['The repository has been updated.'] }

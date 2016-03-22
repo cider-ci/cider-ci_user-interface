@@ -37,7 +37,7 @@ class Admin::ExecutorsController < AdminController
   end
 
   def processed_params
-    params[:executor].try(:permit, :name, :base_url, :enabled,
+    params[:executor].try(:permit, :name, :enabled,
       :upload_trial_attachments, :upload_tree_attachments)
   end
 

@@ -1,0 +1,18 @@
+%li
+  .alert.alert-dismissable{class: "alert-#{issue.bootstrap_type} issue"}
+    - case issue
+    - when JobIssue
+      = link_to issue_workspace_job_path(id: @job,issue_id: issue.id), method: 'DELETE', class: "close" do
+        &times;
+    %h2.panel-title
+      %i.fa.fa-warning
+      #{issue.type.camelize}: #{issue.title}
+
+      %small
+        %span<>(
+        %span<>= render 'humanized_time_from_now', at: issue.created_at
+        %span<>)
+
+    .description{style: "margin-top: 1em"}
+      = markdown(issue.description)
+

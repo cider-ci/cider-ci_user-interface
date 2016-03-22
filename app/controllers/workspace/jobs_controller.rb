@@ -19,20 +19,6 @@ class Workspace::JobsController < WorkspaceController
     @_lookup_context.prefixes << 'workspace/tasks'
   end
 
-  def request_create(data)
-    url = service_base_url(Settings[:services][:builder][:http]) + '/jobs/'
-
-    RestClient::Request.new(
-      method: :post,
-      url: url,
-      user: Settings[:basic_auth][:username],
-      password: Settings[:basic_auth][:password],
-      verify_ssl: false,
-      payload: data.to_json,
-      headers: { accept: :json,
-                 content_type: :json })
-  end
-
   def create
     url = service_base_url(Settings[:services][:builder][:http]) + '/jobs/'
     response = http_do(:post, url) do |c|
@@ -105,7 +91,7 @@ class Workspace::JobsController < WorkspaceController
 
   def delete_issue
     JobIssue.find(params[:issue_id]).destroy
-    redirect_to issues_workspace_job_path(params[:id])
+    redirect_to workspace_job_path(params[:id])
   end
 
   def job_specification

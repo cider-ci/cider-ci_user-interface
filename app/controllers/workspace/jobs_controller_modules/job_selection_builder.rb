@@ -38,7 +38,8 @@ module Workspace::JobsControllerModules
         nil
 
       rescue Faraday::ResourceNotFound => e
-        @alerts[:errors] << 'The project_configuration or an included resource was not found. '
+        @alerts[:errors] << 'The project_configuration ' \
+                            'or an included resource was not found. '
         @alerts[:errors] << e.to_s + ' ' + e.response.to_s
         nil
       end
