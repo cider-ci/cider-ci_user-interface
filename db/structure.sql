@@ -2,12 +2,16 @@
 -- PostgreSQL database dump
 --
 
+-- Dumped from database version 9.5.1
+-- Dumped by pg_dump version 9.5.1
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
+SET row_security = off;
 
 --
 -- Name: plpgsql; Type: EXTENSION; Schema: -; Owner: -
@@ -197,7 +201,7 @@ SET default_tablespace = '';
 SET default_with_oids = false;
 
 --
--- Name: branches; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: branches; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE branches (
@@ -211,7 +215,7 @@ CREATE TABLE branches (
 
 
 --
--- Name: branches_commits; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: branches_commits; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE branches_commits (
@@ -221,7 +225,7 @@ CREATE TABLE branches_commits (
 
 
 --
--- Name: commit_arcs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: commit_arcs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE commit_arcs (
@@ -231,7 +235,7 @@ CREATE TABLE commit_arcs (
 
 
 --
--- Name: commits; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: commits; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE commits (
@@ -252,7 +256,7 @@ CREATE TABLE commits (
 
 
 --
--- Name: jobs; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: jobs; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE jobs (
@@ -277,7 +281,7 @@ CREATE TABLE jobs (
 
 
 --
--- Name: repositories; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: repositories; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE repositories (
@@ -313,7 +317,7 @@ CREATE VIEW commit_cache_signatures AS
 
 
 --
--- Name: email_addresses; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: email_addresses; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE email_addresses (
@@ -324,7 +328,7 @@ CREATE TABLE email_addresses (
 
 
 --
--- Name: executors; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: executors; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE executors (
@@ -344,7 +348,7 @@ CREATE TABLE executors (
 
 
 --
--- Name: executors_with_load; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: executors_with_load; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE executors_with_load (
@@ -368,7 +372,7 @@ ALTER TABLE ONLY executors_with_load REPLICA IDENTITY NOTHING;
 
 
 --
--- Name: job_cache_signatures; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: job_cache_signatures; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE job_cache_signatures (
@@ -386,7 +390,7 @@ ALTER TABLE ONLY job_cache_signatures REPLICA IDENTITY NOTHING;
 
 
 --
--- Name: job_issues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: job_issues; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE job_issues (
@@ -401,7 +405,7 @@ CREATE TABLE job_issues (
 
 
 --
--- Name: job_specifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: job_specifications; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE job_specifications (
@@ -411,7 +415,7 @@ CREATE TABLE job_specifications (
 
 
 --
--- Name: tasks; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tasks; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE tasks (
@@ -427,7 +431,7 @@ CREATE TABLE tasks (
     created_at timestamp without time zone DEFAULT now() NOT NULL,
     updated_at timestamp without time zone DEFAULT now() NOT NULL,
     entity_errors jsonb DEFAULT '[]'::jsonb,
-    dispatch_storm_delay_seconds integer DEFAULT 5 NOT NULL,
+    dispatch_storm_delay_seconds integer DEFAULT 1 NOT NULL,
     CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['failed'::character varying, 'aborted'::character varying, 'aborting'::character varying, 'pending'::character varying, 'executing'::character varying, 'passed'::character varying])::text[])))
 );
 
@@ -463,7 +467,7 @@ CREATE VIEW job_stats AS
 
 
 --
--- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE schema_migrations (
@@ -472,7 +476,7 @@ CREATE TABLE schema_migrations (
 
 
 --
--- Name: scripts; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: scripts; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE scripts (
@@ -507,7 +511,7 @@ CREATE TABLE scripts (
 
 
 --
--- Name: submodules; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: submodules; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE submodules (
@@ -518,7 +522,7 @@ CREATE TABLE submodules (
 
 
 --
--- Name: task_specifications; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: task_specifications; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE task_specifications (
@@ -528,7 +532,7 @@ CREATE TABLE task_specifications (
 
 
 --
--- Name: tree_attachments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: tree_attachments; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE tree_attachments (
@@ -544,7 +548,7 @@ CREATE TABLE tree_attachments (
 
 
 --
--- Name: trial_attachments; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: trial_attachments; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE trial_attachments (
@@ -559,7 +563,7 @@ CREATE TABLE trial_attachments (
 
 
 --
--- Name: trial_issues; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: trial_issues; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE trial_issues (
@@ -574,7 +578,7 @@ CREATE TABLE trial_issues (
 
 
 --
--- Name: trials; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: trials; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE trials (
@@ -598,7 +602,7 @@ CREATE TABLE trials (
 
 
 --
--- Name: users; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: users; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE users (
@@ -622,7 +626,7 @@ CREATE TABLE users (
 
 
 --
--- Name: welcome_page_settings; Type: TABLE; Schema: public; Owner: -; Tablespace: 
+-- Name: welcome_page_settings; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE welcome_page_settings (
@@ -635,7 +639,7 @@ CREATE TABLE welcome_page_settings (
 
 
 --
--- Name: branches_commits_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: branches_commits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY branches_commits
@@ -643,7 +647,7 @@ ALTER TABLE ONLY branches_commits
 
 
 --
--- Name: branches_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: branches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY branches
@@ -651,7 +655,7 @@ ALTER TABLE ONLY branches
 
 
 --
--- Name: commits_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: commits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY commits
@@ -659,7 +663,7 @@ ALTER TABLE ONLY commits
 
 
 --
--- Name: email_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: email_addresses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY email_addresses
@@ -667,7 +671,7 @@ ALTER TABLE ONLY email_addresses
 
 
 --
--- Name: executors_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: executors_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY executors
@@ -675,7 +679,7 @@ ALTER TABLE ONLY executors
 
 
 --
--- Name: job_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: job_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY job_issues
@@ -683,7 +687,7 @@ ALTER TABLE ONLY job_issues
 
 
 --
--- Name: job_specifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: job_specifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY job_specifications
@@ -691,7 +695,7 @@ ALTER TABLE ONLY job_specifications
 
 
 --
--- Name: jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY jobs
@@ -699,7 +703,7 @@ ALTER TABLE ONLY jobs
 
 
 --
--- Name: repositories_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: repositories_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY repositories
@@ -707,7 +711,7 @@ ALTER TABLE ONLY repositories
 
 
 --
--- Name: scripts_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: scripts_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY scripts
@@ -715,7 +719,7 @@ ALTER TABLE ONLY scripts
 
 
 --
--- Name: submodules_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: submodules_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY submodules
@@ -723,7 +727,7 @@ ALTER TABLE ONLY submodules
 
 
 --
--- Name: task_specifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: task_specifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY task_specifications
@@ -731,7 +735,7 @@ ALTER TABLE ONLY task_specifications
 
 
 --
--- Name: tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tasks_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tasks
@@ -739,7 +743,7 @@ ALTER TABLE ONLY tasks
 
 
 --
--- Name: tree_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: tree_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY tree_attachments
@@ -747,7 +751,7 @@ ALTER TABLE ONLY tree_attachments
 
 
 --
--- Name: trial_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: trial_attachments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY trial_attachments
@@ -755,7 +759,7 @@ ALTER TABLE ONLY trial_attachments
 
 
 --
--- Name: trial_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: trial_issues_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY trial_issues
@@ -763,7 +767,7 @@ ALTER TABLE ONLY trial_issues
 
 
 --
--- Name: trials_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: trials_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY trials
@@ -771,7 +775,7 @@ ALTER TABLE ONLY trials
 
 
 --
--- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: users_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY users
@@ -779,7 +783,7 @@ ALTER TABLE ONLY users
 
 
 --
--- Name: welcome_page_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -; Tablespace: 
+-- Name: welcome_page_settings_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY welcome_page_settings
@@ -787,350 +791,350 @@ ALTER TABLE ONLY welcome_page_settings
 
 
 --
--- Name: branches_lower_name_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: branches_lower_name_idx; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX branches_lower_name_idx ON branches USING btree (lower((name)::text));
 
 
 --
--- Name: commits_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: commits_to_tsvector_idx; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX commits_to_tsvector_idx ON commits USING gin (to_tsvector('english'::regconfig, body));
 
 
 --
--- Name: commits_to_tsvector_idx1; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: commits_to_tsvector_idx1; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX commits_to_tsvector_idx1 ON commits USING gin (to_tsvector('english'::regconfig, (author_name)::text));
 
 
 --
--- Name: commits_to_tsvector_idx2; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: commits_to_tsvector_idx2; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX commits_to_tsvector_idx2 ON commits USING gin (to_tsvector('english'::regconfig, (author_email)::text));
 
 
 --
--- Name: commits_to_tsvector_idx3; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: commits_to_tsvector_idx3; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX commits_to_tsvector_idx3 ON commits USING gin (to_tsvector('english'::regconfig, (committer_name)::text));
 
 
 --
--- Name: commits_to_tsvector_idx4; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: commits_to_tsvector_idx4; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX commits_to_tsvector_idx4 ON commits USING gin (to_tsvector('english'::regconfig, (committer_email)::text));
 
 
 --
--- Name: commits_to_tsvector_idx5; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: commits_to_tsvector_idx5; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX commits_to_tsvector_idx5 ON commits USING gin (to_tsvector('english'::regconfig, subject));
 
 
 --
--- Name: commits_to_tsvector_idx6; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: commits_to_tsvector_idx6; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX commits_to_tsvector_idx6 ON commits USING gin (to_tsvector('english'::regconfig, body));
 
 
 --
--- Name: idx_jobs_tree-id_job-specification-id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_jobs_tree-id_job-specification-id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX "idx_jobs_tree-id_job-specification-id" ON jobs USING btree (tree_id, job_specification_id);
 
 
 --
--- Name: idx_jobs_tree-id_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_jobs_tree-id_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX "idx_jobs_tree-id_key" ON jobs USING btree (tree_id, key);
 
 
 --
--- Name: idx_jobs_tree-id_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: idx_jobs_tree-id_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX "idx_jobs_tree-id_name" ON jobs USING btree (tree_id, name);
 
 
 --
--- Name: index_branches_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_branches_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_branches_on_name ON branches USING btree (name);
 
 
 --
--- Name: index_branches_on_repository_id_and_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_branches_on_repository_id_and_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_branches_on_repository_id_and_name ON branches USING btree (repository_id, name);
 
 
 --
--- Name: index_commit_arcs_on_child_id_and_parent_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_commit_arcs_on_child_id_and_parent_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_commit_arcs_on_child_id_and_parent_id ON commit_arcs USING btree (child_id, parent_id);
 
 
 --
--- Name: index_commit_arcs_on_parent_id_and_child_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_commit_arcs_on_parent_id_and_child_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_commit_arcs_on_parent_id_and_child_id ON commit_arcs USING btree (parent_id, child_id);
 
 
 --
--- Name: index_commits_on_author_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_commits_on_author_date; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_commits_on_author_date ON commits USING btree (author_date);
 
 
 --
--- Name: index_commits_on_committer_date; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_commits_on_committer_date; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_commits_on_committer_date ON commits USING btree (committer_date);
 
 
 --
--- Name: index_commits_on_depth; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_commits_on_depth; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_commits_on_depth ON commits USING btree (depth);
 
 
 --
--- Name: index_commits_on_tree_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_commits_on_tree_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_commits_on_tree_id ON commits USING btree (tree_id);
 
 
 --
--- Name: index_commits_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_commits_on_updated_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_commits_on_updated_at ON commits USING btree (updated_at);
 
 
 --
--- Name: index_email_addresses_on_user_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_email_addresses_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_email_addresses_on_user_id ON email_addresses USING btree (user_id);
 
 
 --
--- Name: index_executors_on_accepted_repositories; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_executors_on_accepted_repositories; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_executors_on_accepted_repositories ON executors USING btree (accepted_repositories);
 
 
 --
--- Name: index_executors_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_executors_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_executors_on_name ON executors USING btree (name);
 
 
 --
--- Name: index_executors_on_traits; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_executors_on_traits; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_executors_on_traits ON executors USING btree (traits);
 
 
 --
--- Name: index_job_issues_on_job_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_job_issues_on_job_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_job_issues_on_job_id ON job_issues USING btree (job_id);
 
 
 --
--- Name: index_jobs_on_job_specification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_jobs_on_job_specification_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_jobs_on_job_specification_id ON jobs USING btree (job_specification_id);
 
 
 --
--- Name: index_jobs_on_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_jobs_on_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_jobs_on_key ON jobs USING btree (key);
 
 
 --
--- Name: index_jobs_on_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_jobs_on_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_jobs_on_name ON jobs USING btree (name);
 
 
 --
--- Name: index_jobs_on_tree_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_jobs_on_tree_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_jobs_on_tree_id ON jobs USING btree (tree_id);
 
 
 --
--- Name: index_repositories_on_created_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_repositories_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_repositories_on_created_at ON repositories USING btree (created_at);
 
 
 --
--- Name: index_repositories_on_git_url; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_repositories_on_git_url; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_repositories_on_git_url ON repositories USING btree (git_url);
 
 
 --
--- Name: index_repositories_on_update_notification_token; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_repositories_on_update_notification_token; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_repositories_on_update_notification_token ON repositories USING btree (update_notification_token);
 
 
 --
--- Name: index_repositories_on_updated_at; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_repositories_on_updated_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_repositories_on_updated_at ON repositories USING btree (updated_at);
 
 
 --
--- Name: index_scripts_on_trial_id_and_key; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_scripts_on_trial_id_and_key; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_scripts_on_trial_id_and_key ON scripts USING btree (trial_id, key);
 
 
 --
--- Name: index_submodules_on_commit_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_submodules_on_commit_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_submodules_on_commit_id ON submodules USING btree (commit_id);
 
 
 --
--- Name: index_submodules_on_submodule_commit_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_submodules_on_submodule_commit_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_submodules_on_submodule_commit_id ON submodules USING btree (submodule_commit_id);
 
 
 --
--- Name: index_tasks_on_exclusive_global_resources; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tasks_on_exclusive_global_resources; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_tasks_on_exclusive_global_resources ON tasks USING btree (exclusive_global_resources);
 
 
 --
--- Name: index_tasks_on_job_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tasks_on_job_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_tasks_on_job_id ON tasks USING btree (job_id);
 
 
 --
--- Name: index_tasks_on_job_id_and_name; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tasks_on_job_id_and_name; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_tasks_on_job_id_and_name ON tasks USING btree (job_id, name);
 
 
 --
--- Name: index_tasks_on_task_specification_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tasks_on_task_specification_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_tasks_on_task_specification_id ON tasks USING btree (task_specification_id);
 
 
 --
--- Name: index_tasks_on_traits; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tasks_on_traits; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_tasks_on_traits ON tasks USING btree (traits);
 
 
 --
--- Name: index_tree_attachments_on_tree_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tree_attachments_on_tree_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_tree_attachments_on_tree_id ON tree_attachments USING btree (tree_id);
 
 
 --
--- Name: index_tree_attachments_on_tree_id_and_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_tree_attachments_on_tree_id_and_path; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_tree_attachments_on_tree_id_and_path ON tree_attachments USING btree (tree_id, path);
 
 
 --
--- Name: index_trial_attachments_on_trial_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_trial_attachments_on_trial_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_trial_attachments_on_trial_id ON trial_attachments USING btree (trial_id);
 
 
 --
--- Name: index_trial_attachments_on_trial_id_and_path; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_trial_attachments_on_trial_id_and_path; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX index_trial_attachments_on_trial_id_and_path ON trial_attachments USING btree (trial_id, path);
 
 
 --
--- Name: index_trial_issues_on_trial_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_trial_issues_on_trial_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_trial_issues_on_trial_id ON trial_issues USING btree (trial_id);
 
 
 --
--- Name: index_trials_on_state; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_trials_on_state; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_trials_on_state ON trials USING btree (state);
 
 
 --
--- Name: index_trials_on_task_id; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: index_trials_on_task_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_trials_on_task_id ON trials USING btree (task_id);
 
 
 --
--- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON schema_migrations USING btree (version);
 
 
 --
--- Name: user_lower_login_idx; Type: INDEX; Schema: public; Owner: -; Tablespace: 
+-- Name: user_lower_login_idx; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX user_lower_login_idx ON users USING btree (lower((login)::text));
@@ -1452,7 +1456,7 @@ ALTER TABLE ONLY trials
 -- PostgreSQL database dump complete
 --
 
-SET search_path TO "$user",public;
+SET search_path TO "$user", public;
 
 INSERT INTO schema_migrations (version) VALUES ('0');
 
@@ -1509,6 +1513,8 @@ INSERT INTO schema_migrations (version) VALUES ('38');
 INSERT INTO schema_migrations (version) VALUES ('39');
 
 INSERT INTO schema_migrations (version) VALUES ('40');
+
+INSERT INTO schema_migrations (version) VALUES ('400');
 
 INSERT INTO schema_migrations (version) VALUES ('41');
 
