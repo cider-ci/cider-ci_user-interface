@@ -33,6 +33,4 @@
         %span.monospaced= number_to_human_size(@attachment.content_length)
 
   .panel-body
-    %iframe#iframe{src: @attachment.url, style: "width: 100%; height: 100%; seamless: 'seamless' "}
-
-
+    %iframe{src: @attachment.url, seamless: true, style: "width: 100%; height: 100%;"}
