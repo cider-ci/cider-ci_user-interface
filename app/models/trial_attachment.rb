@@ -1,5 +1,6 @@
 class TrialAttachment < ActiveRecord::Base
   include Concerns::UrlBuilder
+  paginates_per 100 # kaminari
 
   def url
     service_path(Settings[:services][:storage][:http]) \
