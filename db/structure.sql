@@ -209,8 +209,8 @@ CREATE TABLE branches (
     repository_id uuid NOT NULL,
     name character varying NOT NULL,
     current_commit_id character varying(40) NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -244,14 +244,14 @@ CREATE TABLE commits (
     depth integer,
     author_name character varying,
     author_email character varying,
-    author_date timestamp without time zone,
+    author_date timestamp with time zone,
     committer_name character varying,
     committer_email character varying,
-    committer_date timestamp without time zone,
+    committer_date timestamp with time zone,
     subject text,
     body text,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -269,13 +269,13 @@ CREATE TABLE jobs (
     tree_id character varying(40) NOT NULL,
     job_specification_id uuid NOT NULL,
     priority integer DEFAULT 0 NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     created_by uuid,
     aborted_by uuid,
-    aborted_at timestamp without time zone,
+    aborted_at timestamp with time zone,
     resumed_by uuid,
-    resumed_at timestamp without time zone,
+    resumed_at timestamp with time zone,
     CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
 );
 
@@ -289,8 +289,8 @@ CREATE TABLE repositories (
     git_url text NOT NULL,
     name character varying,
     public_view_permission boolean DEFAULT false,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     update_notification_token uuid DEFAULT uuid_generate_v4(),
     proxy_id uuid DEFAULT uuid_generate_v4() NOT NULL,
     branch_trigger_include_match text DEFAULT '^.*$'::text NOT NULL,
@@ -315,8 +315,8 @@ CREATE TABLE tree_issues (
     description text,
     type character varying DEFAULT 'error'::character varying NOT NULL,
     tree_id text NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -360,8 +360,8 @@ CREATE TABLE executor_issues (
     description text,
     type character varying DEFAULT 'error'::character varying NOT NULL,
     executor_id uuid NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -375,9 +375,9 @@ CREATE TABLE executors (
     max_load integer DEFAULT 1 NOT NULL,
     enabled boolean DEFAULT true NOT NULL,
     traits character varying[] DEFAULT '{}'::character varying[],
-    last_ping_at timestamp without time zone,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    last_ping_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     accepted_repositories character varying[] DEFAULT '{}'::character varying[],
     upload_tree_attachments boolean DEFAULT true NOT NULL,
     upload_trial_attachments boolean DEFAULT true NOT NULL,
@@ -395,9 +395,9 @@ CREATE TABLE executors_with_load (
     max_load integer,
     enabled boolean,
     traits character varying[],
-    last_ping_at timestamp without time zone,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone,
+    last_ping_at timestamp with time zone,
+    created_at timestamp with time zone,
+    updated_at timestamp with time zone,
     accepted_repositories character varying[],
     upload_tree_attachments boolean,
     upload_trial_attachments boolean,
@@ -436,8 +436,8 @@ CREATE TABLE job_issues (
     description text,
     type character varying DEFAULT 'error'::character varying NOT NULL,
     job_id uuid NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -465,8 +465,8 @@ CREATE TABLE tasks (
     priority integer DEFAULT 0 NOT NULL,
     traits character varying[] DEFAULT '{}'::character varying[] NOT NULL,
     exclusive_global_resources character varying[] DEFAULT '{}'::character varying[] NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     entity_errors jsonb DEFAULT '[]'::jsonb,
     dispatch_storm_delay_seconds integer DEFAULT 1 NOT NULL,
     CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
@@ -530,16 +530,16 @@ CREATE TABLE scripts (
     body character varying(10240) DEFAULT ''::character varying NOT NULL,
     timeout character varying,
     exclusive_executor_resource character varying,
-    started_at timestamp without time zone,
-    finished_at timestamp without time zone,
+    started_at timestamp with time zone,
+    finished_at timestamp with time zone,
     start_when jsonb DEFAULT '[]'::jsonb NOT NULL,
     terminate_when jsonb DEFAULT '[]'::jsonb NOT NULL,
     environment_variables jsonb DEFAULT '{}'::jsonb NOT NULL,
     ignore_abort boolean DEFAULT false NOT NULL,
     ignore_state boolean DEFAULT false NOT NULL,
     template_environment_variables boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     exit_status integer,
     command jsonb,
     working_dir character varying(2048),
@@ -580,8 +580,8 @@ CREATE TABLE tree_attachments (
     path text NOT NULL,
     content_length text,
     content_type text,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     tree_id text NOT NULL,
     CONSTRAINT check_tree_id CHECK ((length(tree_id) = 40))
 );
@@ -596,8 +596,8 @@ CREATE TABLE trial_attachments (
     path text NOT NULL,
     content_length text,
     content_type text,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     trial_id uuid NOT NULL
 );
 
@@ -612,8 +612,8 @@ CREATE TABLE trial_issues (
     description text,
     type character varying DEFAULT 'error'::character varying NOT NULL,
     trial_id uuid NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -628,15 +628,15 @@ CREATE TABLE trials (
     error text,
     state character varying DEFAULT 'pending'::character varying NOT NULL,
     result jsonb,
-    started_at timestamp without time zone,
-    finished_at timestamp without time zone,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    started_at timestamp with time zone,
+    finished_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     created_by uuid,
     aborted_by uuid,
-    aborted_at timestamp without time zone,
+    aborted_at timestamp with time zone,
     token uuid DEFAULT uuid_generate_v4() NOT NULL,
-    dispatched_at timestamp without time zone,
+    dispatched_at timestamp with time zone,
     CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
 );
 
@@ -650,8 +650,8 @@ CREATE TABLE users (
     password_digest character varying,
     login character varying NOT NULL,
     is_admin boolean DEFAULT false NOT NULL,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     workspace_filters jsonb,
     mini_profiler_is_enabled boolean DEFAULT false,
     reload_frequency character varying,
@@ -672,8 +672,8 @@ CREATE TABLE users (
 CREATE TABLE welcome_page_settings (
     id integer NOT NULL,
     welcome_message text,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT one_and_only_one CHECK ((id = 0))
 );
 
@@ -1224,14 +1224,14 @@ CREATE INDEX user_lower_login_idx ON users USING btree (lower((login)::text));
 CREATE RULE "_RETURN" AS
     ON SELECT TO job_cache_signatures DO INSTEAD  SELECT jobs.id AS job_id,
     md5(string_agg(DISTINCT (branches.updated_at)::text, ',
-               '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
+             '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
     md5(string_agg(DISTINCT (commits.updated_at)::text, ',
-               '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
+             '::text ORDER BY (commits.updated_at)::text)) AS commits_signature,
     md5(string_agg(DISTINCT (job_issues.updated_at)::text, ',
-               '::text ORDER BY (job_issues.updated_at)::text)) AS job_issues_signature,
+             '::text ORDER BY (job_issues.updated_at)::text)) AS job_issues_signature,
     count(DISTINCT job_issues.*) AS job_issues_count,
     md5(string_agg(DISTINCT (repositories.updated_at)::text, ',
-               '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
+             '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
     ( SELECT (((count(DISTINCT tasks.id))::text || ' - '::text) || (max(tasks.updated_at))::text)
            FROM tasks
           WHERE (tasks.job_id = jobs.id)) AS tasks_signature,
@@ -1266,7 +1266,7 @@ CREATE RULE "_RETURN" AS
     count(trials.executor_id) AS current_load,
     ((count(trials.executor_id))::double precision / (executors.max_load)::double precision) AS relative_load
    FROM (executors
-     LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY ((ARRAY['dispatching'::character varying, 'executing'::character varying])::text[])))))
+     LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY (ARRAY[('dispatching'::character varying)::text, ('executing'::character varying)::text])))))
   GROUP BY executors.id;
 
 
@@ -1635,6 +1635,8 @@ INSERT INTO schema_migrations (version) VALUES ('409');
 INSERT INTO schema_migrations (version) VALUES ('41');
 
 INSERT INTO schema_migrations (version) VALUES ('410');
+
+INSERT INTO schema_migrations (version) VALUES ('411');
 
 INSERT INTO schema_migrations (version) VALUES ('42');
 
