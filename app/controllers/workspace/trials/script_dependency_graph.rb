@@ -25,7 +25,7 @@ module ::Workspace::Trials::ScriptDependencyGraph
         scripts.flat_map do |s|
           s[type] && s[type].map { |k, v| v || k }.sort_by { |s| s[:key] } \
             .map do |dependency|
-              [sanitize.(dependency['script']),
+              [sanitize.(dependency['script_key']),
                sanitize.(s[:key]),
                (dependency['states'] || ['passed']).map { |w| sanitize.(w) }]
           end
