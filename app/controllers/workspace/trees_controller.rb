@@ -34,6 +34,7 @@ class Workspace::TreesController < WorkspaceController
   def project_configuration
     @project_configuration_response =
       begin
+        @tree_issues = TreeIssue.where(tree_id: params[:tree_id])
         get_project_configuration(params[:tree_id])
       rescue Faraday::ClientError => e
         Rails.logger.warn(Formatter.exception_to_log_s(e))
