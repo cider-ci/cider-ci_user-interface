@@ -13,9 +13,9 @@ class Task < ActiveRecord::Base
 
   default_scope { order(created_at: :desc, id: :asc) }
 
-  scope :with_failed_trials, lambda{
+  scope :with_unpassed_trials, lambda{
     where("EXISTS (SELECT 1 FROM trials WHERE trials.task_id = tasks.id
-          AND trials.state = 'failed')".squish)
+          AND trials.state != 'passed')".squish)
   }
 
   def to_s

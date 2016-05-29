@@ -38,16 +38,8 @@ module Workspace::JobsControllerModules::TasksFilter
     case @tasks_select_condition
     when :all
       tasks
-    when :failed_or_aborted
-      tasks.where("state IN ('failed','aborted')")
-    when :unpassed
-      tasks.where("state <> 'passed'")
-    when :with_failed_trials
-      tasks.with_failed_trials
-    when :passed
-      tasks.where(state: 'passed')
     else
-      tasks
+      tasks.with_unpassed_trials
     end
   end
 
@@ -58,10 +50,8 @@ module Workspace::JobsControllerModules::TasksFilter
       case @job.state
       when 'passed'
         :all
-      when 'failed', 'aborted'
-        :failed_or_aborted
       else
-        :unpassed
+        :with_unpassed_trials
       end
     end
   end

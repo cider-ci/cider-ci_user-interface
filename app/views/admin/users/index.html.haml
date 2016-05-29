@@ -8,7 +8,7 @@
     %i.icon-add
     Add a new user
 
-%h1 
+%h1
   Users
 
 .pull-right
@@ -22,16 +22,17 @@
             .form-group
             %label.sr-only{for: "user_text"}
             = text_field :user, :text, placeholder: "Users text search", autofocus: true,
-              value: user_text_search_filter, 
+              value: user_text_search_filter,
               class: "form-control input-sm"
           %li
             .checkbox
               %label
-                = check_box_tag :is_admin, true, admin_filter?, class: "inline" 
+                = check_box_tag :is_admin, true, admin_filter?, class: "inline"
                 Is administrator
 
           %li
-            = render 'per_page_form_group'
+            = render 'per_page_form_group', items_count: @users.unscoped.count
+
 
           %li
             = link_to admin_users_path, class: 'btn btn-sm btn-warning' do

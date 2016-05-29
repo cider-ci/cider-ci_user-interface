@@ -55,6 +55,8 @@ module ApplicationHelper
       'icon-pending'
     when 'skipped'
       'icon-skipped'
+    when 'waiting'
+      'icon-waiting'
     else
       'icon-unknown'
     end
@@ -74,9 +76,9 @@ module ApplicationHelper
       'label-failed'
     when 'passed'
       'label-passed'
-    when 'pending'
+    when 'pending', 'waiting'
       'label-pending'
-    when 'executing', 'dispatched'
+    when 'executing', 'dispatching'
       'label-executing'
     when 'aborted', 'aborting', 'defective', 'skipped'
       'label-warning'
