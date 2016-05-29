@@ -31,7 +31,7 @@
                   class: "search-query form-control input-sm"
 
             %li
-              = render 'per_page_form_group', items_count: tasks.unscoped.count
+              = render 'per_page_form_group', items_count: tasks.unscoped.where(job_id: @job.id).count
 
             %li
               = link_to workspace_job_path(job), class: 'btn btn-sm btn-warning' do
