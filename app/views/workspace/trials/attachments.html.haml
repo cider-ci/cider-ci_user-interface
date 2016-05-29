@@ -9,11 +9,7 @@
   %h2
     Attachments
 
-
   %table.table.table-striped
     %thead
     %tbody
       =render partial: 'attachment', collection: @trial_attachments, as: :attachment
-
-  = paginate @trial_attachments, theme: 'default'
-
