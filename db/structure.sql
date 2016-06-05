@@ -70,6 +70,21 @@ CREATE FUNCTION add_fast_forward_ancestors_to_branches_commits(branch_id uuid, c
 
 
 --
+-- Name: create_task_eval_notification_on_task_create(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_task_eval_notification_on_task_create() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  INSERT INTO task_eval_notifications
+    (task_id, state) VALUES (NEW.id, NEW.state);
+  RETURN NEW;
+END;
+$$;
+
+
+--
 -- Name: create_tree_id_notification_on_branch_change(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -197,6 +212,21 @@ CREATE FUNCTION update_branches_commits(branch_id uuid, new_commit_id character 
         RETURN 'done';
       END;
       $_$;
+
+
+--
+-- Name: update_task_eval_notification_on_task_update(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION update_task_eval_notification_on_task_update() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  INSERT INTO task_eval_notifications
+    (task_id, state) VALUES (NEW.id, NEW.state);
+  RETURN NEW;
+END;
+$$;
 
 
 --
@@ -611,6 +641,19 @@ CREATE TABLE submodules (
 
 
 --
+-- Name: task_eval_notifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE task_eval_notifications (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    task_id uuid NOT NULL,
+    state character varying,
+    created_at timestamp without time zone DEFAULT now() NOT NULL,
+    updated_at timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: task_specifications; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -836,6 +879,14 @@ ALTER TABLE ONLY scripts
 
 ALTER TABLE ONLY submodules
     ADD CONSTRAINT submodules_pkey PRIMARY KEY (commit_id, path);
+
+
+--
+-- Name: task_eval_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY task_eval_notifications
+    ADD CONSTRAINT task_eval_notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -1185,6 +1236,13 @@ CREATE INDEX index_submodules_on_submodule_commit_id ON submodules USING btree (
 
 
 --
+-- Name: index_task_eval_notifications_on_task_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_task_eval_notifications_on_task_id ON task_eval_notifications USING btree (task_id);
+
+
+--
 -- Name: index_tasks_on_exclusive_global_resources; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1343,6 +1401,13 @@ CREATE RULE "_RETURN" AS
 
 
 --
+-- Name: create_task_eval_notification_on_task_create; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_task_eval_notification_on_task_create AFTER INSERT ON tasks FOR EACH ROW EXECUTE PROCEDURE create_task_eval_notification_on_task_create();
+
+
+--
 -- Name: create_tree_id_notification_on_branch_change; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1354,6 +1419,13 @@ CREATE TRIGGER create_tree_id_notification_on_branch_change AFTER INSERT OR UPDA
 --
 
 CREATE TRIGGER create_tree_id_notification_on_job_state_change AFTER UPDATE ON jobs FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE create_tree_id_notification_on_job_state_change();
+
+
+--
+-- Name: update_task_eval_notification_on_task_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_task_eval_notification_on_task_update AFTER UPDATE ON tasks FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE update_task_eval_notification_on_task_update();
 
 
 --
@@ -1410,6 +1482,13 @@ CREATE TRIGGER update_updated_at_column_of_repositories BEFORE UPDATE ON reposit
 --
 
 CREATE TRIGGER update_updated_at_column_of_scripts BEFORE UPDATE ON scripts FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_task_eval_notifications; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_task_eval_notifications BEFORE UPDATE ON task_eval_notifications FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -1545,6 +1624,14 @@ ALTER TABLE ONLY branches
 
 ALTER TABLE ONLY executor_issues
     ADD CONSTRAINT fk_rails_880255918f FOREIGN KEY (executor_id) REFERENCES executors(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_aad30d5d19; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY task_eval_notifications
+    ADD CONSTRAINT fk_rails_aad30d5d19 FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE;
 
 
 --
@@ -1732,6 +1819,8 @@ INSERT INTO schema_migrations (version) VALUES ('410');
 INSERT INTO schema_migrations (version) VALUES ('411');
 
 INSERT INTO schema_migrations (version) VALUES ('412');
+
+INSERT INTO schema_migrations (version) VALUES ('413');
 
 INSERT INTO schema_migrations (version) VALUES ('42');
 
