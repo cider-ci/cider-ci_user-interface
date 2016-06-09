@@ -195,6 +195,26 @@ $$;
 
 
 --
+-- Name: create_pending_task_evaluation_on_trial_state_update_event_inse(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_pending_task_evaluation_on_trial_state_update_event_inse() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  t_id UUID;
+BEGIN
+   SELECT task_id INTO t_id
+      FROM trials
+      WHERE trials.id = NEW.trial_id;
+   INSERT INTO pending_task_evaluations
+    (task_id, trial_state_update_event_id) VALUES (t_id, NEW.id);
+   RETURN NEW;
+END;
+$$;
+
+
+--
 -- Name: create_pending_trial_evaluation_on_script_state_update_event_in(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -817,6 +837,37 @@ CREATE TABLE pending_create_trials_evaluations (
 
 
 --
+-- Name: pending_task_evaluations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE pending_task_evaluations (
+    id integer NOT NULL,
+    task_id uuid NOT NULL,
+    trial_state_update_event_id uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: pending_task_evaluations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE pending_task_evaluations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pending_task_evaluations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE pending_task_evaluations_id_seq OWNED BY pending_task_evaluations.id;
+
+
+--
 -- Name: pending_trial_evaluations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1090,6 +1141,13 @@ CREATE TABLE welcome_page_settings (
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY pending_task_evaluations ALTER COLUMN id SET DEFAULT nextval('pending_task_evaluations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY pending_trial_evaluations ALTER COLUMN id SET DEFAULT nextval('pending_trial_evaluations_id_seq'::regclass);
 
 
@@ -1179,6 +1237,14 @@ ALTER TABLE ONLY jobs
 
 ALTER TABLE ONLY pending_create_trials_evaluations
     ADD CONSTRAINT pending_create_trials_evaluations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pending_task_evaluations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_task_evaluations
+    ADD CONSTRAINT pending_task_evaluations_pkey PRIMARY KEY (id);
 
 
 --
@@ -1564,6 +1630,13 @@ CREATE INDEX index_pending_create_trials_evaluations_on_task_id ON pending_creat
 
 
 --
+-- Name: index_pending_task_evaluations_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pending_task_evaluations_on_created_at ON pending_task_evaluations USING btree (created_at);
+
+
+--
 -- Name: index_pending_trial_evaluations_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1890,6 +1963,13 @@ CREATE TRIGGER create_pending_create_trials_evaluations_on_trial_state_change AF
 
 
 --
+-- Name: create_pending_task_evaluation_on_trial_state_update_event_inse; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_pending_task_evaluation_on_trial_state_update_event_inse AFTER INSERT ON trial_state_update_events FOR EACH ROW EXECUTE PROCEDURE create_pending_task_evaluation_on_trial_state_update_event_inse();
+
+
+--
 -- Name: create_pending_trial_evaluation_on_script_state_update_event_in; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2090,6 +2170,22 @@ CREATE TRIGGER update_updated_at_column_of_users BEFORE UPDATE ON users FOR EACH
 --
 
 CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE ON welcome_page_settings FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: fk_rails_2043ecf4ac; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_task_evaluations
+    ADD CONSTRAINT fk_rails_2043ecf4ac FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_2285e098a6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_task_evaluations
+    ADD CONSTRAINT fk_rails_2285e098a6 FOREIGN KEY (trial_state_update_event_id) REFERENCES trial_state_update_events(id) ON DELETE CASCADE;
 
 
 --
@@ -2429,6 +2525,8 @@ INSERT INTO schema_migrations (version) VALUES ('414');
 INSERT INTO schema_migrations (version) VALUES ('415');
 
 INSERT INTO schema_migrations (version) VALUES ('416');
+
+INSERT INTO schema_migrations (version) VALUES ('417');
 
 INSERT INTO schema_migrations (version) VALUES ('42');
 
