@@ -195,6 +195,26 @@ $$;
 
 
 --
+-- Name: create_pending_job_evaluation_on_task_state_update_event_insert(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_pending_job_evaluation_on_task_state_update_event_insert() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  t_id UUID;
+BEGIN
+   SELECT job_id INTO t_id
+      FROM tasks
+      WHERE tasks.id = NEW.task_id;
+   INSERT INTO pending_job_evaluations
+    (job_id, task_state_update_event_id) VALUES (t_id, NEW.id);
+   RETURN NEW;
+END;
+$$;
+
+
+--
 -- Name: create_pending_task_evaluation_on_trial_state_update_event_inse(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -837,6 +857,37 @@ CREATE TABLE pending_create_trials_evaluations (
 
 
 --
+-- Name: pending_job_evaluations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE pending_job_evaluations (
+    id integer NOT NULL,
+    job_id uuid NOT NULL,
+    task_state_update_event_id uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: pending_job_evaluations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE pending_job_evaluations_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pending_job_evaluations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE pending_job_evaluations_id_seq OWNED BY pending_job_evaluations.id;
+
+
+--
 -- Name: pending_task_evaluations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1141,6 +1192,13 @@ CREATE TABLE welcome_page_settings (
 -- Name: id; Type: DEFAULT; Schema: public; Owner: -
 --
 
+ALTER TABLE ONLY pending_job_evaluations ALTER COLUMN id SET DEFAULT nextval('pending_job_evaluations_id_seq'::regclass);
+
+
+--
+-- Name: id; Type: DEFAULT; Schema: public; Owner: -
+--
+
 ALTER TABLE ONLY pending_task_evaluations ALTER COLUMN id SET DEFAULT nextval('pending_task_evaluations_id_seq'::regclass);
 
 
@@ -1237,6 +1295,14 @@ ALTER TABLE ONLY jobs
 
 ALTER TABLE ONLY pending_create_trials_evaluations
     ADD CONSTRAINT pending_create_trials_evaluations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pending_job_evaluations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_job_evaluations
+    ADD CONSTRAINT pending_job_evaluations_pkey PRIMARY KEY (id);
 
 
 --
@@ -1630,6 +1696,13 @@ CREATE INDEX index_pending_create_trials_evaluations_on_task_id ON pending_creat
 
 
 --
+-- Name: index_pending_job_evaluations_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pending_job_evaluations_on_created_at ON pending_job_evaluations USING btree (created_at);
+
+
+--
 -- Name: index_pending_task_evaluations_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1963,6 +2036,13 @@ CREATE TRIGGER create_pending_create_trials_evaluations_on_trial_state_change AF
 
 
 --
+-- Name: create_pending_job_evaluation_on_task_state_update_event_insert; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_pending_job_evaluation_on_task_state_update_event_insert AFTER INSERT ON task_state_update_events FOR EACH ROW EXECUTE PROCEDURE create_pending_job_evaluation_on_task_state_update_event_insert();
+
+
+--
 -- Name: create_pending_task_evaluation_on_trial_state_update_event_inse; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2173,6 +2253,14 @@ CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE O
 
 
 --
+-- Name: fk_rails_0bf999a237; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_job_evaluations
+    ADD CONSTRAINT fk_rails_0bf999a237 FOREIGN KEY (task_state_update_event_id) REFERENCES task_state_update_events(id) ON DELETE CASCADE;
+
+
+--
 -- Name: fk_rails_2043ecf4ac; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2258,6 +2346,14 @@ ALTER TABLE ONLY pending_trial_evaluations
 
 ALTER TABLE ONLY script_state_update_events
     ADD CONSTRAINT fk_rails_5ff6d4badd FOREIGN KEY (script_id) REFERENCES scripts(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_613c47280f; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_job_evaluations
+    ADD CONSTRAINT fk_rails_613c47280f FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE;
 
 
 --
@@ -2527,6 +2623,8 @@ INSERT INTO schema_migrations (version) VALUES ('415');
 INSERT INTO schema_migrations (version) VALUES ('416');
 
 INSERT INTO schema_migrations (version) VALUES ('417');
+
+INSERT INTO schema_migrations (version) VALUES ('418');
 
 INSERT INTO schema_migrations (version) VALUES ('42');
 
