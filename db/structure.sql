@@ -160,6 +160,41 @@ $$;
 
 
 --
+-- Name: create_pending_create_trials_evaluations_on_tasks_insert(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_pending_create_trials_evaluations_on_tasks_insert() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+   INSERT INTO pending_create_trials_evaluations
+    (task_id) VALUES (NEW.id);
+   RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: create_pending_create_trials_evaluations_on_trial_state_change(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_pending_create_trials_evaluations_on_trial_state_change() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+  task_id UUID;
+BEGIN
+   SELECT trials.task_id INTO task_id
+      FROM trials
+      WHERE trials.id = NEW.trial_id;
+   INSERT INTO pending_create_trials_evaluations
+    (task_id, trial_state_update_event_id) VALUES (task_id, NEW.id);
+   RETURN NEW;
+END;
+$$;
+
+
+--
 -- Name: create_script_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -750,6 +785,18 @@ CREATE VIEW job_stats AS
 
 
 --
+-- Name: pending_create_trials_evaluations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE pending_create_trials_evaluations (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    task_id uuid NOT NULL,
+    trial_state_update_event_id uuid,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1066,6 +1113,14 @@ ALTER TABLE ONLY job_state_update_events
 
 ALTER TABLE ONLY jobs
     ADD CONSTRAINT jobs_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pending_create_trials_evaluations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_create_trials_evaluations
+    ADD CONSTRAINT pending_create_trials_evaluations_pkey PRIMARY KEY (id);
 
 
 --
@@ -1429,6 +1484,20 @@ CREATE INDEX index_jobs_on_tree_id ON jobs USING btree (tree_id);
 
 
 --
+-- Name: index_pending_create_trials_evaluations_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pending_create_trials_evaluations_on_created_at ON pending_create_trials_evaluations USING btree (created_at);
+
+
+--
+-- Name: index_pending_create_trials_evaluations_on_task_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pending_create_trials_evaluations_on_task_id ON pending_create_trials_evaluations USING btree (task_id);
+
+
+--
 -- Name: index_repositories_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1734,6 +1803,20 @@ CREATE TRIGGER create_job_state_update_events_on_update AFTER UPDATE ON jobs FOR
 
 
 --
+-- Name: create_pending_create_trials_evaluations_on_tasks_insert; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_pending_create_trials_evaluations_on_tasks_insert AFTER INSERT ON tasks FOR EACH ROW EXECUTE PROCEDURE create_pending_create_trials_evaluations_on_tasks_insert();
+
+
+--
+-- Name: create_pending_create_trials_evaluations_on_trial_state_change; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_pending_create_trials_evaluations_on_trial_state_change AFTER INSERT ON trial_state_update_events FOR EACH ROW WHEN (((new.state)::text = ANY ((ARRAY['aborted'::character varying, 'defective'::character varying, 'failed'::character varying, 'passed'::character varying, 'skipped'::character varying])::text[]))) EXECUTE PROCEDURE create_pending_create_trials_evaluations_on_trial_state_change();
+
+
+--
 -- Name: create_script_state_update_events_on_insert; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2018,6 +2101,14 @@ ALTER TABLE ONLY executor_issues
 
 
 --
+-- Name: fk_rails_99e0f3714e; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_create_trials_evaluations
+    ADD CONSTRAINT fk_rails_99e0f3714e FOREIGN KEY (trial_state_update_event_id) REFERENCES trial_state_update_events(id) ON DELETE CASCADE;
+
+
+--
 -- Name: fk_rails_aad30d5d19; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2079,6 +2170,14 @@ ALTER TABLE ONLY email_addresses
 
 ALTER TABLE ONLY scripts
     ADD CONSTRAINT fk_rails_eb81826b6c FOREIGN KEY (trial_id) REFERENCES trials(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_f0d4638ea2; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_create_trials_evaluations
+    ADD CONSTRAINT fk_rails_f0d4638ea2 FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE;
 
 
 --
@@ -2230,6 +2329,8 @@ INSERT INTO schema_migrations (version) VALUES ('412');
 INSERT INTO schema_migrations (version) VALUES ('413');
 
 INSERT INTO schema_migrations (version) VALUES ('414');
+
+INSERT INTO schema_migrations (version) VALUES ('415');
 
 INSERT INTO schema_migrations (version) VALUES ('42');
 
