@@ -53,6 +53,7 @@ class CreateTreeIdNotifications < ActiveRecord::Migration
             create_tree_id_notification_on_branch_change ON branches;
         SQL
       end
+
     end
 
 

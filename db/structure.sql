@@ -70,6 +70,111 @@ CREATE FUNCTION add_fast_forward_ancestors_to_branches_commits(branch_id uuid, c
 
 
 --
+-- Name: clean_job_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION clean_job_state_update_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  DELETE FROM job_state_update_events
+    WHERE created_at < NOW() - INTERVAL '3 days';
+  RETURN NULL;
+END;
+$$;
+
+
+--
+-- Name: clean_script_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION clean_script_state_update_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  DELETE FROM script_state_update_events
+    WHERE created_at < NOW() - INTERVAL '3 days';
+  RETURN NULL;
+END;
+$$;
+
+
+--
+-- Name: clean_task_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION clean_task_state_update_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  DELETE FROM task_state_update_events
+    WHERE created_at < NOW() - INTERVAL '3 days';
+  RETURN NULL;
+END;
+$$;
+
+
+--
+-- Name: clean_trial_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION clean_trial_state_update_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  DELETE FROM trial_state_update_events
+    WHERE created_at < NOW() - INTERVAL '3 days';
+  RETURN NULL;
+END;
+$$;
+
+
+--
+-- Name: create_job_state_update_event(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_job_state_update_event() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+   INSERT INTO job_state_update_events
+    (job_id, state) VALUES (New.id, NEW.state);
+   RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: create_job_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_job_state_update_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+   INSERT INTO job_state_update_events
+    (job_id, state) VALUES (New.id, NEW.state);
+   RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: create_script_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_script_state_update_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+   INSERT INTO script_state_update_events
+    (script_id, state) VALUES (New.id, NEW.state);
+   RETURN NEW;
+END;
+$$;
+
+
+--
 -- Name: create_task_eval_notification_on_task_create(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -80,6 +185,36 @@ BEGIN
   INSERT INTO task_eval_notifications
     (task_id, state) VALUES (NEW.id, NEW.state);
   RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: create_task_state_update_event(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_task_state_update_event() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+   INSERT INTO task_state_update_events
+    (task_id, state) VALUES (New.id, NEW.state);
+   RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: create_task_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_task_state_update_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+   INSERT INTO task_state_update_events
+    (task_id, state) VALUES (New.id, NEW.state);
+   RETURN NEW;
 END;
 $$;
 
@@ -129,6 +264,21 @@ BEGIN
   WHERE submodule_commits.tree_id = NEW.tree_id;
 
   RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: create_trial_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_trial_state_update_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+   INSERT INTO trial_state_update_events
+    (trial_id, state) VALUES (New.id, NEW.state);
+   RETURN NEW;
 END;
 $$;
 
@@ -236,11 +386,11 @@ $$;
 CREATE FUNCTION update_updated_at_column() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
-          BEGIN
-             NEW.updated_at = now();
-             RETURN NEW;
-          END;
-          $$;
+BEGIN
+   NEW.updated_at = now();
+   RETURN NEW;
+END;
+$$;
 
 
 --
@@ -355,7 +505,8 @@ CREATE TABLE jobs (
     aborted_at timestamp with time zone,
     resumed_by uuid,
     resumed_at timestamp with time zone,
-    CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
+    CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[]))),
+    CONSTRAINT check_valid_state CHECK (((state)::text = ANY ((ARRAY['passed'::character varying, 'executing'::character varying, 'pending'::character varying, 'aborting'::character varying, 'aborted'::character varying, 'defective'::character varying, 'failed'::character varying])::text[])))
 );
 
 
@@ -531,6 +682,19 @@ CREATE TABLE job_specifications (
 
 
 --
+-- Name: job_state_update_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE job_state_update_events (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    job_id uuid,
+    state character varying,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT check_valid_state CHECK (((state)::text = ANY ((ARRAY['passed'::character varying, 'executing'::character varying, 'pending'::character varying, 'aborting'::character varying, 'aborted'::character varying, 'defective'::character varying, 'failed'::character varying])::text[])))
+);
+
+
+--
 -- Name: tasks; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -595,6 +759,19 @@ CREATE TABLE schema_migrations (
 
 
 --
+-- Name: script_state_update_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE script_state_update_events (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    script_id uuid,
+    state character varying,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT check_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying, 'skipped'::character varying, 'waiting'::character varying])::text[])))
+);
+
+
+--
 -- Name: scripts; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -648,8 +825,8 @@ CREATE TABLE task_eval_notifications (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     task_id uuid NOT NULL,
     state character varying,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -660,6 +837,19 @@ CREATE TABLE task_eval_notifications (
 CREATE TABLE task_specifications (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     data jsonb
+);
+
+
+--
+-- Name: task_state_update_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE task_state_update_events (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    task_id uuid,
+    state character varying,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT check_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
 );
 
 
@@ -721,6 +911,19 @@ CREATE TABLE trial_issues (
     trial_id uuid NOT NULL,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
+-- Name: trial_state_update_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE trial_state_update_events (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    trial_id uuid,
+    state character varying,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    CONSTRAINT check_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
 );
 
 
@@ -850,6 +1053,14 @@ ALTER TABLE ONLY job_specifications
 
 
 --
+-- Name: job_state_update_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY job_state_update_events
+    ADD CONSTRAINT job_state_update_events_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: jobs_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -863,6 +1074,14 @@ ALTER TABLE ONLY jobs
 
 ALTER TABLE ONLY repositories
     ADD CONSTRAINT repositories_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: script_state_update_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY script_state_update_events
+    ADD CONSTRAINT script_state_update_events_pkey PRIMARY KEY (id);
 
 
 --
@@ -895,6 +1114,14 @@ ALTER TABLE ONLY task_eval_notifications
 
 ALTER TABLE ONLY task_specifications
     ADD CONSTRAINT task_specifications_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: task_state_update_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY task_state_update_events
+    ADD CONSTRAINT task_state_update_events_pkey PRIMARY KEY (id);
 
 
 --
@@ -943,6 +1170,14 @@ ALTER TABLE ONLY trial_attachments
 
 ALTER TABLE ONLY trial_issues
     ADD CONSTRAINT trial_issues_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: trial_state_update_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY trial_state_update_events
+    ADD CONSTRAINT trial_state_update_events_pkey PRIMARY KEY (id);
 
 
 --
@@ -1152,6 +1387,20 @@ CREATE INDEX index_job_issues_on_job_id ON job_issues USING btree (job_id);
 
 
 --
+-- Name: index_job_state_update_events_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_job_state_update_events_on_created_at ON job_state_update_events USING btree (created_at);
+
+
+--
+-- Name: index_job_state_update_events_on_job_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_job_state_update_events_on_job_id ON job_state_update_events USING btree (job_id);
+
+
+--
 -- Name: index_jobs_on_job_specification_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1208,6 +1457,20 @@ CREATE INDEX index_repositories_on_updated_at ON repositories USING btree (updat
 
 
 --
+-- Name: index_script_state_update_events_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_script_state_update_events_on_created_at ON script_state_update_events USING btree (created_at);
+
+
+--
+-- Name: index_script_state_update_events_on_script_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_script_state_update_events_on_script_id ON script_state_update_events USING btree (script_id);
+
+
+--
 -- Name: index_scripts_on_issues; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1240,6 +1503,20 @@ CREATE INDEX index_submodules_on_submodule_commit_id ON submodules USING btree (
 --
 
 CREATE INDEX index_task_eval_notifications_on_task_id ON task_eval_notifications USING btree (task_id);
+
+
+--
+-- Name: index_task_state_update_events_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_task_state_update_events_on_created_at ON task_state_update_events USING btree (created_at);
+
+
+--
+-- Name: index_task_state_update_events_on_task_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_task_state_update_events_on_task_id ON task_state_update_events USING btree (task_id);
 
 
 --
@@ -1317,6 +1594,20 @@ CREATE UNIQUE INDEX index_trial_attachments_on_trial_id_and_path ON trial_attach
 --
 
 CREATE INDEX index_trial_issues_on_trial_id ON trial_issues USING btree (trial_id);
+
+
+--
+-- Name: index_trial_state_update_events_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_trial_state_update_events_on_created_at ON trial_state_update_events USING btree (created_at);
+
+
+--
+-- Name: index_trial_state_update_events_on_trial_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_trial_state_update_events_on_trial_id ON trial_state_update_events USING btree (trial_id);
 
 
 --
@@ -1401,10 +1692,80 @@ CREATE RULE "_RETURN" AS
 
 
 --
+-- Name: clean_job_state_update_events; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER clean_job_state_update_events AFTER INSERT ON job_state_update_events FOR EACH ROW EXECUTE PROCEDURE clean_job_state_update_events();
+
+
+--
+-- Name: clean_script_state_update_events; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER clean_script_state_update_events AFTER INSERT ON script_state_update_events FOR EACH ROW EXECUTE PROCEDURE clean_script_state_update_events();
+
+
+--
+-- Name: clean_task_state_update_events; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER clean_task_state_update_events AFTER INSERT ON task_state_update_events FOR EACH ROW EXECUTE PROCEDURE clean_task_state_update_events();
+
+
+--
+-- Name: clean_trial_state_update_events; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER clean_trial_state_update_events AFTER INSERT ON trial_state_update_events FOR EACH ROW EXECUTE PROCEDURE clean_trial_state_update_events();
+
+
+--
+-- Name: create_job_state_update_events_on_insert; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_job_state_update_events_on_insert AFTER INSERT ON jobs FOR EACH ROW EXECUTE PROCEDURE create_job_state_update_events();
+
+
+--
+-- Name: create_job_state_update_events_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_job_state_update_events_on_update AFTER UPDATE ON jobs FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE create_job_state_update_events();
+
+
+--
+-- Name: create_script_state_update_events_on_insert; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_script_state_update_events_on_insert AFTER INSERT ON scripts FOR EACH ROW EXECUTE PROCEDURE create_script_state_update_events();
+
+
+--
+-- Name: create_script_state_update_events_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_script_state_update_events_on_update AFTER UPDATE ON scripts FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE create_script_state_update_events();
+
+
+--
 -- Name: create_task_eval_notification_on_task_create; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER create_task_eval_notification_on_task_create AFTER INSERT ON tasks FOR EACH ROW EXECUTE PROCEDURE create_task_eval_notification_on_task_create();
+
+
+--
+-- Name: create_task_state_update_events_on_insert; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_task_state_update_events_on_insert AFTER INSERT ON tasks FOR EACH ROW EXECUTE PROCEDURE create_task_state_update_events();
+
+
+--
+-- Name: create_task_state_update_events_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_task_state_update_events_on_update AFTER UPDATE ON tasks FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE create_task_state_update_events();
 
 
 --
@@ -1419,6 +1780,20 @@ CREATE TRIGGER create_tree_id_notification_on_branch_change AFTER INSERT OR UPDA
 --
 
 CREATE TRIGGER create_tree_id_notification_on_job_state_change AFTER UPDATE ON jobs FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE create_tree_id_notification_on_job_state_change();
+
+
+--
+-- Name: create_trial_state_update_events_on_insert; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_trial_state_update_events_on_insert AFTER INSERT ON trials FOR EACH ROW EXECUTE PROCEDURE create_trial_state_update_events();
+
+
+--
+-- Name: create_trial_state_update_events_on_update; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_trial_state_update_events_on_update AFTER UPDATE ON trials FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE create_trial_state_update_events();
 
 
 --
@@ -1555,6 +1930,14 @@ CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE O
 
 
 --
+-- Name: fk_rails_2420fea61c; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY task_state_update_events
+    ADD CONSTRAINT fk_rails_2420fea61c FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE;
+
+
+--
 -- Name: fk_rails_2595d4f43b; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1592,6 +1975,14 @@ ALTER TABLE ONLY trials
 
 ALTER TABLE ONLY jobs
     ADD CONSTRAINT fk_rails_5056f0a1f0 FOREIGN KEY (aborted_by) REFERENCES users(id);
+
+
+--
+-- Name: fk_rails_5ff6d4badd; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY script_state_update_events
+    ADD CONSTRAINT fk_rails_5ff6d4badd FOREIGN KEY (script_id) REFERENCES scripts(id) ON DELETE CASCADE;
 
 
 --
@@ -1635,6 +2026,14 @@ ALTER TABLE ONLY task_eval_notifications
 
 
 --
+-- Name: fk_rails_b33ab63674; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY job_state_update_events
+    ADD CONSTRAINT fk_rails_b33ab63674 FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE;
+
+
+--
 -- Name: fk_rails_ce2b80387a; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1656,6 +2055,14 @@ ALTER TABLE ONLY branches
 
 ALTER TABLE ONLY jobs
     ADD CONSTRAINT fk_rails_cf50105b6a FOREIGN KEY (resumed_by) REFERENCES users(id);
+
+
+--
+-- Name: fk_rails_dbbb93c299; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY trial_state_update_events
+    ADD CONSTRAINT fk_rails_dbbb93c299 FOREIGN KEY (trial_id) REFERENCES trials(id) ON DELETE CASCADE;
 
 
 --
@@ -1821,6 +2228,8 @@ INSERT INTO schema_migrations (version) VALUES ('411');
 INSERT INTO schema_migrations (version) VALUES ('412');
 
 INSERT INTO schema_migrations (version) VALUES ('413');
+
+INSERT INTO schema_migrations (version) VALUES ('414');
 
 INSERT INTO schema_migrations (version) VALUES ('42');
 
