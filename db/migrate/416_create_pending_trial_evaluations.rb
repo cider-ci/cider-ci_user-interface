@@ -4,7 +4,7 @@ class CreatePendingTrialEvaluations < ActiveRecord::Migration
   include MigrationHelper
 
   def change
-    create_table :pending_trial_evaluations, uuid: true do |t|
+    create_table :pending_trial_evaluations, id: :uuid do |t|
       t.uuid :trial_id, null: false
       t.uuid :script_state_update_event_id
     end

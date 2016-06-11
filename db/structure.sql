@@ -861,7 +861,7 @@ CREATE TABLE pending_create_trials_evaluations (
 --
 
 CREATE TABLE pending_job_evaluations (
-    id integer NOT NULL,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     job_id uuid NOT NULL,
     task_state_update_event_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL
@@ -869,30 +869,11 @@ CREATE TABLE pending_job_evaluations (
 
 
 --
--- Name: pending_job_evaluations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE pending_job_evaluations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: pending_job_evaluations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE pending_job_evaluations_id_seq OWNED BY pending_job_evaluations.id;
-
-
---
 -- Name: pending_task_evaluations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE pending_task_evaluations (
-    id integer NOT NULL,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     task_id uuid NOT NULL,
     trial_state_update_event_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL
@@ -900,53 +881,15 @@ CREATE TABLE pending_task_evaluations (
 
 
 --
--- Name: pending_task_evaluations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE pending_task_evaluations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: pending_task_evaluations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE pending_task_evaluations_id_seq OWNED BY pending_task_evaluations.id;
-
-
---
 -- Name: pending_trial_evaluations; Type: TABLE; Schema: public; Owner: -
 --
 
 CREATE TABLE pending_trial_evaluations (
-    id integer NOT NULL,
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
     trial_id uuid NOT NULL,
     script_state_update_event_id uuid,
     created_at timestamp with time zone DEFAULT now() NOT NULL
 );
-
-
---
--- Name: pending_trial_evaluations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE pending_trial_evaluations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: pending_trial_evaluations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE pending_trial_evaluations_id_seq OWNED BY pending_trial_evaluations.id;
 
 
 --
@@ -1186,27 +1129,6 @@ CREATE TABLE welcome_page_settings (
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT one_and_only_one CHECK ((id = 0))
 );
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY pending_job_evaluations ALTER COLUMN id SET DEFAULT nextval('pending_job_evaluations_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY pending_task_evaluations ALTER COLUMN id SET DEFAULT nextval('pending_task_evaluations_id_seq'::regclass);
-
-
---
--- Name: id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY pending_trial_evaluations ALTER COLUMN id SET DEFAULT nextval('pending_trial_evaluations_id_seq'::regclass);
 
 
 --

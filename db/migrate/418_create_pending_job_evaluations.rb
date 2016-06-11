@@ -4,7 +4,7 @@ class CreatePendingJobEvaluations < ActiveRecord::Migration
   include MigrationHelper
 
   def change
-    create_table :pending_job_evaluations, uuid: true do |t|
+    create_table :pending_job_evaluations, id: :uuid do |t|
       t.uuid :job_id, null: false
       t.uuid :task_state_update_event_id
     end

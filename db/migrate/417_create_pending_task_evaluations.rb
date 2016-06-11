@@ -4,7 +4,7 @@ class CreatePendingTaskEvaluations < ActiveRecord::Migration
   include MigrationHelper
 
   def change
-    create_table :pending_task_evaluations, uuid: true do |t|
+    create_table :pending_task_evaluations, id: :uuid do |t|
       t.uuid :task_id, null: false
       t.uuid :trial_state_update_event_id
     end
