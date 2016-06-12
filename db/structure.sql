@@ -251,6 +251,21 @@ $$;
 
 
 --
+-- Name: create_pending_result_propagation(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_pending_result_propagation() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+   INSERT INTO pending_result_propagations
+    (trial_id) VALUES (NEW.id);
+   RETURN NEW;
+END;
+$$;
+
+
+--
 -- Name: create_pending_task_evaluation_on_trial_state_update_event_inse(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -917,6 +932,17 @@ CREATE TABLE pending_job_evaluations (
 
 
 --
+-- Name: pending_result_propagations; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE pending_result_propagations (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    trial_id uuid NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: pending_task_evaluations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1281,6 +1307,14 @@ ALTER TABLE ONLY pending_create_trials_evaluations
 
 ALTER TABLE ONLY pending_job_evaluations
     ADD CONSTRAINT pending_job_evaluations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pending_result_propagations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_result_propagations
+    ADD CONSTRAINT pending_result_propagations_pkey PRIMARY KEY (id);
 
 
 --
@@ -1688,6 +1722,13 @@ CREATE INDEX index_pending_job_evaluations_on_created_at ON pending_job_evaluati
 
 
 --
+-- Name: index_pending_result_propagations_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pending_result_propagations_on_created_at ON pending_result_propagations USING btree (created_at);
+
+
+--
 -- Name: index_pending_task_evaluations_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2042,6 +2083,13 @@ CREATE TRIGGER create_pending_job_evaluation_on_task_state_update_event_insert A
 
 
 --
+-- Name: create_pending_result_propagation; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_pending_result_propagation AFTER UPDATE ON trials FOR EACH ROW WHEN ((old.result IS DISTINCT FROM new.result)) EXECUTE PROCEDURE create_pending_result_propagation();
+
+
+--
 -- Name: create_pending_task_evaluation_on_trial_state_update_event_inse; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2388,6 +2436,14 @@ ALTER TABLE ONLY branches
 
 
 --
+-- Name: fk_rails_870c3ec6fd; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY pending_result_propagations
+    ADD CONSTRAINT fk_rails_870c3ec6fd FOREIGN KEY (trial_id) REFERENCES trials(id) ON DELETE CASCADE;
+
+
+--
 -- Name: fk_rails_880255918f; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2636,6 +2692,8 @@ INSERT INTO schema_migrations (version) VALUES ('418');
 INSERT INTO schema_migrations (version) VALUES ('419');
 
 INSERT INTO schema_migrations (version) VALUES ('42');
+
+INSERT INTO schema_migrations (version) VALUES ('420');
 
 INSERT INTO schema_migrations (version) VALUES ('43');
 
