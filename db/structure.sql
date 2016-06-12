@@ -166,21 +166,6 @@ $$;
 
 
 --
--- Name: create_job_state_update_event(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION create_job_state_update_event() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-   INSERT INTO job_state_update_events
-    (job_id, state) VALUES (New.id, NEW.state);
-   RETURN NEW;
-END;
-$$;
-
-
---
 -- Name: create_job_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -321,36 +306,6 @@ $$;
 
 
 --
--- Name: create_task_eval_notification_on_task_create(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION create_task_eval_notification_on_task_create() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-  INSERT INTO task_eval_notifications
-    (task_id, state) VALUES (NEW.id, NEW.state);
-  RETURN NEW;
-END;
-$$;
-
-
---
--- Name: create_task_state_update_event(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION create_task_state_update_event() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-   INSERT INTO task_state_update_events
-    (task_id, state) VALUES (New.id, NEW.state);
-   RETURN NEW;
-END;
-$$;
-
-
---
 -- Name: create_task_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -361,55 +316,6 @@ BEGIN
    INSERT INTO task_state_update_events
     (task_id, state) VALUES (New.id, NEW.state);
    RETURN NEW;
-END;
-$$;
-
-
---
--- Name: create_tree_id_notification_on_branch_change(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION create_tree_id_notification_on_branch_change() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-DECLARE
-tree_id TEXT;
-BEGIN
-   SELECT commits.tree_id INTO tree_id
-      FROM commits
-      WHERE id = NEW.current_commit_id;
-   INSERT INTO tree_id_notifications
-    (tree_id, branch_id,description)
-    VALUES (tree_id, NEW.id,TG_OP);
-   RETURN NEW;
-END;
-$$;
-
-
---
--- Name: create_tree_id_notification_on_job_state_change(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION create_tree_id_notification_on_job_state_change() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-  INSERT INTO tree_id_notifications
-    (tree_id, job_id,description)
-    VALUES (NEW.tree_id, NEW.id, NEW.state);
-
-  INSERT INTO tree_id_notifications
-    (tree_id, job_id, description)
-  SELECT DISTINCT
-    supermodule_commits.tree_id, NEW.id, NEW.state
-  FROM commits AS submodule_commits
-  INNER JOIN submodules
-    ON submodule_commit_id = submodule_commits.id
-  INNER JOIN commits AS supermodule_commits
-    ON submodules.commit_id = supermodule_commits.id
-  WHERE submodule_commits.tree_id = NEW.tree_id;
-
-  RETURN NEW;
 END;
 $$;
 
@@ -508,21 +414,6 @@ CREATE FUNCTION update_branches_commits(branch_id uuid, new_commit_id character 
         RETURN 'done';
       END;
       $_$;
-
-
---
--- Name: update_task_eval_notification_on_task_update(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION update_task_eval_notification_on_task_update() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-BEGIN
-  INSERT INTO task_eval_notifications
-    (task_id, state) VALUES (NEW.id, NEW.state);
-  RETURN NEW;
-END;
-$$;
 
 
 --
@@ -663,8 +554,7 @@ CREATE TABLE jobs (
     aborted_at timestamp with time zone,
     resumed_by uuid,
     resumed_at timestamp with time zone,
-    CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[]))),
-    CONSTRAINT check_valid_state CHECK (((state)::text = ANY ((ARRAY['passed'::character varying, 'executing'::character varying, 'pending'::character varying, 'aborting'::character varying, 'aborted'::character varying, 'defective'::character varying, 'failed'::character varying])::text[])))
+    CONSTRAINT check_jobs_valid_state CHECK (((state)::text = ANY ((ARRAY['passed'::character varying, 'executing'::character varying, 'pending'::character varying, 'aborting'::character varying, 'aborted'::character varying, 'defective'::character varying, 'failed'::character varying])::text[])))
 );
 
 
@@ -715,9 +605,12 @@ CREATE TABLE tree_issues (
 CREATE VIEW commit_cache_signatures AS
  SELECT commits.id AS commit_id,
     (count(tree_issues.*) > 0) AS has_tree_issues,
-    md5(string_agg(DISTINCT (branches.updated_at)::text, ', '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
-    md5(string_agg(DISTINCT (repositories.updated_at)::text, ', '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
-    md5(string_agg(DISTINCT (jobs.updated_at)::text, ', '::text ORDER BY (jobs.updated_at)::text)) AS jobs_signature
+    md5(string_agg(DISTINCT (branches.updated_at)::text, ',
+            '::text ORDER BY (branches.updated_at)::text)) AS branches_signature,
+    md5(string_agg(DISTINCT (repositories.updated_at)::text, ',
+            '::text ORDER BY (repositories.updated_at)::text)) AS repositories_signature,
+    md5(string_agg(DISTINCT (jobs.updated_at)::text, ',
+            '::text ORDER BY (jobs.updated_at)::text)) AS jobs_signature
    FROM (((((commits
      LEFT JOIN branches_commits ON (((branches_commits.commit_id)::text = (commits.id)::text)))
      LEFT JOIN branches ON ((branches_commits.branch_id = branches.id)))
@@ -885,25 +778,25 @@ CREATE VIEW job_stats AS
           WHERE (tasks.job_id = jobs.id)) AS total,
     ( SELECT count(*) AS count
            FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'aborted'::text))) AS aborted,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'aborting'::text))) AS aborting,
-    ( SELECT count(*) AS count
-           FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'defective'::text))) AS defective,
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'passed'::text))) AS passed,
     ( SELECT count(*) AS count
            FROM tasks
           WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'executing'::text))) AS executing,
     ( SELECT count(*) AS count
            FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'failed'::text))) AS failed,
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'pending'::text))) AS pending,
     ( SELECT count(*) AS count
            FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'passed'::text))) AS passed,
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'aborting'::text))) AS aborting,
     ( SELECT count(*) AS count
            FROM tasks
-          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'pending'::text))) AS pending
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'aborted'::text))) AS aborted,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'defective'::text))) AS defective,
+    ( SELECT count(*) AS count
+           FROM tasks
+          WHERE ((tasks.job_id = jobs.id) AND ((tasks.state)::text = 'failed'::text))) AS failed
    FROM jobs;
 
 
@@ -1035,19 +928,6 @@ CREATE TABLE submodules (
 
 
 --
--- Name: task_eval_notifications; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE task_eval_notifications (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    task_id uuid NOT NULL,
-    state character varying,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL
-);
-
-
---
 -- Name: task_specifications; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1083,21 +963,6 @@ CREATE TABLE tree_attachments (
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     tree_id text NOT NULL,
     CONSTRAINT check_tree_id CHECK ((length(tree_id) = 40))
-);
-
-
---
--- Name: tree_id_notifications; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE tree_id_notifications (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    tree_id character varying(40) NOT NULL,
-    branch_id uuid,
-    job_id uuid,
-    description text,
-    created_at timestamp without time zone DEFAULT now() NOT NULL,
-    updated_at timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -1366,14 +1231,6 @@ ALTER TABLE ONLY submodules
 
 
 --
--- Name: task_eval_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY task_eval_notifications
-    ADD CONSTRAINT task_eval_notifications_pkey PRIMARY KEY (id);
-
-
---
 -- Name: task_specifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1403,14 +1260,6 @@ ALTER TABLE ONLY tasks
 
 ALTER TABLE ONLY tree_attachments
     ADD CONSTRAINT tree_attachments_pkey PRIMARY KEY (id);
-
-
---
--- Name: tree_id_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY tree_id_notifications
-    ADD CONSTRAINT tree_id_notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -1813,13 +1662,6 @@ CREATE INDEX index_submodules_on_submodule_commit_id ON submodules USING btree (
 
 
 --
--- Name: index_task_eval_notifications_on_task_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_task_eval_notifications_on_task_id ON task_eval_notifications USING btree (task_id);
-
-
---
 -- Name: index_task_state_update_events_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2016,28 +1858,28 @@ CREATE TRIGGER clean_branch_update_events AFTER INSERT ON branch_update_events F
 -- Name: clean_job_state_update_events; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER clean_job_state_update_events AFTER INSERT ON job_state_update_events FOR EACH ROW EXECUTE PROCEDURE clean_job_state_update_events();
+CREATE TRIGGER clean_job_state_update_events AFTER INSERT ON job_state_update_events FOR EACH STATEMENT EXECUTE PROCEDURE clean_job_state_update_events();
 
 
 --
 -- Name: clean_script_state_update_events; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER clean_script_state_update_events AFTER INSERT ON script_state_update_events FOR EACH ROW EXECUTE PROCEDURE clean_script_state_update_events();
+CREATE TRIGGER clean_script_state_update_events AFTER INSERT ON script_state_update_events FOR EACH STATEMENT EXECUTE PROCEDURE clean_script_state_update_events();
 
 
 --
 -- Name: clean_task_state_update_events; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER clean_task_state_update_events AFTER INSERT ON task_state_update_events FOR EACH ROW EXECUTE PROCEDURE clean_task_state_update_events();
+CREATE TRIGGER clean_task_state_update_events AFTER INSERT ON task_state_update_events FOR EACH STATEMENT EXECUTE PROCEDURE clean_task_state_update_events();
 
 
 --
 -- Name: clean_trial_state_update_events; Type: TRIGGER; Schema: public; Owner: -
 --
 
-CREATE TRIGGER clean_trial_state_update_events AFTER INSERT ON trial_state_update_events FOR EACH ROW EXECUTE PROCEDURE clean_trial_state_update_events();
+CREATE TRIGGER clean_trial_state_update_events AFTER INSERT ON trial_state_update_events FOR EACH STATEMENT EXECUTE PROCEDURE clean_trial_state_update_events();
 
 
 --
@@ -2118,13 +1960,6 @@ CREATE TRIGGER create_script_state_update_events_on_update AFTER UPDATE ON scrip
 
 
 --
--- Name: create_task_eval_notification_on_task_create; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER create_task_eval_notification_on_task_create AFTER INSERT ON tasks FOR EACH ROW EXECUTE PROCEDURE create_task_eval_notification_on_task_create();
-
-
---
 -- Name: create_task_state_update_events_on_insert; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2139,20 +1974,6 @@ CREATE TRIGGER create_task_state_update_events_on_update AFTER UPDATE ON tasks F
 
 
 --
--- Name: create_tree_id_notification_on_branch_change; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER create_tree_id_notification_on_branch_change AFTER INSERT OR UPDATE ON branches FOR EACH ROW EXECUTE PROCEDURE create_tree_id_notification_on_branch_change();
-
-
---
--- Name: create_tree_id_notification_on_job_state_change; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER create_tree_id_notification_on_job_state_change AFTER UPDATE ON jobs FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE create_tree_id_notification_on_job_state_change();
-
-
---
 -- Name: create_trial_state_update_events_on_insert; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2164,13 +1985,6 @@ CREATE TRIGGER create_trial_state_update_events_on_insert AFTER INSERT ON trials
 --
 
 CREATE TRIGGER create_trial_state_update_events_on_update AFTER UPDATE ON trials FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE create_trial_state_update_events();
-
-
---
--- Name: update_task_eval_notification_on_task_update; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_task_eval_notification_on_task_update AFTER UPDATE ON tasks FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE update_task_eval_notification_on_task_update();
 
 
 --
@@ -2230,13 +2044,6 @@ CREATE TRIGGER update_updated_at_column_of_scripts BEFORE UPDATE ON scripts FOR 
 
 
 --
--- Name: update_updated_at_column_of_task_eval_notifications; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_task_eval_notifications BEFORE UPDATE ON task_eval_notifications FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
-
-
---
 -- Name: update_updated_at_column_of_tasks; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2248,13 +2055,6 @@ CREATE TRIGGER update_updated_at_column_of_tasks BEFORE UPDATE ON tasks FOR EACH
 --
 
 CREATE TRIGGER update_updated_at_column_of_tree_attachments BEFORE UPDATE ON tree_attachments FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
-
-
---
--- Name: update_updated_at_column_of_tree_id_notifications; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER update_updated_at_column_of_tree_id_notifications BEFORE UPDATE ON tree_id_notifications FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -2457,14 +2257,6 @@ ALTER TABLE ONLY executor_issues
 
 ALTER TABLE ONLY pending_create_trials_evaluations
     ADD CONSTRAINT fk_rails_99e0f3714e FOREIGN KEY (trial_state_update_event_id) REFERENCES trial_state_update_events(id) ON DELETE CASCADE;
-
-
---
--- Name: fk_rails_aad30d5d19; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY task_eval_notifications
-    ADD CONSTRAINT fk_rails_aad30d5d19 FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE;
 
 
 --
@@ -2674,10 +2466,6 @@ INSERT INTO schema_migrations (version) VALUES ('41');
 INSERT INTO schema_migrations (version) VALUES ('410');
 
 INSERT INTO schema_migrations (version) VALUES ('411');
-
-INSERT INTO schema_migrations (version) VALUES ('412');
-
-INSERT INTO schema_migrations (version) VALUES ('413');
 
 INSERT INTO schema_migrations (version) VALUES ('414');
 
