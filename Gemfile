@@ -32,7 +32,6 @@ gem 'sass-rails'
 # The rest
 gem 'bcrypt-ruby'
 gem 'bootswatch-rails'
-gem 'bunny', '>= 1.3'
 gem 'chronic_duration'
 gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
 gem 'configuration_management_backdoor', '>= 3.0.0', '< 4.0.0' #path: '/Users/thomas/Programming/ROR/ConfigurationManagementBackdoor'
