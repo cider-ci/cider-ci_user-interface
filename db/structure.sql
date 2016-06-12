@@ -321,6 +321,55 @@ $$;
 
 
 --
+-- Name: create_tree_id_notification_on_branch_change(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_tree_id_notification_on_branch_change() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+tree_id TEXT;
+BEGIN
+   SELECT commits.tree_id INTO tree_id
+      FROM commits
+      WHERE id = NEW.current_commit_id;
+   INSERT INTO tree_id_notifications
+    (tree_id, branch_id,description)
+    VALUES (tree_id, NEW.id,TG_OP);
+   RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: create_tree_id_notification_on_job_state_change(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_tree_id_notification_on_job_state_change() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  INSERT INTO tree_id_notifications
+    (tree_id, job_id,description)
+    VALUES (NEW.tree_id, NEW.id, NEW.state);
+
+  INSERT INTO tree_id_notifications
+    (tree_id, job_id, description)
+  SELECT DISTINCT
+    supermodule_commits.tree_id, NEW.id, NEW.state
+  FROM commits AS submodule_commits
+  INNER JOIN submodules
+    ON submodule_commit_id = submodule_commits.id
+  INNER JOIN commits AS supermodule_commits
+    ON submodules.commit_id = supermodule_commits.id
+  WHERE submodule_commits.tree_id = NEW.tree_id;
+
+  RETURN NEW;
+END;
+$$;
+
+
+--
 -- Name: create_trial_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -967,6 +1016,21 @@ CREATE TABLE tree_attachments (
 
 
 --
+-- Name: tree_id_notifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE tree_id_notifications (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    tree_id character varying(40) NOT NULL,
+    branch_id uuid,
+    job_id uuid,
+    description text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: trial_attachments; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1260,6 +1324,14 @@ ALTER TABLE ONLY tasks
 
 ALTER TABLE ONLY tree_attachments
     ADD CONSTRAINT tree_attachments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: tree_id_notifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY tree_id_notifications
+    ADD CONSTRAINT tree_id_notifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -1974,6 +2046,20 @@ CREATE TRIGGER create_task_state_update_events_on_update AFTER UPDATE ON tasks F
 
 
 --
+-- Name: create_tree_id_notification_on_branch_change; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_tree_id_notification_on_branch_change AFTER INSERT OR UPDATE ON branches FOR EACH ROW EXECUTE PROCEDURE create_tree_id_notification_on_branch_change();
+
+
+--
+-- Name: create_tree_id_notification_on_job_state_change; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_tree_id_notification_on_job_state_change AFTER UPDATE ON jobs FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE create_tree_id_notification_on_job_state_change();
+
+
+--
 -- Name: create_trial_state_update_events_on_insert; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2055,6 +2141,13 @@ CREATE TRIGGER update_updated_at_column_of_tasks BEFORE UPDATE ON tasks FOR EACH
 --
 
 CREATE TRIGGER update_updated_at_column_of_tree_attachments BEFORE UPDATE ON tree_attachments FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: update_updated_at_column_of_tree_id_notifications; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER update_updated_at_column_of_tree_id_notifications BEFORE UPDATE ON tree_id_notifications FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
 
 
 --
@@ -2466,6 +2559,8 @@ INSERT INTO schema_migrations (version) VALUES ('41');
 INSERT INTO schema_migrations (version) VALUES ('410');
 
 INSERT INTO schema_migrations (version) VALUES ('411');
+
+INSERT INTO schema_migrations (version) VALUES ('412');
 
 INSERT INTO schema_migrations (version) VALUES ('414');
 
