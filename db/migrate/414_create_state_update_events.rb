@@ -102,7 +102,7 @@ class CreateStateUpdateEvents < ActiveRecord::Migration
 
           execute <<-SQL.strip_heredoc
             CREATE TRIGGER clean_#{table_name}
-            AFTER INSERT ON #{table_name} FOR EACH ROW
+            AFTER INSERT ON #{table_name} FOR EACH STATEMENT
             EXECUTE PROCEDURE clean_#{table_name}();
           SQL
         end

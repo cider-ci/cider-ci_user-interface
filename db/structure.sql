@@ -70,6 +70,21 @@ CREATE FUNCTION add_fast_forward_ancestors_to_branches_commits(branch_id uuid, c
 
 
 --
+-- Name: clean_branch_update_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION clean_branch_update_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  DELETE FROM branch_update_events
+    WHERE created_at < NOW() - INTERVAL '3 days';
+  RETURN NULL;
+END;
+$$;
+
+
+--
 -- Name: clean_job_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -125,6 +140,27 @@ BEGIN
   DELETE FROM trial_state_update_events
     WHERE created_at < NOW() - INTERVAL '3 days';
   RETURN NULL;
+END;
+$$;
+
+
+--
+-- Name: create_branch_update_event(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION create_branch_update_event() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+tree_id TEXT;
+BEGIN
+   SELECT commits.tree_id INTO tree_id
+      FROM commits
+      WHERE id = NEW.current_commit_id;
+   INSERT INTO branch_update_events
+    (tree_id, branch_id)
+    VALUES (tree_id, NEW.id);
+   RETURN NEW;
 END;
 $$;
 
@@ -523,6 +559,18 @@ CREATE FUNCTION with_descendants(character varying) RETURNS TABLE(descendant_id 
 SET default_tablespace = '';
 
 SET default_with_oids = false;
+
+--
+-- Name: branch_update_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE branch_update_events (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    branch_id uuid NOT NULL,
+    tree_id character varying(40) NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
 
 --
 -- Name: branches; Type: TABLE; Schema: public; Owner: -
@@ -1132,6 +1180,14 @@ CREATE TABLE welcome_page_settings (
 
 
 --
+-- Name: branch_update_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branch_update_events
+    ADD CONSTRAINT branch_update_events_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: branches_commits_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1454,6 +1510,13 @@ CREATE UNIQUE INDEX "idx_jobs_tree-id_key" ON jobs USING btree (tree_id, key);
 --
 
 CREATE UNIQUE INDEX "idx_jobs_tree-id_name" ON jobs USING btree (tree_id, name);
+
+
+--
+-- Name: index_branch_update_events_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_branch_update_events_on_created_at ON branch_update_events USING btree (created_at);
 
 
 --
@@ -1902,6 +1965,13 @@ CREATE RULE "_RETURN" AS
 
 
 --
+-- Name: clean_branch_update_events; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER clean_branch_update_events AFTER INSERT ON branch_update_events FOR EACH STATEMENT EXECUTE PROCEDURE clean_branch_update_events();
+
+
+--
 -- Name: clean_job_state_update_events; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1927,6 +1997,13 @@ CREATE TRIGGER clean_task_state_update_events AFTER INSERT ON task_state_update_
 --
 
 CREATE TRIGGER clean_trial_state_update_events AFTER INSERT ON trial_state_update_events FOR EACH ROW EXECUTE PROCEDURE clean_trial_state_update_events();
+
+
+--
+-- Name: create_branch_update_event; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER create_branch_update_event AFTER INSERT OR UPDATE ON branches FOR EACH ROW EXECUTE PROCEDURE create_branch_update_event();
 
 
 --
@@ -2180,6 +2257,14 @@ CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE O
 
 ALTER TABLE ONLY pending_job_evaluations
     ADD CONSTRAINT fk_rails_0bf999a237 FOREIGN KEY (task_state_update_event_id) REFERENCES task_state_update_events(id) ON DELETE CASCADE;
+
+
+--
+-- Name: fk_rails_1aba877542; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY branch_update_events
+    ADD CONSTRAINT fk_rails_1aba877542 FOREIGN KEY (branch_id) REFERENCES branches(id) ON DELETE CASCADE;
 
 
 --
@@ -2547,6 +2632,8 @@ INSERT INTO schema_migrations (version) VALUES ('416');
 INSERT INTO schema_migrations (version) VALUES ('417');
 
 INSERT INTO schema_migrations (version) VALUES ('418');
+
+INSERT INTO schema_migrations (version) VALUES ('419');
 
 INSERT INTO schema_migrations (version) VALUES ('42');
 
