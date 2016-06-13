@@ -271,26 +271,6 @@ $$;
 
 
 --
--- Name: create_pending_trial_evaluation_on_script_state_update_event_in(); Type: FUNCTION; Schema: public; Owner: -
---
-
-CREATE FUNCTION create_pending_trial_evaluation_on_script_state_update_event_in() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-DECLARE
-  t_id UUID;
-BEGIN
-   SELECT trial_id INTO t_id
-      FROM scripts
-      WHERE scripts.id = NEW.script_id;
-   INSERT INTO pending_trial_evaluations
-    (trial_id, script_state_update_event_id) VALUES (t_id, NEW.id);
-   RETURN NEW;
-END;
-$$;
-
-
---
 -- Name: create_script_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -897,18 +877,6 @@ CREATE TABLE pending_task_evaluations (
 
 
 --
--- Name: pending_trial_evaluations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE pending_trial_evaluations (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    trial_id uuid NOT NULL,
-    script_state_update_event_id uuid,
-    created_at timestamp with time zone DEFAULT now() NOT NULL
-);
-
-
---
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1252,14 +1220,6 @@ ALTER TABLE ONLY pending_result_propagations
 
 ALTER TABLE ONLY pending_task_evaluations
     ADD CONSTRAINT pending_task_evaluations_pkey PRIMARY KEY (id);
-
-
---
--- Name: pending_trial_evaluations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY pending_trial_evaluations
-    ADD CONSTRAINT pending_trial_evaluations_pkey PRIMARY KEY (id);
 
 
 --
@@ -1657,13 +1617,6 @@ CREATE INDEX index_pending_task_evaluations_on_created_at ON pending_task_evalua
 
 
 --
--- Name: index_pending_trial_evaluations_on_created_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_pending_trial_evaluations_on_created_at ON pending_trial_evaluations USING btree (created_at);
-
-
---
 -- Name: index_repositories_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2011,13 +1964,6 @@ CREATE TRIGGER create_pending_task_evaluation_on_trial_state_update_event_inse A
 
 
 --
--- Name: create_pending_trial_evaluation_on_script_state_update_event_in; Type: TRIGGER; Schema: public; Owner: -
---
-
-CREATE TRIGGER create_pending_trial_evaluation_on_script_state_update_event_in AFTER INSERT ON script_state_update_events FOR EACH ROW EXECUTE PROCEDURE create_pending_trial_evaluation_on_script_state_update_event_in();
-
-
---
 -- Name: create_script_state_update_events_on_insert; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2241,14 +2187,6 @@ ALTER TABLE ONLY trial_attachments
 
 
 --
--- Name: fk_rails_2e5612679a; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY pending_trial_evaluations
-    ADD CONSTRAINT fk_rails_2e5612679a FOREIGN KEY (script_state_update_event_id) REFERENCES script_state_update_events(id) ON DELETE CASCADE;
-
-
---
 -- Name: fk_rails_3bfb7b73f7; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2278,14 +2216,6 @@ ALTER TABLE ONLY trials
 
 ALTER TABLE ONLY jobs
     ADD CONSTRAINT fk_rails_5056f0a1f0 FOREIGN KEY (aborted_by) REFERENCES users(id);
-
-
---
--- Name: fk_rails_59227102b1; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY pending_trial_evaluations
-    ADD CONSTRAINT fk_rails_59227102b1 FOREIGN KEY (trial_id) REFERENCES trials(id) ON DELETE CASCADE;
 
 
 --
@@ -2565,8 +2495,6 @@ INSERT INTO schema_migrations (version) VALUES ('412');
 INSERT INTO schema_migrations (version) VALUES ('414');
 
 INSERT INTO schema_migrations (version) VALUES ('415');
-
-INSERT INTO schema_migrations (version) VALUES ('416');
 
 INSERT INTO schema_migrations (version) VALUES ('417');
 
