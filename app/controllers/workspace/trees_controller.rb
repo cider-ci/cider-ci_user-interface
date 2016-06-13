@@ -7,8 +7,7 @@ class Workspace::TreesController < WorkspaceController
   include Concerns::HTTP
 
   def attachments
-    @tree_attachments = TreeAttachment \
-      .where(tree_id: params[:tree_id]).page(params[:page])
+    @tree_attachments = TreeAttachment.where(tree_id: params[:tree_id])
   end
 
   def show

@@ -23,7 +23,7 @@ class Workspace::TrialsController < WorkspaceController
   def attachments
     @trial = Trial.find params[:id]
     require_sign_in unless @trial.task.job.public_view_permission?
-    @trial_attachments = @trial.trial_attachments.page(params[:page])
+    @trial_attachments = @trial.trial_attachments
   end
 
   def result
