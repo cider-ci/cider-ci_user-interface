@@ -19,14 +19,14 @@
               .form-group
                 %label.sr-only{for: "tasks_select_condition"}
                 = select_tag :tasks_select_condition,
-                  options_for_select([["All",:all], ["With unpassed trials",:with_unpassed_trials]],
-                    @tasks_select_condition),
+                  options_for_select([["All",:all], ["Unpassed",:unpassed],
+                    ["With unpassed trials",:with_unpassed_trials]], @tasks_select_condition),
                   class: "form-control input-sm"
 
             %li
               .form-group
                 %label.sr-only{for: "name_substring_term"}
-                =text_field_tag :name_substring_term, nil, placeholder: "substr OR substr",
+                = text_field_tag :name_substring_term, nil, placeholder: "substr OR substr",
                   value: @name_substring_term,
                   class: "search-query form-control input-sm"
 

@@ -20,11 +20,11 @@ module Workspace::JobsControllerModules::TasksFilter
   end
 
   def filter_tasks_by_substring_search(tasks)
-    name_substring_term = (params[:name_substring_term] || '')
-    if name_substring_term.blank?
+    @name_substring_term = (params[:name_substring_term] || '')
+    if @name_substring_term.blank?
       tasks
     else
-      terms = name_substring_term.split(/\s+OR\s+/)
+      terms = @name_substring_term.split(/\s+OR\s+/)
       ilike_where = terms.map { ' tasks.name ILIKE ? ' }.join(' OR ')
       terms_matchers = terms.map { |term| "%#{term}%" }
       args = [ilike_where, terms_matchers].flatten
@@ -38,6 +38,8 @@ module Workspace::JobsControllerModules::TasksFilter
     case @tasks_select_condition
     when :all
       tasks
+    when :unpassed
+      tasks.where("tasks.state != 'passed'")
     else
       tasks.with_unpassed_trials
     end
