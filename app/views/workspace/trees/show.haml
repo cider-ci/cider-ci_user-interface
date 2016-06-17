@@ -44,7 +44,7 @@
         - when 1
           %p There exists currently one attachment for this tree-id.
         - else
-          %p There are #{attachments.count} attachments for this tree-id.
+          %p There are #{@attachments.count} attachments for this tree-id.
 
 
     = link_to workspace_tree_project_configuration_path(@tree_id) do
