@@ -12,7 +12,7 @@
     }.map(&:attributes).map(&:with_indifferent_access).map{|s|
       s.merge(finished_at: s[:finished_at] || Time.zone.now)
     }.map{|s|
-      duration= s[:finished_at] - s[:started_at]
+      duration= [ s[:finished_at] - s[:started_at],1].max
       s.merge(duration: duration)
     }
 
@@ -63,10 +63,10 @@
         x= script_rect[:x] - 5
         anchor='end'
       end
-      secs = script[:duration]
+      secs = script[:duration].round
       { x: x,
         y: script_rect[:y] + row_height/2,
-        text: "#{script[:name]}, in #{distance_of_time_in_words script[:started_at], script[:finished_at], include_seconds: true} (#{pluralize secs, 'second'})",
+        text: "#{script[:name]} (#{pluralize secs, 'second'})",
         key: "#{script[:key]}",
         'text-anchor': anchor,
         'dominant-baseline': 'central'
