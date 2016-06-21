@@ -5,7 +5,8 @@
 
 :ruby
   task ||= @task
-  cache_signature = CacheSignature.signature task.cache_signature, task.trials.collection_cache_signature
+  cache_signature = CacheSignature.signature current_user,
+    task.cache_signature, task.trials.collection_cache_signature
 
 - cache cache_signature do
 

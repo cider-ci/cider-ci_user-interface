@@ -10,7 +10,8 @@
   relevant_ccs = [ccs.map(&:commit_id), ccs.map(&:branches_signature),
     ccs.map(&:repositories_signature), ccs.map(&:jobs_signature)].flatten
 
-  cache_signature = CacheSignature.signature job.cache_signature,
+
+  cache_signature = CacheSignature.signature current_user, job.cache_signature,
     jcs.repositories_signature, jcs.branches_signature, jcs.tasks_signature,
     jcs.job_issues_count, params, @trials.collection_cache_signature, relevant_ccs
 
