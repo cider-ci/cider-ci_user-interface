@@ -45,10 +45,10 @@ module Concerns::AuthProvider::GitHub
 
     github_email_addresses = github_get_email_addresses config, github_user_access_token
 
-    if strategy = config['sign-in_strategies'].detect do |strategy|
+    if strategy = config['sign_in_strategies'].detect do |strategy|
         case strategy['type']
         when 'email-addresses'
-          (strategy['email-addresses'].map(&:downcase) &
+          (strategy['email_addresses'].map(&:downcase) &
            github_email_addresses.map(&:downcase)).any?
         when 'organization-membership'
           github_satisfies_organization_membership_strategy? config, strategy,
@@ -75,7 +75,7 @@ module Concerns::AuthProvider::GitHub
   def github_satisfies_organization_membership_strategy?(config, strategy,
     github_user_properties, github_user_access_token)
     url = "#{config[:api_endpoint]}/orgs/" \
-      << strategy['organization-login'] \
+      << strategy['organization_login'] \
       << '/members/' << github_user_properties['login'] \
       << "?access_token=#{strategy[:access_token].presence || github_user_access_token}"
     [204, 302].include?(
@@ -88,7 +88,7 @@ module Concerns::AuthProvider::GitHub
   def github_satisfies_team_membership_strategy?(config, strategy,
     github_user_access_token, github_user_properties)
     team_id_query_url = "#{config[:api_endpoint]}/orgs/" \
-      << strategy['organization-login'] << '/teams' \
+      << strategy['organization_login'] << '/teams' \
       << '?per_page=100&access_token=' \
       << (strategy[:access_token].presence || github_user_access_token)
     # TODO: handle pagination properly; (are there orgs with +100 teams?)
@@ -98,7 +98,7 @@ module Concerns::AuthProvider::GitHub
     end.get
     if team_id_response.status.between?(200, 299)
       if team_id = JSON.parse(team_id_response.body) \
-          .detect { |t| t['name'] == strategy['team-name'] } \
+          .detect { |t| t['name'] == strategy['team_name'] } \
           .try(:[], 'id')
         membership_query =  "#{config[:api_endpoint]}/teams/" \
           << team_id.to_s << '/memberships/' << github_user_properties['login'] \
@@ -129,10 +129,10 @@ module Concerns::AuthProvider::GitHub
 
     github_id = github_user_properties['id']
     user = User.find_by(github_id: github_id) || \
-      User.create!((strategy['create-attributes'] || {}) \
+      User.create!((strategy['create_attributes'] || {}) \
                    .to_h.merge(github_id: github_id,
                                login: login(github_user_properties, config)))
-    user.update_attributes! (strategy['update-attributes'] || {}).to_h.merge(
+    user.update_attributes! (strategy['update_attributes'] || {}).to_h.merge(
       name: github_user_properties['name'],
       login: login(github_user_properties, config),
       github_access_token: github_user_access_token)
