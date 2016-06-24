@@ -40,7 +40,7 @@
           %code= trial.executor
 
     - if (wd = trial.scripts.map(&:working_dir).compact.first)
-      %section#executor.reload{data: {cache_signature: wd}}
+      %section#working-directory.reload{data: {cache_signature: wd}}
         %h3 Working Directory
         %p
           Working directory
