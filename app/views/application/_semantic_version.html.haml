@@ -1,4 +1,5 @@
 :ruby
+  show_build ||= false
   major= semver['version_major'].presence
   minor= semver['version_minor'].presence
   patch= semver['version_patch'].presence
@@ -19,7 +20,7 @@
     %span.version<>
       %span.divider<>='-'
       #{pre}
-  - if build
+  - if build && show_build
     %span.build<>
       %span.divider<>='+'
       = build

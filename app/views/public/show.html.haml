@@ -38,7 +38,7 @@
           = link_to "https://github.com/cider-ci/cider-ci/blob/#{commit_ref}/config/releases.yml" do
             Version&nbsp;
             = render partial: 'application/semantic_version',
-              locals: { semver: Semver.get }
+              locals: { semver: Semver.get, show_build: true }
 
             - if release_name = Settings[:releases][0][:name]
               %em "#{release_name}"
