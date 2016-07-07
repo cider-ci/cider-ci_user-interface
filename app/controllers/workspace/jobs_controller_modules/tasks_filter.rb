@@ -53,7 +53,7 @@ module Workspace::JobsControllerModules::TasksFilter
       when 'passed'
         :all
       else
-        :with_unpassed_trials
+        :unpassed
       end
     end
   end
