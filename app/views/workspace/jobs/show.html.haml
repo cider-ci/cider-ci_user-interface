@@ -36,20 +36,14 @@
 
           %li
             = link_to api_browser_path("/jobs/#{job.id}")  do
-              %icon.icon-raw-data
-              Job-Data
-
-          %li
-            = link_to api_browser_path("/job-specifications/#{job.job_specification_id}"),
-                class: "api"  do
-              %icon.icon-raw-data
-              Job-Specification-Data
+              %icon.icon-api
+              Job
 
           %li
             = link_to job_specification_workspace_job_path(job),
                 class: "spec" do
               %i.icon-spec
-              Specification
+              Job-Specification
 
           -if job.result.present?
             %li#result-link.reload{data: {cache_signature: job.result_summary?.to_s}}

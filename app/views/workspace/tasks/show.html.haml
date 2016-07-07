@@ -13,12 +13,13 @@
     %ol.breadcrumb.with-circle-separator.pull-right
       %li
         %a.api{href: api_browser_path("/tasks/#{task.id}")}
-          %icon.icon-raw-data
-          Task-Data
+          %icon.icon-api
+          Task
       %li
-        %a.api{href: api_browser_path("/task-specifications/#{task.task_specification_id}")}
-          %icon.icon-raw-data
-          Task-Specification Data
+        = link_to specification_workspace_task_path(task),
+            class: "spec" do
+          %i.icon-spec
+          Task-Specification
 
 
     - if task.result

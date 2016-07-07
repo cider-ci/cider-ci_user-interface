@@ -97,6 +97,15 @@ class Workspace::JobsController < WorkspaceController
   def job_specification
     @job = Job.find(params[:id])
     require_sign_in unless @job.public_view_permission?
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: JSON.pretty_generate(@job.job_specification.data)
+      end
+      format.yaml do
+        render content_type: 'text/yaml', body: @job.job_specification.data.to_yaml
+      end
+    end
   end
 
   def tree_attachments

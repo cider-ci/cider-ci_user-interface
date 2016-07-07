@@ -1,7 +1,7 @@
 .orientation.row
   .col-md-9
     %ol.breadcrumb.pull-left
-      = render '/breadcrumbs/workspace_job', job: @job
+      = render '/breadcrumbs/task', task: @task
       %li.active
         %i.icon-spec
         Specification
@@ -9,32 +9,32 @@
   .col-md-3
     %ol.breadcrumb.with-circle-separator.pull-right
       %li
-        = link_to job_specification_workspace_job_path(@job, format: :json) do
+        = link_to specification_workspace_task_path(@task, format: :json) do
           %i.fa.fa-file-code-o
           JSON
       %li
-        = link_to job_specification_workspace_job_path(@job, format: :yaml) do
+        = link_to specification_workspace_task_path(@task, format: :yaml) do
           %i.fa.fa-file-code-o
           YAML
 
 
 
 
-%section.job-specification
+%section.task-specification
 
   %h1.text-center
-    Job-Specification
+    Task-Specification
 
 
-  - if @job.job_specification
+  - if @task.task_specification
 
-    %pre= @job.job_specification.data.to_yaml
+    %pre= @task.task_specification.data.to_yaml
 
   - else
 
     %p.text-danger
 
       There is no specification. Possibly something went wrong. Have a look at
-      the job-issues or the log files.
+      the task-issues or the log files.
 
 

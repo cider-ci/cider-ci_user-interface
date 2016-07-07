@@ -45,4 +45,18 @@ class Workspace::TasksController < WorkspaceController
     @task.reload.trials.reload.select(:id).map(&:id)
   end
 
+  def specification
+    @task = Task.find(params[:id])
+    require_sign_in unless @task.job.public_view_permission?
+    respond_to do |format|
+      format.html
+      format.json do
+        render json: JSON.pretty_generate(@task.task_specification.data)
+      end
+      format.yaml do
+        render content_type: 'text/yaml', body: @task.task_specification.data.to_yaml
+      end
+    end
+  end
+
 end

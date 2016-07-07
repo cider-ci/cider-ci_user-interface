@@ -42,8 +42,8 @@
 
             %li
               = link_to api_browser_path("/trials/#{trial.id}")  do
-                %icon.icon-raw-data
-                Data via API
+                %icon.icon-api
+                Trial
 
       #issues-alert.reload{data: {cache_signature: issues.count}}
         - if issues.count >= 1

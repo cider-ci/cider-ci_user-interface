@@ -96,6 +96,7 @@ CiderCI::Application.routes.draw do
 
     resources :tasks do
       member do
+        get :specification
         post 'retry'
         get 'result'
       end
