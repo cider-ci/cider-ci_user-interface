@@ -13,7 +13,7 @@ module ApplicationHelper
 
   def gravatar_url(email)
     hs = Digest::MD5.hexdigest email.squish.downcase
-    "http://www.gravatar.com/avatar/#{hs}?s=20&d=retro"
+    "https://www.gravatar.com/avatar/#{hs}?s=20&d=retro"
   end
 
   def form_group(label, opts = {}, &block)
