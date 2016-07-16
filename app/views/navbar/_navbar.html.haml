@@ -10,7 +10,7 @@
         %span
           Cider-CI
         %span.edition
-          = Settings[:edition]
+          = Settings[:releases][0][:edition].presence
           &nbsp;
         %span{class:  Settings[:releases][0][:version_pre].present? ? "text-warning" : ""}<
           - if release_name = Settings[:releases][0][:name]
