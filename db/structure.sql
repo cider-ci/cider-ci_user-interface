@@ -688,7 +688,7 @@ CREATE TABLE executor_issues (
 CREATE TABLE executors (
     id uuid DEFAULT uuid_generate_v4() NOT NULL,
     name character varying NOT NULL,
-    max_load integer DEFAULT 1 NOT NULL,
+    max_load double precision DEFAULT 1.0 NOT NULL,
     enabled boolean DEFAULT true NOT NULL,
     traits character varying[] DEFAULT '{}'::character varying[],
     last_ping_at timestamp with time zone,
@@ -697,31 +697,99 @@ CREATE TABLE executors (
     accepted_repositories character varying[] DEFAULT '{}'::character varying[],
     upload_tree_attachments boolean DEFAULT true NOT NULL,
     upload_trial_attachments boolean DEFAULT true NOT NULL,
-    version text
+    version text,
+    temporary_overload_factor double precision DEFAULT 1.5,
+    CONSTRAINT max_load_is_positive CHECK ((max_load >= (0)::double precision)),
+    CONSTRAINT sensible_temoporary_overload_factor CHECK ((temporary_overload_factor >= (1.0)::double precision))
 );
 
 
 --
--- Name: executors_with_load; Type: TABLE; Schema: public; Owner: -
+-- Name: tasks; Type: TABLE; Schema: public; Owner: -
 --
 
-CREATE TABLE executors_with_load (
-    id uuid,
-    name character varying,
-    max_load integer,
-    enabled boolean,
-    traits character varying[],
-    last_ping_at timestamp with time zone,
-    created_at timestamp with time zone,
-    updated_at timestamp with time zone,
-    accepted_repositories character varying[],
-    upload_tree_attachments boolean,
-    upload_trial_attachments boolean,
-    current_load bigint,
-    relative_load double precision
+CREATE TABLE tasks (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    job_id uuid NOT NULL,
+    state character varying DEFAULT 'pending'::character varying NOT NULL,
+    name text NOT NULL,
+    result jsonb,
+    task_specification_id uuid NOT NULL,
+    priority integer DEFAULT 0 NOT NULL,
+    traits character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    exclusive_global_resources character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    entity_errors jsonb DEFAULT '[]'::jsonb,
+    dispatch_storm_delay_seconds integer DEFAULT 1 NOT NULL,
+    load double precision DEFAULT 1.0,
+    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[]))),
+    CONSTRAINT load_is_stricly_positive CHECK ((load > (0)::double precision))
 );
 
-ALTER TABLE ONLY executors_with_load REPLICA IDENTITY NOTHING;
+
+--
+-- Name: trials; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE trials (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    task_id uuid NOT NULL,
+    executor_id uuid,
+    error text,
+    state character varying DEFAULT 'pending'::character varying NOT NULL,
+    result jsonb,
+    started_at timestamp with time zone,
+    finished_at timestamp with time zone,
+    created_at timestamp with time zone DEFAULT now() NOT NULL,
+    updated_at timestamp with time zone DEFAULT now() NOT NULL,
+    created_by uuid,
+    aborted_by uuid,
+    aborted_at timestamp with time zone,
+    token uuid DEFAULT uuid_generate_v4() NOT NULL,
+    dispatched_at timestamp with time zone,
+    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
+);
+
+
+--
+-- Name: executors_load; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW executors_load AS
+ SELECT count(trials.id) AS trials_count,
+    sum(COALESCE(tasks.load, (0.0)::double precision)) AS current_load,
+    executors.id AS executor_id
+   FROM ((executors
+     LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY ((ARRAY['aborting'::character varying, 'dispatching'::character varying, 'executing'::character varying])::text[])))))
+     LEFT JOIN tasks ON ((tasks.id = trials.task_id)))
+  GROUP BY executors.id;
+
+
+--
+-- Name: executors_with_load; Type: VIEW; Schema: public; Owner: -
+--
+
+CREATE VIEW executors_with_load AS
+ SELECT executors.id,
+    executors.name,
+    executors.max_load,
+    executors.enabled,
+    executors.traits,
+    executors.last_ping_at,
+    executors.created_at,
+    executors.updated_at,
+    executors.accepted_repositories,
+    executors.upload_tree_attachments,
+    executors.upload_trial_attachments,
+    executors.version,
+    executors.temporary_overload_factor,
+    executors_load.trials_count,
+    executors_load.current_load,
+    executors_load.executor_id,
+    (executors_load.current_load / executors.max_load) AS relative_load
+   FROM (executors
+     JOIN executors_load ON ((executors_load.executor_id = executors.id)));
 
 
 --
@@ -777,28 +845,6 @@ CREATE TABLE job_state_update_events (
     state character varying,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT check_valid_state CHECK (((state)::text = ANY ((ARRAY['passed'::character varying, 'executing'::character varying, 'pending'::character varying, 'aborting'::character varying, 'aborted'::character varying, 'defective'::character varying, 'failed'::character varying])::text[])))
-);
-
-
---
--- Name: tasks; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE tasks (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    job_id uuid NOT NULL,
-    state character varying DEFAULT 'pending'::character varying NOT NULL,
-    name text NOT NULL,
-    result jsonb,
-    task_specification_id uuid NOT NULL,
-    priority integer DEFAULT 0 NOT NULL,
-    traits character varying[] DEFAULT '{}'::character varying[] NOT NULL,
-    exclusive_global_resources character varying[] DEFAULT '{}'::character varying[] NOT NULL,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    entity_errors jsonb DEFAULT '[]'::jsonb,
-    dispatch_storm_delay_seconds integer DEFAULT 1 NOT NULL,
-    CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
 );
 
 
@@ -1044,30 +1090,6 @@ CREATE TABLE trial_state_update_events (
     state character varying,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT check_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
-);
-
-
---
--- Name: trials; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE trials (
-    id uuid DEFAULT uuid_generate_v4() NOT NULL,
-    task_id uuid NOT NULL,
-    executor_id uuid,
-    error text,
-    state character varying DEFAULT 'pending'::character varying NOT NULL,
-    result jsonb,
-    started_at timestamp with time zone,
-    finished_at timestamp with time zone,
-    created_at timestamp with time zone DEFAULT now() NOT NULL,
-    updated_at timestamp with time zone DEFAULT now() NOT NULL,
-    created_by uuid,
-    aborted_by uuid,
-    aborted_at timestamp with time zone,
-    token uuid DEFAULT uuid_generate_v4() NOT NULL,
-    dispatched_at timestamp with time zone,
-    CONSTRAINT check_trials_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
 );
 
 
@@ -1856,29 +1878,6 @@ CREATE RULE "_RETURN" AS
 
 
 --
--- Name: _RETURN; Type: RULE; Schema: public; Owner: -
---
-
-CREATE RULE "_RETURN" AS
-    ON SELECT TO executors_with_load DO INSTEAD  SELECT executors.id,
-    executors.name,
-    executors.max_load,
-    executors.enabled,
-    executors.traits,
-    executors.last_ping_at,
-    executors.created_at,
-    executors.updated_at,
-    executors.accepted_repositories,
-    executors.upload_tree_attachments,
-    executors.upload_trial_attachments,
-    count(trials.executor_id) AS current_load,
-    ((count(trials.executor_id))::double precision / (executors.max_load)::double precision) AS relative_load
-   FROM (executors
-     LEFT JOIN trials ON (((trials.executor_id = executors.id) AND ((trials.state)::text = ANY (ARRAY[('dispatching'::character varying)::text, ('executing'::character varying)::text])))))
-  GROUP BY executors.id;
-
-
---
 -- Name: clean_branch_update_events; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2513,6 +2512,8 @@ INSERT INTO schema_migrations (version) VALUES ('42');
 INSERT INTO schema_migrations (version) VALUES ('420');
 
 INSERT INTO schema_migrations (version) VALUES ('421');
+
+INSERT INTO schema_migrations (version) VALUES ('422');
 
 INSERT INTO schema_migrations (version) VALUES ('43');
 

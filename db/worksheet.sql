@@ -1,4 +1,84 @@
 
+SELECT
+  count(trials.id) AS trials_count,
+  sum(COALESCE(tasks.load, 0.0)) AS current_load,
+  executors.id AS executor_id
+  FROM executors
+  LEFT OUTER JOIN trials ON trials.executor_id = executors.id
+    AND trials.state IN ('aborting', 'dispatching', 'executing')
+  LEFT OUTER JOIN tasks ON tasks.id = trials.task_id
+  GROUP BY executors.id
+    ;
+
+
+      CREATE OR REPLACE VIEW executors_load AS
+        SELECT count(trials.id) AS trials_count,
+          sum(COALESCE(tasks.load, 0.0)) AS current_load,
+          executors.id AS executor_id
+          FROM executors
+          LEFT OUTER JOIN trials ON trials.executor_id = executors.id
+            AND trials.state IN ('aborting', 'dispatching', 'executing')
+          LEFT OUTER JOIN tasks ON tasks.id = trials.task_id
+          GROUP BY executors.id;
+
+
+
+
+SELECT keywords.*,
+       count(keywords.id) AS usage_count
+FROM keywords
+INNER JOIN meta_data_keywords ON meta_data_keywords.keyword_id = keywords.id
+INNER JOIN meta_data AS md_5ef28832 ON md_5ef28832.id = meta_data_keywords.meta_datum_id
+LEFT JOIN media_entries AS me_b372dd88 ON me_b372dd88.id = md_5ef28832.media_entry_id
+WHERE ((md_5ef28832.media_entry_id IS NOT NULL
+        AND me_b372dd88.is_published)
+       OR md_5ef28832.collection_id IS NOT NULL
+       OR md_5ef28832.filter_set_id IS NOT NULL)
+GROUP BY keywords.id
+ORDER BY usage_count DESC
+
+SELECT trials.id,
+       trials.task_id,
+       exs.id AS executor_id
+FROM trials
+INNER JOIN tasks ON tasks.id = trials.task_id
+INNER JOIN executors_with_load exs ON (tasks.traits <@ exs.traits)
+INNER JOIN jobs ON tasks.job_id = jobs.id
+INNER JOIN commits ON jobs.tree_id = commits.tree_id
+INNER JOIN branches_commits bcts ON commits.id = bcts.commit_id
+INNER JOIN branches ON bcts.branch_id = branches.id
+INNER JOIN repositories ON branches.repository_id = repositories.id
+WHERE ((((((((trials.state = 'pending'
+              AND exs.relative_load < 1)
+             AND exs.enabled = TRUE)
+            AND (exs.last_ping_at > (now() - interval '1 Minutes')))
+           AND NOT EXISTS(
+                            (SELECT 1
+                             FROM trials dispatch_storm_trials
+                             INNER JOIN tasks dispatch_storm_tasks ON dispatch_storm_tasks.id = dispatch_storm_trials.task_id
+                             WHERE ((dispatch_storm_trials.state IN ('executing','dispatching')
+                                     AND dispatch_storm_trials.executor_id = exs.id)
+                                    AND (Coalesce(dispatch_storm_trials.dispatched_at, dispatch_storm_trials.created_at) + (interval '1 second' * dispatch_storm_tasks.dispatch_storm_delay_seconds)) > now()))))
+          AND NOT EXISTS(
+                           (SELECT 1
+                            FROM trials active_trials
+                            INNER JOIN tasks active_tasks ON active_tasks.id = active_trials.task_id
+                            WHERE (active_trials.state IN ('executing','dispatching')
+                                   AND active_tasks.exclusive_global_resources && tasks.exclusive_global_resources))))
+         AND ((exs.accepted_repositories = '{}')
+              OR repositories.git_url = ANY(exs.accepted_repositories)))
+        AND exs.id = 'b7b62b79-e9d2-4f12-bd30-f9ebe42978b3' )
+       AND 1 = 1)
+ORDER BY jobs.priority DESC,
+         jobs.created_at ASC,
+         tasks.priority DESC,
+         tasks.created_at ASC,
+         trials.created_at ASC,
+         tasks.name ASC LIMIT 1
+        ;
+
+$1 = 'b7b62b79-e9d2-4f12-bd30-f9ebe42978b3', $2 = '4.0.2+49cafbc', $3 = '4.0.2+49cafbc'
+
 --#############################################################################
 
 SELECT id FROM commits WHERE tree_id = 'df7ca91946dd93944cbd5a2371c20b4f1360c27a';
