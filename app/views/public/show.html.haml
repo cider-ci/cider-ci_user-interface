@@ -29,13 +29,15 @@
       .col-md-3
       .col-md-6
 
-        :ruby
-          commit_ref = `cd .. && git log -n 1 --format=%H`.strip rescue 'master'
-
         %h2 About Cider-CI
 
+        :markdown
+          Cider-CI is an application and service stack for **highly parallelized**
+          and **resilient integration testing**.  Read more about Cider-CI at
+          [cider-ci.info](http://cider-ci.info/).
+
         %p#release-info
-          = link_to "https://github.com/cider-ci/cider-ci/blob/#{commit_ref}/config/releases.yml" do
+          = link_to "https://github.com/cider-ci/cider-ci/blob/master/config/releases.yml" do
             Version&nbsp;
             = render partial: 'application/semantic_version',
               locals: { semver: Semver.get, show_build: true }
@@ -43,10 +45,6 @@
             - if release_name = Settings[:releases][0][:name]
               %em "#{release_name}"
 
-        :markdown
-          Cider-CI is an application and service stack for **highly parallelized**
-          and **resilient integration testing**.  Read more about Cider-CI at
-          [cider-ci.info](http://cider-ci.info/).
 
         - if Settings[:releases][0]['about-name']
           %p.about-name= markdown(Settings[:releases][0]['about-name'])
