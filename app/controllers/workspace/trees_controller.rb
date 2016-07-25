@@ -43,19 +43,21 @@ class Workspace::TreesController < WorkspaceController
       @project_configuration_response.status
     case status
     when 200..299
-      @project_configuration = JSON.parse @project_configuration_response.body
-    when 404
-      render :project_configuration_error
-    when 422
-      render :project_configuration_error
-    when 500
+      respond_to do |format|
+        @project_configuration = JSON.parse @project_configuration_response.body
+        format.html
+        format.json do
+          render json: JSON.pretty_generate(@project_configuration)
+        end
+        format.yaml do
+          render content_type: 'text/yaml', body: @project_configuration.to_yaml
+        end
+      end
+    when 300..1000
       render :project_configuration_error
     else
       raise "Handle for #{@project_configuration_response[:status].presence} is missing"
     end
-  end
-
-  def project_configuration_validation
   end
 
 end

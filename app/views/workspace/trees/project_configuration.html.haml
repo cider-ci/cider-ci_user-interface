@@ -1,13 +1,24 @@
 - tree_id ||= params[:tree_id]
 
 .row
-  .col-md-10
+  .col-md-9
     %ol.breadcrumb.pull-left
       = render "breadcrumbs/workspace_tree_objects", tree_id: tree_id
       %li.active
         %i.icon-project-configuration
         Project-Configuration
-  .col-md-2
+  .col-md-3
+    %ol.breadcrumb.with-circle-separator.pull-right
+      %li
+        = link_to workspace_tree_project_configuration_path(tree_id, format: :json) do
+          %i.fa.fa-file-code-o
+          JSON
+      %li
+        = link_to workspace_tree_project_configuration_path(tree_id, format: :json) do
+          %i.fa.fa-file-code-o
+          YAML
+
+
 
 %ul#tree-issues.list-unstyled
   = render partial: 'issue', collection: @tree_issues, as: :issue
