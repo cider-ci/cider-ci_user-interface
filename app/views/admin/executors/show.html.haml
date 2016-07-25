@@ -54,6 +54,12 @@
           %i{class: (executor.relative_load > 0 ? "icon-executing" : "")}
           %span #{executor.current_load} / #{executor.max_load}
 
+    %tr
+      %td Temporary overload factor
+      %td
+        %span #{executor.temporary_overload_factor}
+
+
 %h2 Http-Properties
 
 %table.table.table-striped

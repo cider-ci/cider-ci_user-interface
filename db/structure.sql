@@ -698,7 +698,7 @@ CREATE TABLE executors (
     upload_tree_attachments boolean DEFAULT true NOT NULL,
     upload_trial_attachments boolean DEFAULT true NOT NULL,
     version text,
-    temporary_overload_factor double precision DEFAULT 1.5,
+    temporary_overload_factor double precision DEFAULT 1.5 NOT NULL,
     CONSTRAINT max_load_is_positive CHECK ((max_load >= (0)::double precision)),
     CONSTRAINT sensible_temoporary_overload_factor CHECK ((temporary_overload_factor >= (1.0)::double precision))
 );
@@ -722,7 +722,7 @@ CREATE TABLE tasks (
     updated_at timestamp with time zone DEFAULT now() NOT NULL,
     entity_errors jsonb DEFAULT '[]'::jsonb,
     dispatch_storm_delay_seconds integer DEFAULT 1 NOT NULL,
-    load double precision DEFAULT 1.0,
+    load double precision DEFAULT 1.0 NOT NULL,
     CONSTRAINT check_tasks_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[]))),
     CONSTRAINT load_is_stricly_positive CHECK ((load > (0)::double precision))
 );

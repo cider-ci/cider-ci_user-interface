@@ -3,21 +3,21 @@ class AddLoadToTasks < ActiveRecord::Migration
 
     execute 'DROP VIEW executors_with_load;'
 
-    add_column :tasks, :load, :float, nil: false, default: 1.0
+    add_column :tasks, :load, :float, null: false, default: 1.0
     execute <<-SQL.strip_heredoc
       ALTER TABLE tasks
         ADD CONSTRAINT load_is_stricly_positive CHECK (load > 0)
     SQL
 
     change_column :executors, :max_load, :float,
-      nil: false, default: 1.0
+      null: false, default: 1.0
     execute <<-SQL.strip_heredoc
       ALTER TABLE executors
         ADD CONSTRAINT max_load_is_positive CHECK (max_load >= 0)
      SQL
 
     add_column :executors, :temporary_overload_factor, :float,
-      nil: false, default: 1.5
+      null: false, default: 1.5
     execute <<-SQL.strip_heredoc
       ALTER TABLE executors
         ADD CONSTRAINT sensible_temoporary_overload_factor
