@@ -111,8 +111,6 @@ module ApplicationHelper
     case (current_user && current_user.ui_theme)
     when 'cider'
       'cider'
-    when 'darkly'
-      'darkly'
     when 'bootstrap'
       'bootstrap-plain'
     else

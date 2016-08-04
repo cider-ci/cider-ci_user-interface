@@ -24,8 +24,7 @@
           = form_group "UI Theme", control_id: :ui_theme do
 
             = form.select :ui_theme,
-              options_for_select([ ["Cider",:cider],
-                ["Darkly",:darkly], ["Boostrap",:bootstrap]],
+              options_for_select([ ["Cider",:cider], ["Boostrap",:bootstrap]],
                 current_user.ui_theme || :default),
               class: "form-control"
 

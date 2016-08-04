@@ -86,7 +86,7 @@ module CiderCI
 
     config.cache_store = :memory_store, {size: (Settings[:ui_cache_size_megabytes].presence || 128).megabytes}
 
-    config.assets.precompile += ['cider.css', 'darkly.css', 'bootstrap-plain.css']
+    config.assets.precompile += ['cider.css', 'bootstrap-plain.css']
 
   end
 end

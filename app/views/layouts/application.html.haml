@@ -12,8 +12,6 @@
     - case (current_user && current_user.ui_theme) || :default
     - when 'cider'
       = stylesheet_link_tag "cider", media: "all"
-    - when 'darkly'
-      = stylesheet_link_tag "darkly", media: "all"
     - when 'bootstrap'
       = stylesheet_link_tag "bootstrap-plain", media: "all"
     - else
