@@ -78,6 +78,8 @@ module CiderCI
 
     config.active_record.timestamped_migrations = false
 
+    config.logger = ActiveSupport::Logger.new(STDOUT)
+
     config.log_level = ENV['RAILS_LOG_LEVEL'].present? ? ENV['RAILS_LOG_LEVEL'] : :warn
 
     config.log_tags = [:port, :remote_ip, ->(req) { Time.now.strftime('%T') }]
