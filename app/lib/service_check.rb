@@ -21,10 +21,6 @@ module ServiceCheck
       check_service Settings[:services][:dispatcher][:http]
     end
 
-    def check_notifier
-      check_service Settings[:services][:notifier][:http]
-    end
-
     def check_repository
       check_service Settings[:services][:repository][:http]
     end

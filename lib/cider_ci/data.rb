@@ -10,8 +10,39 @@ module CiderCI
         end
 
         data[:managed_repositories].try(:each) do |git_url, config|
-          create_and_or_update Repository, 'git_url', git_url, config
+          mapped_config = map_repository_config(config)
+          create_and_or_update Repository, 'git_url', git_url, mapped_config
         end
+      end
+
+      def map_repository_config config
+        config.map do |k,v|
+          [k, map_repository_attributes(v)]
+        end.to_h
+      end
+
+      def map_repository_attributes attributes
+        attributes.with_indifferent_access.to_a.map do |k,v|
+          mapped_key = case k.to_sym
+                       when :foreign_api_repo
+                         :remote_api_name
+                       when :foreign_api_owner
+                         :remote_api_namespace
+                       when :foreign_api_authtoken
+                         :remote_api_token
+                       when :foreign_api_token_bearer
+                         :remote_api_token_bearer
+                       when :foreign_api_type
+                         :remote_api_type
+                       when :foreign_api_endpoint
+                         :remote_api_endpoint
+                       when :git_fetch_and_update_interval
+                         :remote_fetch_interval
+                       else
+                         k
+                       end
+          [mapped_key, v]
+        end.to_h
       end
 
       def create_and_or_update(entity, primary_attribute_name,

@@ -602,19 +602,20 @@ CREATE TABLE repositories (
     proxy_id uuid DEFAULT uuid_generate_v4() NOT NULL,
     branch_trigger_include_match text DEFAULT '^.*$'::text NOT NULL,
     branch_trigger_exclude_match text DEFAULT ''::text NOT NULL,
-    foreign_api_endpoint character varying,
-    foreign_api_authtoken character varying,
-    foreign_api_owner character varying,
-    foreign_api_repo character varying,
-    foreign_api_type text DEFAULT 'github'::text NOT NULL,
-    git_fetch_and_update_interval text DEFAULT '1 Minute'::text NOT NULL,
-    foreign_api_token_bearer character varying,
-    CONSTRAINT check_valid_foreign_api_type CHECK ((foreign_api_type = 'github'::text)),
-    CONSTRAINT foreign_api_authtoken_not_empty CHECK (((foreign_api_authtoken)::text <> ''::text)),
-    CONSTRAINT foreign_api_endpoint_not_empty CHECK (((foreign_api_endpoint)::text <> ''::text)),
-    CONSTRAINT foreign_api_owner_not_empty CHECK (((foreign_api_owner)::text <> ''::text)),
-    CONSTRAINT foreign_api_repo_not_empty CHECK (((foreign_api_repo)::text <> ''::text)),
-    CONSTRAINT foreign_api_token_bearer_not_empty CHECK (((foreign_api_token_bearer)::text <> ''::text))
+    remote_api_endpoint character varying,
+    remote_api_token character varying,
+    remote_api_namespace character varying,
+    remote_api_name character varying,
+    remote_api_type text DEFAULT 'github'::text NOT NULL,
+    remote_fetch_interval text DEFAULT '1 Minute'::text NOT NULL,
+    remote_api_token_bearer character varying,
+    remote_http_fetch_token text,
+    CONSTRAINT check_valid_remote_api_type CHECK ((remote_api_type = ANY (ARRAY['github'::text, 'gitlab'::text, 'bitbucket'::text]))),
+    CONSTRAINT foreign_api_authtoken_not_empty CHECK (((remote_api_token)::text <> ''::text)),
+    CONSTRAINT foreign_api_endpoint_not_empty CHECK (((remote_api_endpoint)::text <> ''::text)),
+    CONSTRAINT foreign_api_owner_not_empty CHECK (((remote_api_namespace)::text <> ''::text)),
+    CONSTRAINT foreign_api_repo_not_empty CHECK (((remote_api_name)::text <> ''::text)),
+    CONSTRAINT foreign_api_token_bearer_not_empty CHECK (((remote_api_token_bearer)::text <> ''::text))
 );
 
 
@@ -2514,6 +2515,8 @@ INSERT INTO schema_migrations (version) VALUES ('420');
 INSERT INTO schema_migrations (version) VALUES ('421');
 
 INSERT INTO schema_migrations (version) VALUES ('422');
+
+INSERT INTO schema_migrations (version) VALUES ('423');
 
 INSERT INTO schema_migrations (version) VALUES ('43');
 
