@@ -606,7 +606,7 @@ CREATE TABLE repositories (
     remote_api_token character varying,
     remote_api_namespace character varying,
     remote_api_name character varying,
-    remote_api_type text DEFAULT 'github'::text NOT NULL,
+    remote_api_type text,
     remote_fetch_interval text DEFAULT '1 Minute'::text NOT NULL,
     remote_api_token_bearer character varying,
     remote_http_fetch_token text,
@@ -2517,6 +2517,8 @@ INSERT INTO schema_migrations (version) VALUES ('421');
 INSERT INTO schema_migrations (version) VALUES ('422');
 
 INSERT INTO schema_migrations (version) VALUES ('423');
+
+INSERT INTO schema_migrations (version) VALUES ('424');
 
 INSERT INTO schema_migrations (version) VALUES ('43');
 
