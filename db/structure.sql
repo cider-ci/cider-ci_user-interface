@@ -100,6 +100,21 @@ $$;
 
 
 --
+-- Name: clean_repository_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION clean_repository_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  DELETE FROM repository_events
+    WHERE created_at < NOW() - INTERVAL '3 days';
+  RETURN NULL;
+END;
+$$;
+
+
+--
 -- Name: clean_script_state_update_events(); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -138,6 +153,21 @@ CREATE FUNCTION clean_trial_state_update_events() RETURNS trigger
     AS $$
 BEGIN
   DELETE FROM trial_state_update_events
+    WHERE created_at < NOW() - INTERVAL '3 days';
+  RETURN NULL;
+END;
+$$;
+
+
+--
+-- Name: clean_user_events(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION clean_user_events() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  DELETE FROM user_events
     WHERE created_at < NOW() - INTERVAL '3 days';
   RETURN NULL;
 END;
@@ -408,6 +438,24 @@ CREATE FUNCTION is_descendant(node character varying, possible_descendant charac
 
 
 --
+-- Name: repository_event(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION repository_event() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  IF (TG_OP = 'DELETE') THEN
+    INSERT INTO repository_events (repository_id, event) VALUES (OLD.id, TG_OP);
+  ELSE
+    INSERT INTO repository_events (repository_id, event) VALUES (NEW.id, TG_OP);
+  END IF;
+  RETURN NULL;
+END;
+$$;
+
+
+--
 -- Name: update_branches_commits(uuid, character varying, character varying); Type: FUNCTION; Schema: public; Owner: -
 --
 
@@ -455,6 +503,24 @@ CREATE FUNCTION update_updated_at_column() RETURNS trigger
 BEGIN
    NEW.updated_at = now();
    RETURN NEW;
+END;
+$$;
+
+
+--
+-- Name: user_event(); Type: FUNCTION; Schema: public; Owner: -
+--
+
+CREATE FUNCTION user_event() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+  IF (TG_OP = 'DELETE') THEN
+    INSERT INTO user_events (user_id, event) VALUES (OLD.id, TG_OP);
+  ELSE
+    INSERT INTO user_events (user_id, event) VALUES (NEW.id, TG_OP);
+  END IF;
+  RETURN NULL;
 END;
 $$;
 
@@ -930,6 +996,18 @@ CREATE TABLE pending_task_evaluations (
 
 
 --
+-- Name: repository_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE repository_events (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    repository_id uuid,
+    event text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1091,6 +1169,18 @@ CREATE TABLE trial_state_update_events (
     state character varying,
     created_at timestamp with time zone DEFAULT now() NOT NULL,
     CONSTRAINT check_valid_state CHECK (((state)::text = ANY ((ARRAY['aborted'::character varying, 'aborting'::character varying, 'defective'::character varying, 'dispatching'::character varying, 'executing'::character varying, 'failed'::character varying, 'passed'::character varying, 'pending'::character varying])::text[])))
+);
+
+
+--
+-- Name: user_events; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE user_events (
+    id uuid DEFAULT uuid_generate_v4() NOT NULL,
+    user_id uuid,
+    event text,
+    created_at timestamp with time zone DEFAULT now() NOT NULL
 );
 
 
@@ -1260,6 +1350,14 @@ ALTER TABLE ONLY repositories
 
 
 --
+-- Name: repository_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY repository_events
+    ADD CONSTRAINT repository_events_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: script_state_update_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -1361,6 +1459,14 @@ ALTER TABLE ONLY trial_state_update_events
 
 ALTER TABLE ONLY trials
     ADD CONSTRAINT trials_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_events_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY user_events
+    ADD CONSTRAINT user_events_pkey PRIMARY KEY (id);
 
 
 --
@@ -1674,6 +1780,13 @@ CREATE INDEX index_repositories_on_updated_at ON repositories USING btree (updat
 
 
 --
+-- Name: index_repository_events_on_repository_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_repository_events_on_repository_id ON repository_events USING btree (repository_id);
+
+
+--
 -- Name: index_script_state_update_events_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1835,6 +1948,13 @@ CREATE INDEX index_trials_on_task_id ON trials USING btree (task_id);
 
 
 --
+-- Name: index_user_events_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_events_on_user_id ON user_events USING btree (user_id);
+
+
+--
 -- Name: unique_schema_migrations; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -1893,6 +2013,13 @@ CREATE TRIGGER clean_job_state_update_events AFTER INSERT ON job_state_update_ev
 
 
 --
+-- Name: clean_repository_events; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER clean_repository_events AFTER INSERT ON repository_events FOR EACH STATEMENT EXECUTE PROCEDURE clean_repository_events();
+
+
+--
 -- Name: clean_script_state_update_events; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -1911,6 +2038,13 @@ CREATE TRIGGER clean_task_state_update_events AFTER INSERT ON task_state_update_
 --
 
 CREATE TRIGGER clean_trial_state_update_events AFTER INSERT ON trial_state_update_events FOR EACH STATEMENT EXECUTE PROCEDURE clean_trial_state_update_events();
+
+
+--
+-- Name: clean_user_events; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER clean_user_events AFTER INSERT ON user_events FOR EACH STATEMENT EXECUTE PROCEDURE clean_user_events();
 
 
 --
@@ -2023,6 +2157,13 @@ CREATE TRIGGER create_trial_state_update_events_on_insert AFTER INSERT ON trials
 --
 
 CREATE TRIGGER create_trial_state_update_events_on_update AFTER UPDATE ON trials FOR EACH ROW WHEN (((old.state)::text IS DISTINCT FROM (new.state)::text)) EXECUTE PROCEDURE create_trial_state_update_events();
+
+
+--
+-- Name: repository_event; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER repository_event AFTER INSERT OR DELETE OR UPDATE ON repositories FOR EACH ROW EXECUTE PROCEDURE repository_event();
 
 
 --
@@ -2142,6 +2283,13 @@ CREATE TRIGGER update_updated_at_column_of_users BEFORE UPDATE ON users FOR EACH
 --
 
 CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE ON welcome_page_settings FOR EACH ROW WHEN ((old.* IS DISTINCT FROM new.*)) EXECUTE PROCEDURE update_updated_at_column();
+
+
+--
+-- Name: user_event; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER user_event AFTER INSERT OR DELETE OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE user_event();
 
 
 --
@@ -2519,6 +2667,8 @@ INSERT INTO schema_migrations (version) VALUES ('422');
 INSERT INTO schema_migrations (version) VALUES ('423');
 
 INSERT INTO schema_migrations (version) VALUES ('424');
+
+INSERT INTO schema_migrations (version) VALUES ('425');
 
 INSERT INTO schema_migrations (version) VALUES ('43');
 

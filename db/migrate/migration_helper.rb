@@ -59,4 +59,90 @@ module MigrationHelper extend ActiveSupport::Concern
     end
   end
 
+
+  def add_events_table table_name
+
+    entity_name = table_name.singularize
+
+    event_table_name = "#{entity_name}_events"
+    trigger_name = event_table_name.singularize
+
+
+    create_table event_table_name, id: :uuid  do |t|
+      t.uuid "#{entity_name}_id", index: true
+      t.text :event
+    end
+
+    reversible do |dir|
+
+      dir.up do
+        add_auto_timestamps event_table_name, updated_at: false
+
+        execute <<-SQL.strip_heredoc
+
+          CREATE OR REPLACE FUNCTION #{trigger_name}()
+          RETURNS TRIGGER AS $$
+          BEGIN
+            IF (TG_OP = 'DELETE') THEN
+              INSERT INTO #{event_table_name} (#{entity_name}_id, event) VALUES (OLD.id, TG_OP);
+            ELSE
+              INSERT INTO #{event_table_name} (#{entity_name}_id, event) VALUES (NEW.id, TG_OP);
+            END IF;
+            RETURN NULL;
+          END;
+          $$ language 'plpgsql';
+
+          CREATE TRIGGER #{trigger_name}
+            AFTER INSERT OR DELETE OR UPDATE
+            ON #{table_name}
+            FOR EACH ROW EXECUTE PROCEDURE #{trigger_name}();
+
+         SQL
+      end
+
+      dir.down do
+
+        execute <<-SQL.strip_heredoc
+
+          DROP TRIGGER #{trigger_name} ON #{table_name};
+          DROP FUNCTION #{trigger_name}();
+
+        SQL
+
+      end
+
+
+    end
+
+    ### clean old events ######################################################
+
+    reversible do |dir|
+      dir.up do
+        execute <<-SQL.strip_heredoc
+          CREATE OR REPLACE FUNCTION clean_#{event_table_name}()
+          RETURNS trigger AS $$
+          BEGIN
+            DELETE FROM #{event_table_name}
+              WHERE created_at < NOW() - INTERVAL '3 days';
+            RETURN NULL;
+          END;
+          $$ language 'plpgsql';
+        SQL
+
+        execute <<-SQL.strip_heredoc
+          CREATE TRIGGER clean_#{event_table_name}
+          AFTER INSERT ON #{event_table_name} FOR EACH STATEMENT
+          EXECUTE PROCEDURE clean_#{event_table_name}();
+        SQL
+      end
+
+      dir.down do
+        execute <<-SQL.strip_heredoc
+          DROP TRIGGER clean_#{event_table_name} ON #{event_table_name};
+          DROP FUNCTION clean_#{event_table_name}();
+        SQL
+      end
+    end
+  end
+
 end
