@@ -676,6 +676,8 @@ CREATE TABLE repositories (
     remote_fetch_interval text DEFAULT '1 Minute'::text NOT NULL,
     remote_api_token_bearer character varying,
     remote_http_fetch_token text,
+    send_status_notifications boolean DEFAULT true NOT NULL,
+    manage_remote_push_hooks boolean DEFAULT false NOT NULL,
     CONSTRAINT check_valid_remote_api_type CHECK ((remote_api_type = ANY (ARRAY['github'::text, 'gitlab'::text, 'bitbucket'::text]))),
     CONSTRAINT foreign_api_authtoken_not_empty CHECK (((remote_api_token)::text <> ''::text)),
     CONSTRAINT foreign_api_endpoint_not_empty CHECK (((remote_api_endpoint)::text <> ''::text)),
@@ -2669,6 +2671,8 @@ INSERT INTO schema_migrations (version) VALUES ('423');
 INSERT INTO schema_migrations (version) VALUES ('424');
 
 INSERT INTO schema_migrations (version) VALUES ('425');
+
+INSERT INTO schema_migrations (version) VALUES ('426');
 
 INSERT INTO schema_migrations (version) VALUES ('43');
 
