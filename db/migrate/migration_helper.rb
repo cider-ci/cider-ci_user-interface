@@ -68,6 +68,16 @@ module MigrationHelper extend ActiveSupport::Concern
     trigger_name = event_table_name.singularize
 
 
+    reversible do |dir|
+      dir.up do
+        execute <<-SQL.strip_heredoc
+          DROP TABLE IF EXISTS #{event_table_name} CASCADE;
+          DROP TRIGGER IF EXISTS #{trigger_name} ON #{table_name} CASCADE;
+          DROP FUNCTION IF EXISTS clean_#{event_table_name}() CASCADE;
+        SQL
+      end
+    end
+
     create_table event_table_name, id: :uuid  do |t|
       t.uuid "#{entity_name}_id", index: true
       t.text :event
@@ -83,11 +93,16 @@ module MigrationHelper extend ActiveSupport::Concern
           CREATE OR REPLACE FUNCTION #{trigger_name}()
           RETURNS TRIGGER AS $$
           BEGIN
-            IF (TG_OP = 'DELETE') THEN
-              INSERT INTO #{event_table_name} (#{entity_name}_id, event) VALUES (OLD.id, TG_OP);
-            ELSE
-              INSERT INTO #{event_table_name} (#{entity_name}_id, event) VALUES (NEW.id, TG_OP);
-            END IF;
+            CASE
+              WHEN TG_OP = 'DELETE' THEN
+                INSERT INTO #{event_table_name}
+                  (#{entity_name}_id, event) VALUES (OLD.id, TG_OP);
+              WHEN TG_OP = 'TRUNCATE' THEN
+                INSERT INTO #{event_table_name} (event) VALUES (TG_OP);
+              ELSE
+                INSERT INTO #{event_table_name}
+                  (#{entity_name}_id, event) VALUES (NEW.id, TG_OP);
+            END CASE;
             RETURN NULL;
           END;
           $$ language 'plpgsql';
@@ -97,6 +112,11 @@ module MigrationHelper extend ActiveSupport::Concern
             ON #{table_name}
             FOR EACH ROW EXECUTE PROCEDURE #{trigger_name}();
 
+          CREATE TRIGGER #{trigger_name}_truncate
+            AFTER TRUNCATE
+            ON #{table_name}
+            EXECUTE PROCEDURE #{trigger_name}();
+
          SQL
       end
 
@@ -105,6 +125,7 @@ module MigrationHelper extend ActiveSupport::Concern
         execute <<-SQL.strip_heredoc
 
           DROP TRIGGER #{trigger_name} ON #{table_name};
+          DROP TRIGGER #{trigger_name}_truncate ON #{table_name};
           DROP FUNCTION #{trigger_name}();
 
         SQL

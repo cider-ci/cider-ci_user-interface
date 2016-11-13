@@ -445,11 +445,16 @@ CREATE FUNCTION repository_event() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
-  IF (TG_OP = 'DELETE') THEN
-    INSERT INTO repository_events (repository_id, event) VALUES (OLD.id, TG_OP);
-  ELSE
-    INSERT INTO repository_events (repository_id, event) VALUES (NEW.id, TG_OP);
-  END IF;
+  CASE
+    WHEN TG_OP = 'DELETE' THEN
+      INSERT INTO repository_events
+        (repository_id, event) VALUES (OLD.id, TG_OP);
+    WHEN TG_OP = 'TRUNCATE' THEN
+      INSERT INTO repository_events (event) VALUES (TG_OP);
+    ELSE
+      INSERT INTO repository_events
+        (repository_id, event) VALUES (NEW.id, TG_OP);
+  END CASE;
   RETURN NULL;
 END;
 $$;
@@ -515,11 +520,16 @@ CREATE FUNCTION user_event() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
 BEGIN
-  IF (TG_OP = 'DELETE') THEN
-    INSERT INTO user_events (user_id, event) VALUES (OLD.id, TG_OP);
-  ELSE
-    INSERT INTO user_events (user_id, event) VALUES (NEW.id, TG_OP);
-  END IF;
+  CASE
+    WHEN TG_OP = 'DELETE' THEN
+      INSERT INTO user_events
+        (user_id, event) VALUES (OLD.id, TG_OP);
+    WHEN TG_OP = 'TRUNCATE' THEN
+      INSERT INTO user_events (event) VALUES (TG_OP);
+    ELSE
+      INSERT INTO user_events
+        (user_id, event) VALUES (NEW.id, TG_OP);
+  END CASE;
   RETURN NULL;
 END;
 $$;
@@ -675,7 +685,6 @@ CREATE TABLE repositories (
     remote_api_type text,
     remote_fetch_interval text DEFAULT '1 Minute'::text NOT NULL,
     remote_api_token_bearer character varying,
-    remote_http_fetch_token text,
     send_status_notifications boolean DEFAULT true NOT NULL,
     manage_remote_push_hooks boolean DEFAULT false NOT NULL,
     CONSTRAINT check_valid_remote_api_type CHECK ((remote_api_type = ANY (ARRAY['github'::text, 'gitlab'::text, 'bitbucket'::text]))),
@@ -2169,6 +2178,13 @@ CREATE TRIGGER repository_event AFTER INSERT OR DELETE OR UPDATE ON repositories
 
 
 --
+-- Name: repository_event_truncate; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER repository_event_truncate AFTER TRUNCATE ON repositories FOR EACH STATEMENT EXECUTE PROCEDURE repository_event();
+
+
+--
 -- Name: update_updated_at_column_of_branches; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -2292,6 +2308,13 @@ CREATE TRIGGER update_updated_at_column_of_welcome_page_settings BEFORE UPDATE O
 --
 
 CREATE TRIGGER user_event AFTER INSERT OR DELETE OR UPDATE ON users FOR EACH ROW EXECUTE PROCEDURE user_event();
+
+
+--
+-- Name: user_event_truncate; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER user_event_truncate AFTER TRUNCATE ON users FOR EACH STATEMENT EXECUTE PROCEDURE user_event();
 
 
 --
@@ -2673,6 +2696,8 @@ INSERT INTO schema_migrations (version) VALUES ('424');
 INSERT INTO schema_migrations (version) VALUES ('425');
 
 INSERT INTO schema_migrations (version) VALUES ('426');
+
+INSERT INTO schema_migrations (version) VALUES ('427');
 
 INSERT INTO schema_migrations (version) VALUES ('43');
 
