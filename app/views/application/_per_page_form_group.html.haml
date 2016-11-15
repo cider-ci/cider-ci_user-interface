@@ -2,7 +2,7 @@
   option_items = [3,7,12,25,items_count].sort
     .select{|c| c <= items_count}
     .map{|pp| ["#{pp} Per page",pp]}
-  option_default = params[:per_page].presence || [25,items_count].min
+  option_default = params[:per_page].presence || [12, items_count].min
 .form-group
   %label.sr-only{for: "per_page"}
   = select_tag :per_page, options_for_select(option_items, option_default),
