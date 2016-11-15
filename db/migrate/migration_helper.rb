@@ -60,7 +60,7 @@ module MigrationHelper extend ActiveSupport::Concern
   end
 
 
-  def add_events_table table_name
+  def add_or_replace_events_table table_name
 
     entity_name = table_name.singularize
 
@@ -107,11 +107,13 @@ module MigrationHelper extend ActiveSupport::Concern
           END;
           $$ language 'plpgsql';
 
+          DROP TRIGGER IF EXISTS #{trigger_name} ON #{table_name};
           CREATE TRIGGER #{trigger_name}
             AFTER INSERT OR DELETE OR UPDATE
             ON #{table_name}
             FOR EACH ROW EXECUTE PROCEDURE #{trigger_name}();
 
+          DROP TRIGGER IF EXISTS #{trigger_name}_truncate ON #{table_name};
           CREATE TRIGGER #{trigger_name}_truncate
             AFTER TRUNCATE
             ON #{table_name}

@@ -4,9 +4,7 @@ class CreateRepositoryEvents < ActiveRecord::Migration
   include MigrationHelper
 
   def change
-
-    add_events_table "repositories"
-    add_events_table "users"
-
+    add_or_replace_events_table "repositories"
+    add_or_replace_events_table "users"
   end
 end
