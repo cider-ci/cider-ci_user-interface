@@ -687,6 +687,8 @@ CREATE TABLE repositories (
     remote_api_token_bearer character varying,
     send_status_notifications boolean DEFAULT true NOT NULL,
     manage_remote_push_hooks boolean DEFAULT false NOT NULL,
+    branch_trigger_max_commit_age text DEFAULT '12 hours'::text,
+    CONSTRAINT branch_trigger_max_commit_age_not_blank CHECK ((branch_trigger_max_commit_age !~ '^\s*$'::text)),
     CONSTRAINT check_valid_remote_api_type CHECK ((remote_api_type = ANY (ARRAY['github'::text, 'gitlab'::text, 'bitbucket'::text]))),
     CONSTRAINT foreign_api_authtoken_not_empty CHECK (((remote_api_token)::text <> ''::text)),
     CONSTRAINT foreign_api_endpoint_not_empty CHECK (((remote_api_endpoint)::text <> ''::text)),
@@ -2698,6 +2700,8 @@ INSERT INTO schema_migrations (version) VALUES ('425');
 INSERT INTO schema_migrations (version) VALUES ('426');
 
 INSERT INTO schema_migrations (version) VALUES ('427');
+
+INSERT INTO schema_migrations (version) VALUES ('428');
 
 INSERT INTO schema_migrations (version) VALUES ('43');
 
