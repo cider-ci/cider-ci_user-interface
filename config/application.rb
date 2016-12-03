@@ -67,6 +67,16 @@ module CiderCI
     config.autoload_paths += \
       %w(lib services messaging).map { |dir| Rails.root.join('app', dir) }
 
+    config.paths["db/migrate"] << \
+      Rails.root.join('database', 'db', 'migrate')
+
+    config.paths["config/initializers"] <<  \
+      Rails.root.join('database', 'initializers')
+
+    config.autoload_paths += [
+      Rails.root.join('database', 'lib'),
+    ]
+
     config.active_record.schema_format = :sql
 
     config.generators.helper = false

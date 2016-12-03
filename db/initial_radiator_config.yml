@@ -1,8 +1,0 @@
----
-rows:
-- name: Demo Project
-  items: 
-  - repository_name: Demo Project
-    branch_name: v3
-    job_name: 
-      - Attachments Demo

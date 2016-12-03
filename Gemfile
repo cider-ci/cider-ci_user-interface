@@ -1,17 +1,8 @@
-source 'https://rubygems.org'
+eval_gemfile Pathname(File.dirname(File.absolute_path(__FILE__))).join('database', 'Gemfile')
 
-####################################################################
-# required for PRODUCTION
-####################################################################
 
-# RAILS
-gem 'rails', '~> 4.2'
 
 # DATABASE
-gem 'activerecord-jdbcpostgresql-adapter',  platform: :jruby
-gem 'jdbc-postgres', platform: :jruby
-gem 'pg', platform: 'mri'
-gem 'pg_tasks', '>= 1.3.0', '< 2.0.0'
 gem 'drtom-textacular', '= 4.0.0.alpha.20160302'
 
 
@@ -58,7 +49,6 @@ gem 'factory_girl', group: [:development, :test]
 gem 'factory_girl_rails', group: [:development, :test]
 gem 'faker', group: [:development, :test]
 gem 'poltergeist', group: [:test]
-gem 'pry', group: [:development, :test]
 gem 'rspec-rails', group: [:development, :test]
 gem 'rubocop', group: [:development, :test], require: false
 gem 'sdoc', group: [:doc], require: false

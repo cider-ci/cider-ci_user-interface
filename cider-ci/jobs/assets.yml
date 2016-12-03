@@ -5,7 +5,7 @@ jobs:
     - type: branch
       include-match: ^.*$
     task-defaults:
-      git-options:
+      git_options:
         submodules:
           clone: True
       environment-variables:
