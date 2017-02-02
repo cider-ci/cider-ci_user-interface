@@ -13,7 +13,7 @@ module Concerns
       if conf.is_a? Hash
         Settings[:server_base_url] + service_path(conf)
       else
-        conf.to_s
+        Settings[:server_base_url] + conf.to_s
       end
     end
 
