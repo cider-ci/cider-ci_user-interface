@@ -11,7 +11,7 @@ class Workspace::TasksController < WorkspaceController
 
   def retry
     set_task
-    url = service_base_url(Settings[:services][:dispatcher][:http]) +
+    url = service_base_url("/cider-ci/dispatcher") +
       "/tasks/#{@task.id}/retry"
     response = http_do(:post, url) do |c|
       c.headers['content-type'] = 'application/json'

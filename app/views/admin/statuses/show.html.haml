@@ -8,7 +8,6 @@
 
     = render 'status_row', result: ServiceCheck.check_api, name: "API Service"
     = render 'status_row', result: ServiceCheck.check_builder, name: "Builder Service"
-    = render 'status_row', result: ServiceCheck.check_dispatcher, name: "Dispatcher Service"
-    = render 'status_row', result: ServiceCheck.check_repository, name: "Repository Service"
+    = render 'status_row', result: ServiceCheck.check_server, name: "Server Service"
     = render 'status_row', result: ServiceCheck.check_storage, name: "Storage Service"
     = render 'status_row', result: InShape::Memory.status, name: "UI"

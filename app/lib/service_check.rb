@@ -17,12 +17,8 @@ module ServiceCheck
       check_service Settings[:services][:builder][:http]
     end
 
-    def check_dispatcher
-      check_service Settings[:services][:dispatcher][:http]
-    end
-
-    def check_repository
-      check_service Settings[:services][:repository][:http]
+    def check_server
+      check_service Settings[:services][:server][:http]
     end
 
     def check_storage

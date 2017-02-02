@@ -40,7 +40,7 @@ class Workspace::JobsController < WorkspaceController
 
   def abort
     job = Job.find(params[:id])
-    url = service_base_url(Settings[:services][:dispatcher][:http]) + "/jobs/#{job.id}/abort"
+    url = service_base_url("/cider-ci/dispatcher") + "/jobs/#{job.id}/abort"
     response = http_do(:post, url) do |c|
       c.headers['content-type'] = 'application/json'
       c.body = { aborted_by: current_user.id,
@@ -116,7 +116,7 @@ class Workspace::JobsController < WorkspaceController
 
   def retry_and_resume
     job = Job.find(params[:id])
-    url = service_base_url(Settings[:services][:dispatcher][:http]) \
+    url = service_base_url("/cider-ci/dispatcher") \
       + "/jobs/#{job.id}/retry-and-resume"
     response = http_do(:post, url) do |c|
       c.headers['content-type'] = 'application/json'

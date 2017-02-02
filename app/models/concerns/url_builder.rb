@@ -10,7 +10,11 @@ module Concerns
     end
 
     def service_base_url(conf, _options = {})
-      Settings[:server_base_url] + service_path(conf)
+      if conf.is_a? Hash
+        Settings[:server_base_url] + service_path(conf)
+      else
+        conf.to_s
+      end
     end
 
     def service_path(conf)
