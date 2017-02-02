@@ -13,10 +13,6 @@ module ServiceCheck
       check_service Settings[:services][:api][:http]
     end
 
-    def check_builder
-      check_service Settings[:services][:builder][:http]
-    end
-
     def check_server
       check_service Settings[:services][:server][:http]
     end

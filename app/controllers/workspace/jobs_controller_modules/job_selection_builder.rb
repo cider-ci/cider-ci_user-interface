@@ -13,8 +13,7 @@ module Workspace::JobsControllerModules
     end
 
     def get_jobs(id)
-      url = service_base_url(Settings[:services][:builder][:http]) +
-        "/jobs/available/#{id}"
+      url = service_base_url("/cider-ci/builder") + "/jobs/available/#{id}"
       JSON.parse(http_get(url).body)
     end
 

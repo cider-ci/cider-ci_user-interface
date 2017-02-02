@@ -20,7 +20,7 @@ class Workspace::JobsController < WorkspaceController
   end
 
   def create
-    url = service_base_url(Settings[:services][:builder][:http]) + '/jobs/'
+    url = service_base_url("/cider-ci/builder") + '/jobs/'
     response = http_do(:post, url) do |c|
       c.headers['content-type'] = 'application/json'
       c.body = params[:job].slice(:key, :tree_id) \
