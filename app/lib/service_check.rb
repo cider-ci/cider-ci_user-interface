@@ -9,16 +9,8 @@ module ServiceCheck
     include Concerns::HTTP
     include Concerns::UrlBuilder
 
-    def check_api
-      check_service Settings[:services][:api][:http]
-    end
-
     def check_server
       check_service Settings[:services][:server][:http]
-    end
-
-    def check_storage
-      check_service Settings[:services][:storage][:http]
     end
 
     def check_service(http_opts)

@@ -2,7 +2,7 @@ class TrialAttachment < ActiveRecord::Base
   include Concerns::UrlBuilder
 
   def url
-    service_path(Settings[:services][:storage][:http]) \
+    service_path('/cider-ci/storage') \
       + "/trial-attachments/#{trial_id}/#{path}"
   end
 
