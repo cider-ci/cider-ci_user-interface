@@ -10,19 +10,19 @@ module Concerns
     end
 
     def service_base_url(conf, _options = {})
-      if conf.is_a? Hash
-        Settings[:server_base_url] + service_path(conf)
-      else
-        Settings[:server_base_url] + conf.to_s
-      end
+      Settings[:server_base_url] + service_path(conf)
     end
 
     def service_path(conf)
-      (conf[:path] || "#{conf[:context]}#{conf[:sub_context]}")
+      if conf.is_a? Hash
+        (conf[:path] || "#{conf[:context]}#{conf[:sub_context]}")
+      else
+        conf.to_s
+      end
     end
 
     def api_path
-      service_path(Settings[:services][:api][:http])
+      service_path("/cider-ci/api")
     end
 
     def api_browser_path(resource_path = '')
