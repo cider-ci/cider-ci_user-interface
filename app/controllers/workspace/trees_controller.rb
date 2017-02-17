@@ -25,7 +25,7 @@ class Workspace::TreesController < WorkspaceController
   end
 
   def get_project_configuration(tree_id)
-    url = service_base_url(Settings[:services][:repository][:http]) +
+    url = service_base_url("/cider-ci/repositories") +
       "/project-configuration/#{tree_id}"
     http_get(url)
   end

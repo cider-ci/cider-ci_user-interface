@@ -17,6 +17,7 @@ module Concerns
         f.options[:timeout] = 3
         f.options[:open_timeout] = 3
         f.adapter Faraday.default_adapter
+        f.headers["Accept"] = "application/json"
         f.ssl.verify = false
       end
 
