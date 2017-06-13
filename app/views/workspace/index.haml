@@ -59,9 +59,10 @@
             class: "text-warning form-control"
         .col-sm-8
           .row
-            .col-sm-3{style: "margin: 10px 0"}
-              = check_box_tag :my_commits, "true", my_commits? , tabindex: 5
-              My Commits
+            .col-sm-3.checkbox{style: "margin: 10px 0"}
+              %label
+                = check_box_tag :my_commits, "true", my_commits? , tabindex: 5
+                My Commits
             .form-group.col-sm-3
               %label.sr-only{for: :depth}
               = select_tag :depth,
