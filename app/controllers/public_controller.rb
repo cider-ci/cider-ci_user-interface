@@ -4,7 +4,7 @@
 
 class PublicController < ApplicationController
 
-  skip_before_filter :verify_authenticity_token, only: [:sign_out]
+  skip_before_action :verify_authenticity_token, only: [:sign_out]
 
   include ActionView::Helpers::TextHelper
   include Concerns::ServiceSession

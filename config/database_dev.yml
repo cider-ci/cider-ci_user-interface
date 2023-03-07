@@ -1,23 +1,22 @@
 default: &default
   adapter: postgresql
-  encoding: unicode
   host: localhost
+  port: <%= ENV['PGPORT'].presence || '5432' %>
   pool: 3
-  username: cider-ci
-  password: secret
-  database: cider-ci_v3_development
+  encoding: unicode
+  username: <%= ENV['DB_USER'].presence || ENV['PGUSER'].presence || 'cider-ci' %>
+  password: <%= ENV['DB_PASSWORD'].presence || ENV['PGPASSWORD'].presence || 'cider-ci' %>
+  database: <%= ENV['DB_NAME'].presence || ENV['PGDATABASE'].presence || 'cider-ci_v5' %>
   variables:
     statement_timeout: 3000
 
 development:
   <<: *default
 
-test: &test
+test:
   <<: *default
-  database: cider-ci_v3_test
 
 production:
   <<: *default
-  #database: cider-ci_v3_production
 
 

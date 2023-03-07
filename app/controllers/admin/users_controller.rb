@@ -50,7 +50,7 @@ class Admin::UsersController < AdminController
   def update
     with_rescue_flash do
       @user = User.find(params[:id])
-      @user.update_attributes! params.require(:user).permit!
+      @user.update! params.require(:user).permit!
       { successes: ['The user has been updated.'] }
     end
   end

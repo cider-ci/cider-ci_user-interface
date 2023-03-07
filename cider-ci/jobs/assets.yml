@@ -25,7 +25,8 @@ jobs:
             - script: bundle
             - script: create-database
             body: |
-              set -eux
-              bundle exec rake assets:precompile
+              #!/usr/bin/env bash
+              set -euo pipefail
+              ./bin/rake assets:precompile
               cd public/assets
               git diff --stat --exit-code -- *

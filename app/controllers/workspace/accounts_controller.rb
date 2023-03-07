@@ -11,7 +11,7 @@ class Workspace::AccountsController < WorkspaceController
 
   def update
     with_rescue_flash do
-      @user.update_attributes! params.require(:user) \
+      @user.update! params.require(:user) \
         .permit(:password, :reload_frequency,
           :ui_theme, :mini_profiler_is_enabled)
       { successes: ['The account has been updated.'] }
