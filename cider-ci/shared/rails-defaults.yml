@@ -1,27 +1,16 @@
 traits:
   postgresql: true
-  rbenv: true
-  ruby: true
+  asdf: true
 
 templates:
   - src: [cider-ci, templates, database.yml]
     dest: [config, database.yml]
 
-environment-variables:
-  RBENV_VERSION:  2.2.4
-
 scripts:
   bundle:
     exclusive-executor-resource: rbenv
     timeout: 10 Minutes
-    body: |
-      if [ ! -d ${HOME}/.rbenv/versions/${RBENV_VERSION} ]; then
-        rbenv install ${RBENV_VERSION}
-        gem install bundler
-      fi
-      cd user-interface
-      rm .bundle/config
-      bundle
+    body: ./bin/ruby-setup
 
   create-database:
     body: bundle exec rake db:reset

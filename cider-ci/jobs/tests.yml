@@ -24,8 +24,6 @@ jobs:
 
       traits:
         postgresql: true
-        rbenv: true
-        ruby: true
 
       tasks:
         specs:
@@ -35,6 +33,4 @@ jobs:
               - script: bundle
               - script: create-database
               body: bundle exec rspec spec/
-
-
 

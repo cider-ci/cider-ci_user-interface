@@ -1,10 +1,13 @@
-eval_gemfile Pathname(File.dirname(File.absolute_path(__FILE__))).join('database', 'Gemfile')
+source 'https://rubygems.org'
 
+gem 'rails', '~> 6.1'
+
+# gem 'activerecord-jdbcpostgresql-adapter',  platform: :jruby
+gem 'pg', platform: 'mri'
 
 
 # DATABASE
-gem 'drtom-textacular', '= 4.0.0.alpha.20160302'
-
+# gem 'drtom-textacular', '= 4.0.0.alpha.20160302'
 
 # FRONTEND
 gem 'bootstrap-sass'
@@ -19,22 +22,23 @@ gem 'kramdown'
 gem 'sass'
 gem 'sass-rails'
 
+gem 'psych', '< 4'
 
 # The rest
 gem 'bcrypt-ruby'
 gem 'chronic_duration'
 gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
-gem 'configuration_management_backdoor', '>= 3.0.0', '< 4.0.0' #path: '/Users/thomas/Programming/ROR/ConfigurationManagementBackdoor'
+#gem 'configuration_management_backdoor', '>= 3.0.0', '< 4.0.0' #path: '/Users/thomas/Programming/ROR/ConfigurationManagementBackdoor'
 gem 'faraday'
-gem 'inshape', '>= 1.0.1', '< 2.0'
+#gem 'inshape', '>= 1.0.1', '< 2.0'
 gem 'kaminari'
-gem 'newrelic_rpm'
+# gem 'newrelic_rpm'
 gem 'nilify_blanks'
-gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
+# gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
 gem 'puma'
 gem 'rack-mini-profiler'
 gem 'rest-client'
-gem 'therubyrhino', platform: :jruby
+# gem 'therubyrhino', platform: :jruby
 gem 'uglifier'
 gem 'uuidtools'
 
