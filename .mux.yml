@@ -1,0 +1,8 @@
+name: CI/ZHdK/ci/ui
+windows:
+  2: 
+    name: "rails server"
+    command: ./bin/rails server -p 8880
+
+
+

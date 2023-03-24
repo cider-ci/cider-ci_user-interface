@@ -10,7 +10,6 @@
 
 *.tar
 *.tar.gz
-.mux.yml
 .rubocop_todo.yml
 /.bundle
 /.ruby-version
