@@ -66,7 +66,7 @@ FactoryGirl.define do
       task = FactoryGirl.create :passed_task,
         job_id: job.id,
         result: { value: 42, summary: '42 OK' }
-      task.trials.first.update_attributes! result: { value: 42, summary: '42 OK' }
+      task.trials.first.update! result: { value: 42, summary: '42 OK' }
     end
   end
 

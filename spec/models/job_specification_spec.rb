@@ -23,7 +23,7 @@ describe JobSpecification do
     describe 'updating the data' do
       it 'raises an error' do
         expect do
-          @ex_spec.update_attributes! data: { x: 7 }
+          @ex_spec.update! data: { x: 7 }
         end.to raise_error /Data is immutable/
       end
     end

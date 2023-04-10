@@ -2,7 +2,9 @@ name: CI/ZHdK/ci/ui
 windows:
   2: 
     name: "rails server"
-    command: ./bin/rails server -p 8880
+    command: |
+      pg_env_set 10
+      ./bin/rails server -p 8880
 
 
 

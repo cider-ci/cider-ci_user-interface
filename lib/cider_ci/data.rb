@@ -59,7 +59,7 @@ module CiderCI
         update_attributes = config['update_attributes'].presence
 
         if (instance && update_attributes)
-          instance.update_attributes! update_attributes.to_h
+          instance.update! update_attributes.to_h
         end
       end
 

@@ -6,6 +6,9 @@ gem 'rails', '~> 6.1'
 gem 'pg', platform: 'mri'
 
 
+
+gem 'pg_tasks', git: 'https://github.com/drtom/rails_pg-tasks'
+
 # DATABASE
 # gem 'drtom-textacular', '= 4.0.0.alpha.20160302'
 
@@ -28,7 +31,7 @@ gem 'psych', '< 4'
 gem 'bcrypt-ruby'
 gem 'chronic_duration'
 gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
-#gem 'configuration_management_backdoor', '>= 3.0.0', '< 4.0.0' #path: '/Users/thomas/Programming/ROR/ConfigurationManagementBackdoor'
+gem 'configuration_management_backdoor', path: '/Users/thomas/Programming/ROR/ConfigurationManagementBackdoor'
 gem 'faraday'
 #gem 'inshape', '>= 1.0.1', '< 2.0'
 gem 'kaminari'
@@ -58,6 +61,9 @@ gem 'rubocop', group: [:development, :test], require: false
 gem 'sdoc', group: [:doc], require: false
 gem 'selenium-webdriver', group: [:test]
 gem 'timecop', group: [:development, :test]
+
+gem 'listen', group: [:development, :test]
+gem 'pry'
 
 # TODO, find unused views and partials after we have some tests
 # https://github.com/vinibaggio/discover-unused-partials

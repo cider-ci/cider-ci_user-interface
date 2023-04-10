@@ -1,10 +1,5 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/usr/bin/env ruby
 
-RAILS_ENV=${RAILS_ENV:-development}
-
-PROJECT_DIR="$(cd -- "$(dirname "${BASH_SOURCE}")" ; cd .. > /dev/null 2>&1 && pwd -P)"
-cd $PROJECT_DIR
-
-./bin/env/ruby-setup
-bundle exec ./bin/rails.rb "$@"
+APP_PATH = File.expand_path('../config/application', __dir__)
+require_relative '../config/boot'
+require 'rails/commands'

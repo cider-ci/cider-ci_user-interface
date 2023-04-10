@@ -136,7 +136,7 @@ class Workspace::JobsController < WorkspaceController
 
   def update
     job = Job.find(params[:id])
-    job.update_attributes! params.require(:job).permit(:priority)
+    job.update! params.require(:job).permit(:priority)
     redirect_to workspace_job_path(job),
       flash: { successes: ['The job has been updated.'] }
   end
