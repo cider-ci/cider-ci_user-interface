@@ -1,15 +1,16 @@
 GIT
+  remote: https://github.com/DrTom/rails_configuration-management-backdoor.git
+  revision: fc0a57faa655ab722a4e5fec4f982695257cb6d1
+  specs:
+    configuration_management_backdoor (5.0.0)
+      rails (>= 4.0.0)
+
+GIT
   remote: https://github.com/drtom/rails_pg-tasks
   revision: a1fa04ff62b4319c4775cfc458d4cc89b9a6b79e
   specs:
     pg_tasks (2.2.0.pre.0)
       rails (~> 6.1.0)
-
-PATH
-  remote: /Users/thomas/Programming/ROR/ConfigurationManagementBackdoor
-  specs:
-    configuration_management_backdoor (5.0.0)
-      rails (>= 4.0.0)
 
 GEM
   remote: https://rubygems.org/
@@ -193,7 +194,7 @@ GEM
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
-    loofah (2.19.1)
+    loofah (2.20.0)
       crass (~> 1.0.2)
       nokogiri (>= 1.5.9)
     mail (2.8.1)
@@ -223,7 +224,7 @@ GEM
     nilify_blanks (1.4.0)
       activerecord (>= 4.0.0)
       activesupport (>= 4.0.0)
-    nio4r (2.5.8)
+    nio4r (2.5.9)
     nokogiri (1.14.2-arm64-darwin)
       racc (~> 1.4)
     numerizer (0.1.1)

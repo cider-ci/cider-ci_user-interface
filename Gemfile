@@ -31,7 +31,10 @@ gem 'psych', '< 4'
 gem 'bcrypt-ruby'
 gem 'chronic_duration'
 gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
-gem 'configuration_management_backdoor', path: '/Users/thomas/Programming/ROR/ConfigurationManagementBackdoor'
+
+# gem 'configuration_management_backdoor', path: '/Users/thomas/Programming/ROR/ConfigurationManagementBackdoor'
+gem 'configuration_management_backdoor',
+  git: 'https://github.com/DrTom/rails_configuration-management-backdoor.git' 
 gem 'faraday'
 #gem 'inshape', '>= 1.0.1', '< 2.0'
 gem 'kaminari'
