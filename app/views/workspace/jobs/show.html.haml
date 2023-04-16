@@ -69,7 +69,7 @@
               %i.icon-abort
               Abort
         %li.for-signed-in-user
-          = form_tag retry_and_resume_workspace_job_path(job,@filter_params), method: 'POST', remote: false do
+          = form_tag retry_and_resume_workspace_job_path(job, @filter_params.permit!), method: 'POST', remote: false do
             = hidden_field_tag :authenticity_token, form_authenticity_token
             = button_tag type: :submit, class: "btn btn-primary" do
               %i.icon-retry

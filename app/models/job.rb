@@ -18,7 +18,7 @@ class Job < ActiveRecord::Base
   has_many :commits, primary_key: 'tree_id', foreign_key: 'tree_id'
   has_many :job_issues
   has_many :branches, through: :commits
-  has_many :repositories, -> { reorder('').uniq }, through: :branches
+  has_many :repositories, -> { reorder('').distinct }, through: :branches
 
   has_many :tasks
 

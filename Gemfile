@@ -15,7 +15,7 @@ gem 'pg_tasks', git: 'https://github.com/drtom/rails_pg-tasks'
 # FRONTEND
 gem 'bootstrap-sass'
 gem 'coffee-rails'
-gem 'font-awesome-sass', '= 4.4.0'
+gem 'font-awesome-sass'
 gem 'haml-contrib'
 gem 'haml-rails'
 gem 'jquery-rails'
