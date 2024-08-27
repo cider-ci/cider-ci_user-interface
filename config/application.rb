@@ -1,9 +1,12 @@
+require_relative 'boot'
 
 require 'active_support/core_ext/numeric/bytes'
 
-require File.expand_path('../boot', __FILE__)
-
 require 'rails/all'
+
+# Require the gems listed in Gemfile, including any gems
+# you've limited to :test, :development, or :production.
+Bundler.require(*Rails.groups)
 
 ######################################################################
 
@@ -80,8 +83,6 @@ module CiderCI
     config.action_controller.relative_url_root = '/cider-ci/ui'
 
     config.cache_store = :memory_store, {size: (Settings[:ui_cache_size_megabytes].presence || 128).megabytes}
-
-    config.assets.precompile += ['cider.css', 'bootstrap-plain.css']
 
   end
 end
