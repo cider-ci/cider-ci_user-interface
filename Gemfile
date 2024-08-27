@@ -30,11 +30,11 @@ gem 'faraday'
 gem 'kaminari'
 gem 'newrelic_rpm'
 gem 'nilify_blanks'
-gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
+gem 'psych'
 gem 'puma'
 gem 'rack-mini-profiler'
 gem 'rest-client'
-gem 'therubyrhino', platform: :jruby
+# gem 'therubyrhino', platform: :jruby
 gem 'uglifier'
 gem 'uuidtools'
 
