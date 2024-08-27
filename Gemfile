@@ -3,7 +3,9 @@ eval_gemfile Pathname(File.dirname(File.absolute_path(__FILE__))).join('database
 
 
 # DATABASE
-gem 'drtom-textacular', '= 4.0.0.alpha.20160302'
+gem 'textacular',
+  git: 'https://github.com/DrTom/textacular.git',
+  branch: 'mk/rails-upgrade'
 
 
 # FRONTEND
@@ -11,30 +13,33 @@ gem 'bootstrap-sass'
 gem 'coffee-rails'
 gem 'font-awesome-sass', '= 4.4.0'
 gem 'haml-contrib'
-gem 'haml-rails'
+gem 'haml-rails', '~> 2.0'
 gem 'jquery-rails'
 gem 'jquery-ui-rails'
 gem 'jquery-ui-sass-rails'
 gem 'kramdown'
 gem 'sass'
 gem 'sass-rails'
+gem 'webpacker'
 
 
 # The rest
 gem 'bcrypt-ruby'
 gem 'chronic_duration'
 gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
-gem 'configuration_management_backdoor', '>= 3.0.0', '< 4.0.0' #path: '/Users/thomas/Programming/ROR/ConfigurationManagementBackdoor'
+gem 'configuration_management_backdoor',
+  git: 'https://github.com/DrTom/rails_configuration-management-backdoor',
+  branch: 'mk/rails-upgrade'
 gem 'faraday'
-gem 'inshape', '>= 1.0.1', '< 2.0'
+# gem 'inshape', '~> 2.0'
 gem 'kaminari'
 gem 'newrelic_rpm'
 gem 'nilify_blanks'
-gem 'psych', platform: :mri # (j)psych is yet directly included in jruby
+gem 'psych', '~> 3.0'
 gem 'puma'
 gem 'rack-mini-profiler'
 gem 'rest-client'
-gem 'therubyrhino', platform: :jruby
+# gem 'therubyrhino', platform: :jruby
 gem 'uglifier'
 gem 'uuidtools'
 

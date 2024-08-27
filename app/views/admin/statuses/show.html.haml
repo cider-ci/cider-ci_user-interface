@@ -7,4 +7,6 @@
   %tbody
 
     = render 'status_row', result: ServiceCheck.check_server, name: "Server Service"
-    = render 'status_row', result: InShape::Memory.status, name: "UI"
+    -# update of inshape gem required
+    -# = render 'status_row', result: InShape::Memory.status, name: "UI"
+    = render 'status_row', result: {}, name: "UI"

@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Job < ActiveRecord::Base
+class Job < ApplicationRecord
 
   # serialize :result, JSON
 

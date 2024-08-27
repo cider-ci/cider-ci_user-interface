@@ -1,4 +1,4 @@
-class TrialAttachment < ActiveRecord::Base
+class TrialAttachment < ApplicationRecord
   include Concerns::UrlBuilder
 
   def url

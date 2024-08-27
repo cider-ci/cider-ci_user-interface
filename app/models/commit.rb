@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Commit < ActiveRecord::Base
+class Commit < ApplicationRecord
   self.primary_key = 'id'
 
   has_and_belongs_to_many :branches

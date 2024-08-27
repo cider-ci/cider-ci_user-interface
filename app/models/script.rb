@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Script < ActiveRecord::Base
+class Script < ApplicationRecord
   belongs_to :trial
 
   default_scope { reorder(started_at: :asc, finished_at: :asc, key: :asc, name: :asc) }

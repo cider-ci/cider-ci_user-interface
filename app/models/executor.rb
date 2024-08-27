@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Executor < ActiveRecord::Base
+class Executor < ApplicationRecord
   ONLINE_SQL_CONDITION = "last_ping_at > (now() - interval '3 Minutes')".freeze
 
   has_many :trials

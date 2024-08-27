@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Trial < ActiveRecord::Base
+class Trial < ApplicationRecord
   belongs_to :task
   belongs_to :executor
   belongs_to :creator, foreign_key: :created_by, class_name: 'User'

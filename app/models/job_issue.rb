@@ -1,4 +1,4 @@
-class JobIssue < ActiveRecord::Base
+class JobIssue < ApplicationRecord
 
   TYPE_BS_MAP = { error: :danger, warning: :warning }.freeze
 

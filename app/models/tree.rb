@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Tree < ActiveRecord::Base
+class Tree < ApplicationRecord
   self.primary_key = 'id'
   has_many :commits
   has_many :jobs

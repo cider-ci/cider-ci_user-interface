@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class Branch < ActiveRecord::Base
+class Branch < ApplicationRecord
 
   self.primary_key = :id
 
