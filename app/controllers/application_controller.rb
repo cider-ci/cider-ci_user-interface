@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 #
-require 'inshape'
+# require 'inshape'
 
 class ApplicationController < ActionController::Base
   protect_from_forgery with: :exception
@@ -73,8 +73,9 @@ class ApplicationController < ActionController::Base
   end
 
   def status
-    memory_status = InShape::Memory.status
-    render json: { memory: memory_status.content }, status: memory_status.is_ok ? 200 : 499
+    # memory_status = InShape::Memory.status
+    # render json: { memory: memory_status.content }, status: memory_status.is_ok ? 200 : 499
+    render json: "disabled: inshape gem update required"
   end
 
 end
