@@ -5,23 +5,6 @@ require File.expand_path('../boot', __FILE__)
 
 require 'rails/all'
 
-# Require the gems listed in Gemfile, including any gems
-# you've limited to :test, :development, or :production.
-Bundler.require(:default, Rails.env)
-
-# fixes an issue with Oracles java, jruby and encrypted cookies
-if RUBY_PLATFORM == 'java'
-  # jce_class.getDeclaredField("isRestricted") will throw an exception
-  # on the free java implementation; but we don't to patch it there anyways
-  begin
-    jce_class =  java::lang::Class.forName('javax.crypto.JceSecurity')
-    field = jce_class.getDeclaredField('isRestricted')
-    field.setAccessible(true)
-    field.set(nil, false)
-  rescue Exception => e
-  end
-end
-
 ######################################################################
 
 Settings = {}.with_indifferent_access
@@ -32,7 +15,7 @@ Settings = {}.with_indifferent_access
   'config/settings.local.yml',
   '/cider-ci/data/config/config.yml'
 ].each do |config_file|
-  if File.exists? config_file
+  if File.exist? config_file
     config = YAML.load_file(config_file).to_h.with_indifferent_access
     Settings.deep_merge! config
   end
