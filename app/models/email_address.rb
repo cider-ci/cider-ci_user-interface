@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class EmailAddress < ActiveRecord::Base
+class EmailAddress < ApplicationRecord
   self.primary_key = 'email_address'
   belongs_to :user
 end

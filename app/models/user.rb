@@ -2,7 +2,7 @@
 #  Licensed under the terms of the GNU Affero General Public License v3.
 #  See the LICENSE.txt file provided with this software.
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   has_secure_password validations: false
   has_many :email_addresses, -> { order(email_address: :asc) }
 

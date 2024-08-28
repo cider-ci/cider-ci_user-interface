@@ -1,4 +1,4 @@
-class TreeAttachment < ActiveRecord::Base
+class TreeAttachment < ApplicationRecord
   include Concerns::UrlBuilder
 
   def url

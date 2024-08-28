@@ -1,4 +1,4 @@
-class TreeIssue < ActiveRecord::Base
+class TreeIssue < ApplicationRecord
   include Issue
 
 end
