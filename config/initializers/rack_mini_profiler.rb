@@ -3,4 +3,4 @@ require 'rack-mini-profiler'
 
 # enable mini profiler on demand and not by default
 c = Rack::MiniProfiler.config
-c.authorization_mode = :whitelist
+c.authorization_mode = :allow_authorized
