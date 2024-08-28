@@ -24,7 +24,9 @@ gem 'sass-rails'
 gem 'bcrypt-ruby'
 gem 'chronic_duration'
 gem 'cider_ci-open_session', '>= 1.0.0', '< 2.0.0'
-gem 'configuration_management_backdoor', git: 'https://github.com/DrTom/rails_configuration-management-backdoor', branch: 'mk/rails-5.0'
+gem 'configuration_management_backdoor',
+  git: 'https://github.com/DrTom/rails_configuration-management-backdoor',
+  branch: 'mk/rails-upgrade'
 gem 'faraday'
 # gem 'inshape', '~> 2.0'
 gem 'kaminari'
