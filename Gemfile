@@ -18,6 +18,7 @@ gem 'jquery-ui-sass-rails'
 gem 'kramdown'
 gem 'sass'
 gem 'sass-rails'
+gem 'webpacker'
 
 
 # The rest
