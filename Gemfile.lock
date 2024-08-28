@@ -14,8 +14,10 @@ GIT
     pg_tasks (2.2.0.pre.0)
       rails (~> 6.1.0)
 
-PATH
-  remote: /Users/nitaai/src/misc/textacular
+GIT
+  remote: https://github.com/DrTom/textacular.git
+  revision: b14c90069c016abb034c9272668fbdff65dd0c6c
+  branch: mk/rails-upgrade
   specs:
     textacular (3.2.1)
       activerecord (~> 6.1.0)

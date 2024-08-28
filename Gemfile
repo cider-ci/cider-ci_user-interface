@@ -3,7 +3,9 @@ eval_gemfile Pathname(File.dirname(File.absolute_path(__FILE__))).join('database
 
 
 # DATABASE
-gem 'textacular', path: '/Users/nitaai/src/misc/textacular'
+gem 'textacular',
+  git: 'https://github.com/DrTom/textacular.git',
+  branch: 'mk/rails-upgrade'
 
 
 # FRONTEND
