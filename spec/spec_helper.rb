@@ -4,7 +4,11 @@ ENV['RAILS_ENV'] ||= 'test'
 require File.expand_path('../../config/environment', __FILE__)
 require 'rspec/rails'
 
+require 'config/factories'
+require 'config/database'
 require 'spec_helper_mock_messaging'
+
+
 
 Dir[Rails.root.join('app/**/*.rb')].each { |f| require f }
 

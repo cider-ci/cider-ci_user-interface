@@ -31,7 +31,28 @@ end
 module CiderCI
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
-    config.load_defaults 5.1
+    config.load_defaults 6.1
+
+    config.active_record.schema_format = :sql
+    config.active_record.timestamped_migrations = false
+
+    config.paths['db/migrate'] << \
+      Rails.root.join('database', 'db', 'migrate')
+
+    config.paths["config/initializers"] <<  \
+      Rails.root.join('database', 'initializers')
+
+    config.eager_load_paths += [
+      Rails.root.join('lib'),
+      Rails.root.join('database', 'lib'),
+      Rails.root.join('database', 'app', 'models', 'concerns'),
+      Rails.root.join('database', 'app', 'controllers'),
+      Rails.root.join('database', 'app', 'controllers', 'concerns'),
+      Rails.root.join('database', 'app', 'models'),
+      Rails.root.join('database', 'app', 'lib'),
+      Rails.root.join('database', 'app', 'queries'),
+    ]
+
 
     # Configuration for the application, engines, and railties goes here.
     #

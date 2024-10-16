@@ -7,19 +7,19 @@ describe 'Functions for managing branches_commits' do
     # 1 <- 4 <- 3
     #      4 <- 5
 
-    @commit1 = FactoryGirl.create :commit, id: '0000000000000000000000000000000000000001'
-    @commit2 = FactoryGirl.create :commit, id: '0000000000000000000000000000000000000002'
+    @commit1 = FactoryBot.create :commit, id: '0000000000000000000000000000000000000001'
+    @commit2 = FactoryBot.create :commit, id: '0000000000000000000000000000000000000002'
     @commit2.parents << @commit1
-    @commit3 = FactoryGirl.create :commit, id: '0000000000000000000000000000000000000003'
+    @commit3 = FactoryBot.create :commit, id: '0000000000000000000000000000000000000003'
     @commit3.parents << @commit2
-    @commit4 = FactoryGirl.create :commit, id: '0000000000000000000000000000000000000004'
+    @commit4 = FactoryBot.create :commit, id: '0000000000000000000000000000000000000004'
     @commit3.parents << @commit4
     @commit4.parents << @commit1
-    @commit5 = FactoryGirl.create :commit, id: '0000000000000000000000000000000000000005'
+    @commit5 = FactoryBot.create :commit, id: '0000000000000000000000000000000000000005'
     @commit5.parents << @commit4
 
-    @repository = FactoryGirl.create :repository
-    @branch = FactoryGirl.create :branch, repository: @repository,
+    @repository = FactoryBot.create :repository
+    @branch = FactoryBot.create :branch, repository: @repository,
                                           current_commit: @commit2
     ActiveRecord::Base.connection.execute 'DELETE FROM branches_commits'
 
@@ -53,20 +53,20 @@ describe 'Functions for managing branches_commits' do
       it 'returns true if the second argument is a descendant of the first' do
         @res = ActiveRecord::Base.connection.exec_query(
           %[SELECT is_descendant('#{@commit2.id}', '#{@commit3.id}')]).rows
-        expect(@res[0][0]).to be == 't'
+        expect(@res[0][0]).to be == true
       end
 
       it 'returns false if the second argument is the same as the first' do
         @res = ActiveRecord::Base.connection.exec_query(
           %[SELECT is_descendant('#{@commit2.id}', '#{@commit2.id}')]).rows
-        expect(@res[0][0]).to be == 'f'
+        expect(@res[0][0]).to be == false
       end
 
       it 'returns false if the second argument is not
             a descendant of the first, and they are not equal'.squish do
         @res = ActiveRecord::Base.connection.exec_query(
           %[SELECT is_descendant('#{@commit2.id}', '#{@commit1.id}')]).rows
-        expect(@res[0][0]).to be == 'f'
+        expect(@res[0][0]).to be == false
       end
 
     end
@@ -101,20 +101,20 @@ describe 'Functions for managing branches_commits' do
       it 'returns true if the second argument is a ancestor of the first' do
         @res = ActiveRecord::Base.connection.exec_query(
           %[SELECT is_ancestor('#{@commit2.id}', '#{@commit1.id}')]).rows
-        expect(@res[0][0]).to be == 't'
+        expect(@res[0][0]).to be == true
       end
 
       it 'returns false if the second argument is the same as the first' do
         @res = ActiveRecord::Base.connection.exec_query(
           %[SELECT is_ancestor('#{@commit2.id}', '#{@commit2.id}')]).rows
-        expect(@res[0][0]).to be == 'f'
+        expect(@res[0][0]).to be == false
       end
 
       it 'returns false if the second argument is not a ancestor of the first,
             and they are not equal'.squish do
         @res = ActiveRecord::Base.connection.exec_query(
           %[SELECT is_ancestor('#{@commit2.id}', '#{@commit3.id}')]).rows
-        expect(@res[0][0]).to be == 'f'
+        expect(@res[0][0]).to be == false
       end
 
     end

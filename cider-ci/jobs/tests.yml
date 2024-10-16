@@ -7,34 +7,38 @@ jobs:
     description: |
       Run specs under MRI.
 
-    run-on:
-    - type: branch
-      include-match: ^.*$
+    run_when:
+      on_any_branch:
+        type: branch
+        include_match: ^.*$
 
     context:
 
-      script-defaults:
-        timeout: 300
+      script_defaults:
+        timeout: 5 Minutes
 
-      task-defaults:
-        _cider-ci_include: 'cider-ci/shared/rails-defaults.yml'
-        environment-variables:
+      task_defaults:
+
+        include: 'cider-ci/shared/rails-defaults.yml'
+
+        environment_variables:
           RAILS_ENV: test
           LANG: "en_US.UTF-8"
 
-      traits:
-        postgresql: true
-        rbenv: true
-        ruby: true
+        scripts:
+          test:
+            start_when:
+              bundled:
+                script_key: bundle
+              database_created:
+                script_key: create-database
+            body: |
+              #!/usr/bin/env bash
+              source database/bin/pg_env
+              bundle exec rspec $CIDER_CI_TASK_FILE
 
-      tasks:
-        specs:
-          scripts:
-            test:
-              start-when:
-              - script: bundle
-              - script: create-database
-              body: bundle exec rspec spec/
+        traits: {}
 
-
+      generate_tasks:
+        include_match: spec\/.*_spec.rb
 

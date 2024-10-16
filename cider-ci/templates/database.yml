@@ -6,6 +6,7 @@ default: &default
   database: 'cider-ci_test_{{CIDER_CI_TRIAL_ID}}'
   username: '<%= ENV['PGUSER'] %>'
   password: '<%= ENV['PGPASSWORD'] %>'
+  port: '<%= ENV['PGPORT'] %>'
   variables:
     statement_timeout: 3000
 

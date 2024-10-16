@@ -1,31 +1,37 @@
 jobs:
   assets:
     name: Assets
-    run-on:
-    - type: branch
-      include-match: ^.*$
-    task-defaults:
+    run_when:
+      on_any_branch:
+        type: branch
+        include_match: ^.*$
+    task_defaults:
       git_options:
         submodules:
-          clone: True
-      environment-variables:
+          include_match: '^.*$'
+      environment_variables:
           RAILS_ENV: production
     tasks:
       assets_present:
         name: Assets are there?
         body: |
-          set -eux
+          #!/usr/bin/env bash
+          set -euo pipefail
           test -f public/assets/application*js
       assets_up_to_date:
         name: Assets are up to date?
-        _cider-ci_include: 'cider-ci/shared/rails-defaults.yml'
+        include: 'cider-ci/shared/rails-defaults.yml'
         scripts:
           test:
-            start-when:
-            - script: bundle
-            - script: create-database
+            start_when:
+              bundled:
+                script_key: bundle
+            start_when:
+              database_created:
+                script_key: create-database
             body: |
-              set -eux
+              #!/usr/bin/env bash
+              set -euo pipefail
               bundle exec rake assets:precompile
               cd public/assets
               git diff --stat --exit-code -- *

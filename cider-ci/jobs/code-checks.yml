@@ -7,16 +7,17 @@ jobs:
     description: |
       Run static checks and metrics: complexity, duplicaiont, code format.
 
-    run-on:
-    - type: branch
-      include-match: ^.*$
+    run_when:
+      on_any_branch:
+        type: branch
+        include_match: ^.*$
 
     context:
 
-      task-defaults:
+      task_defaults:
 
-        eager-trials: 1
-        max-auto-trials: 2
+        eager_trials: 1
+        max_trials: 2
         traits:
           linux: true
           rbenv: true
@@ -25,24 +26,22 @@ jobs:
         environment_variables:
           RAILS_ENV: test
           LANG: "en_US.UTF-8"
-          RBENV_VERSION:  2.2.4
 
         scripts:
           bundle:
-            exclusive-executor-resource: rbenv
+            exclusive_executor_resource: rbenv
             timeout: 10 Minutes
             body: |
-              if [ ! -d ${HOME}/.rbenv/versions/${RBENV_VERSION} ]; then
-                rbenv install ${RBENV_VERSION}
-                gem install bundler
-              fi
+              #!/usr/bin/env bash
+              set -euo pipefail
               cd integration-tests
               rm .bundle/config
               bundle
 
           test:
-            start-when:
-            - script: bundle
+            start_when:
+              bundled:
+                script_key: bundle
 
       tasks:
 

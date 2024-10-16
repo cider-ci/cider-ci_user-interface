@@ -50,11 +50,11 @@ gem 'uuidtools'
 gem 'addressable', group: [:test]
 gem 'capybara', group: [:test]
 gem 'cider_ci-support', '~> 1.2.0', group: [:development, :test]
-gem 'factory_girl', group: [:development, :test]
-gem 'factory_girl_rails', group: [:development, :test]
+gem 'factory_bot', group: [:development, :test]
+gem 'factory_bot_rails', group: [:development, :test]
 gem 'faker', group: [:development, :test]
 gem 'poltergeist', group: [:test]
-gem 'rspec-rails', group: [:development, :test]
+gem 'rspec-rails', '~> 6.1', group: [:development, :test]
 gem 'rubocop', group: [:development, :test], require: false
 gem 'sdoc', group: [:doc], require: false
 gem 'selenium-webdriver', group: [:test]

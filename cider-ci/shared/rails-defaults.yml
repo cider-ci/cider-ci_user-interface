@@ -1,37 +1,53 @@
+git_options:
+  submodules:
+    include_match: '^.*$'
+
 traits:
-  postgresql: true
-  rbenv: true
-  ruby: true
+  PostgreSQL: true
+  asdf: true
 
 templates:
-  - src: [cider-ci, templates, database.yml]
-    dest: [config, database.yml]
+  database:
+    src: 'cider-ci/templates/database.yml'
+    dest: 'config/database.yml'
 
-environment-variables:
-  RBENV_VERSION:  2.2.4
+environment_variables:
+  RAILS_ENV: test
+  RACK_ENV: test
+  PGVERSION: '15'
+  PGPORT: '54{{PGVERSION}}'
 
 scripts:
   bundle:
-    exclusive-executor-resource: rbenv
+    exclusive_executor_resource: ci_ui_setup_ruby
     timeout: 10 Minutes
     body: |
-      if [ ! -d ${HOME}/.rbenv/versions/${RBENV_VERSION} ]; then
-        rbenv install ${RBENV_VERSION}
-        gem install bundler
-      fi
-      cd user-interface
-      rm .bundle/config
+      #!/usr/bin/env bash
+      set -euo pipefail
+      ./bin/env/ruby-setup
       bundle
 
   create-database:
-    body: bundle exec rake db:reset
-    start-when:
-    - script: bundle
+    body: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      source database/bin/pg_env
+      bundle exec rails db:create
+      bundle exec rails db:reset
+    start_when:
+      bundled:
+        script_key: bundle
 
   delete-database:
-    body:  bundle exec rake db:pg:terminate_connections db:drop
-    ignore-state: true
-    start-when:
-    - script: test
-      states: [aborted, passed, failed, skipped]
+    body: |
+      #!/usr/bin/env bash
+      set -euo pipefail
+      source database/bin/pg_env
+
+      bundle exec rake db:pg:terminate_connections db:drop
+    ignore_state: true
+    start_when:
+      tested:
+        script_key: test
+        states: [aborted, passed, failed, skipped]
 

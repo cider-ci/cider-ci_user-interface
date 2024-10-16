@@ -35,7 +35,7 @@ class Admin::RepositoriesController < AdminController
 
   def update
     @repository = Repository.find(params[:id])
-    @repository.update_attributes! params[:repository].permit!
+    @repository.update! params[:repository].permit!
     redirect_to \
       admin_repository_path(@repository),
       flash: { successes: ['The repository has been updated.'] }

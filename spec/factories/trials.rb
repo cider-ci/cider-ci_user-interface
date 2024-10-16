@@ -1,22 +1,22 @@
-FactoryGirl.define do
+FactoryBot.define do
 
   factory :executing_trial, class: 'Trial' do
-    state 'executing'
+    state {'executing'}
   end
 
   factory :passed_trial, class: 'Trial' do
-    state 'passed'
+    state {'passed'}
   end
 
   factory :pending_trial, class: 'Trial' do
-    state 'pending'
+    state {'pending'}
   end
 
   factory :failed_trial, class: 'Trial' do
-    state 'failed'
+    state {'failed'}
 
     after(:create) do |trial|
-      FactoryGirl.create :trial_issue,
+      FactoryBot.create :trial_issue,
         type: 'error', trial: trial
     end
 

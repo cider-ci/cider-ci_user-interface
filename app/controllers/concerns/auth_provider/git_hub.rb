@@ -132,7 +132,7 @@ module Concerns::AuthProvider::GitHub
       User.create!((strategy['create_attributes'] || {}) \
                    .to_h.merge(github_id: github_id,
                                login: login(github_user_properties, config)))
-    user.update_attributes! (strategy['update_attributes'] || {}).to_h.merge(
+    user.update! (strategy['update_attributes'] || {}).to_h.merge(
       name: github_user_properties['name'],
       login: login(github_user_properties, config),
       github_access_token: github_user_access_token)

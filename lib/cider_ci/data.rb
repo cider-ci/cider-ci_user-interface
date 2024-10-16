@@ -56,10 +56,10 @@ module CiderCI
 
         instance ||= entity.create! primary_map.merge(create_attributes.to_h)
 
-        update_attributes = config['update_attributes'].presence
+        update = config['update'].presence
 
-        if (instance && update_attributes)
-          instance.update_attributes! update_attributes.to_h
+        if (instance && update)
+          instance.update! update.to_h
         end
       end
 

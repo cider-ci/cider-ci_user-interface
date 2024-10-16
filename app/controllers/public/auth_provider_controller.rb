@@ -56,16 +56,16 @@ class Public::AuthProviderController < ApplicationController
     user = find_user_for_email_addresses(email_addresses) \
       || create_user(sync_data, provider_config)
     create_or_associate_email_addresses_with_user(user, email_addresses)
-    user.update_attributes(name: sync_data[:name])
-    user.update_attributes(login: sync_data[:login])
+    user.update(name: sync_data[:name])
+    user.update(login: sync_data[:login])
     unless user.password_digest.present?
-      user.update_attributes!(password: SecureRandom.base64)
+      user.update!(password: SecureRandom.base64)
     end
     admin_email_addresses = provider_config.accepted_email_addresses \
       .select(&:admin).map(&:email_address).map(&:downcase)
     if user.email_addresses.where('lower(email_address) IN (?)',
       admin_email_addresses).first
-      user.update_attributes!(is_admin: true)
+      user.update!(is_admin: true)
     end
     user
   end
@@ -74,7 +74,7 @@ class Public::AuthProviderController < ApplicationController
     email_addresses.each do |em|
       EmailAddress.where('lower(email_address) = ?',
         em.downcase).first.try do |em|
-        em.update_attributes!(user: user) if em.user != user
+        em.update!(user: user) if em.user != user
         em
         end || EmailAddress.create(email_address: em, user: user)
     end
