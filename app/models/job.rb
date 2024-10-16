@@ -3,22 +3,21 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Job < ApplicationRecord
-
   # serialize :result, JSON
 
   has_one :job_stat
   has_one :job_cache_signature
-  belongs_to :creator, foreign_key: :created_by, class_name: 'User'
-  belongs_to :aborter, foreign_key: :aborted_by, class_name: 'User'
+  belongs_to :creator, foreign_key: :created_by, class_name: "User"
+  belongs_to :aborter, foreign_key: :aborted_by, class_name: "User"
 
   before_create { self.id ||= SecureRandom.uuid }
 
   belongs_to :job_specification
 
-  has_many :commits, primary_key: 'tree_id', foreign_key: 'tree_id'
+  has_many :commits, primary_key: "tree_id", foreign_key: "tree_id"
   has_many :job_issues
   has_many :branches, through: :commits
-  has_many :repositories, -> { reorder('').uniq }, through: :branches
+  has_many :repositories, -> { reorder("").uniq }, through: :branches
 
   has_many :tasks
 
@@ -29,10 +28,10 @@ class Job < ApplicationRecord
   serialize :substituted_job_specification_data
 
   def self.find_by_repo_branch_name(repo_name, branch_name, job_name)
-    Job.joins(commits: { head_of_branches: :repository }) \
-      .where('lower(jobs.name) = ?', job_name.downcase)
-      .where('lower(branches.name) = ?', branch_name.downcase)
-      .find_by('lower(repositories.name) =? ', repo_name.downcase)
+    Job.joins(commits: { head_of_branches: :repository })
+      .where("lower(jobs.name) = ?", job_name.downcase)
+      .where("lower(branches.name) = ?", branch_name.downcase)
+      .find_by("lower(repositories.name) =? ", repo_name.downcase)
   end
 
   def public_view_permission?
@@ -44,19 +43,19 @@ class Job < ApplicationRecord
   end
 
   def accumulated_time
-    trials.where.not(started_at: nil).where.not(finished_at: nil) \
-      .select("date_part('epoch', SUM(finished_at - started_at)) as acc_time") \
-      .reorder('').group('tasks.job_id').first[:acc_time]
+    trials.where.not(started_at: nil).where.not(finished_at: nil)
+      .select("date_part('epoch', SUM(finished_at - started_at)) as acc_time")
+      .reorder("").group("tasks.job_id").first[:acc_time]
   end
 
   def duration
-    trials.reorder('') \
-      .select("date_part('epoch', MAX(finished_at) - MIN(started_at)) duration") \
-      .group('tasks.job_id').first[:duration]
+    trials.reorder("")
+      .select("date_part('epoch', MAX(finished_at) - MIN(started_at)) duration")
+      .group("tasks.job_id").first[:duration]
   end
 
   def create_tasks_and_trials
-    Messaging.publish('job.create-tasks-and-trials', job_id: id)
+    Messaging.publish("job.create-tasks-and-trials", job_id: id)
   end
 
   def sha1
@@ -69,13 +68,12 @@ class Job < ApplicationRecord
 
   def stats_summary
     stats = job_stat
-    [(stats.failed > 0) ? stats.failed : '',
-     (stats.failed > 0) ? '/' : '',
-     stats.total].join('').squish
+    [(stats.failed > 0) ? stats.failed : "",
+     (stats.failed > 0) ? "/" : "",
+     stats.total].join("").squish
   end
 
   def result_summary?
-    result && result['summary'].present? || false
+    result && result["summary"].present? || false
   end
-
 end

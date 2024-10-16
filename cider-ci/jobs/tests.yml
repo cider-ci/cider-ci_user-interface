@@ -27,11 +27,6 @@ jobs:
 
         scripts:
           test:
-            start_when:
-              bundled:
-                script_key: bundle
-              database_created:
-                script_key: create-database
             body: |
               #!/usr/bin/env bash
               source database/bin/pg_env

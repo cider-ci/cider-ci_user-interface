@@ -3,6 +3,6 @@
 #  See the LICENSE.txt file provided with this software.
 
 class EmailAddress < ApplicationRecord
-  self.primary_key = 'email_address'
+  self.primary_key = "email_address"
   belongs_to :user
 end

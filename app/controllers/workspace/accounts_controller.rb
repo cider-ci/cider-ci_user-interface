@@ -11,10 +11,10 @@ class Workspace::AccountsController < WorkspaceController
 
   def update
     with_rescue_flash do
-      @user.update! params.require(:user) \
-        .permit(:password, :reload_frequency,
-          :ui_theme, :mini_profiler_is_enabled)
-      { successes: ['The account has been updated.'] }
+      @user.update! params.require(:user)
+                      .permit(:password, :reload_frequency,
+                              :ui_theme, :mini_profiler_is_enabled)
+      { successes: ["The account has been updated."] }
     end
   end
 
@@ -22,12 +22,11 @@ class Workspace::AccountsController < WorkspaceController
 
   def with_rescue_flash
     flash = begin
-             @user = current_user
-             yield
-           rescue Exception => e
-             { errors: [e.to_s] }
-           end
+        @user = current_user
+        yield
+      rescue Exception => e
+        { errors: [e.to_s] }
+      end
     redirect_to edit_workspace_account_path, flash: flash
   end
-
 end

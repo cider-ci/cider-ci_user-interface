@@ -4,14 +4,14 @@ module Concerns
 
     def build_git_ref_filter(git_ref)
       lambda do |commits|
-        if (not git_ref)
+        if !git_ref
           commits
         elsif git_ref.length == 40
-          commits.where('commits.id = :git_ref OR tree_id = :git_ref',
-            git_ref: git_ref)
+          commits.where("commits.id = :git_ref OR tree_id = :git_ref",
+                        git_ref: git_ref)
         else
-          commits.where('commits.id ilike :git_ref OR tree_id ilike :git_ref',
-            git_ref: (git_ref + '%'))
+          commits.where("commits.id ilike :git_ref OR tree_id ilike :git_ref",
+                        git_ref: (git_ref + "%"))
         end
       end
     end
@@ -35,7 +35,8 @@ module Concerns
                  WHERE email_addresses.user_id = :user_id)
               OR lower(commits.committer_email) IN
                 (SELECT lower(email_address) FROM email_addresses
-                  WHERE email_addresses.user_id = :user_id)", user_id: user.id)
+                  WHERE email_addresses.user_id = :user_id)", user_id: user.id,
+          )
         else
           commits
         end
@@ -45,12 +46,12 @@ module Concerns
     def build_commits_by_branch_name_filter(branch_name)
       lambda do |commits|
         if branch_name.present?
-          if branch_name =~ /^\^.+/
-            commits.joins(:branches) \
-              .where('branches.name ~* ?', branch_name)
+          if /^\^.+/.match?(branch_name)
+            commits.joins(:branches)
+              .where("branches.name ~* ?", branch_name)
           else
-            commits.joins(:branches) \
-              .where(branches: { name: branch_name.split(',').map(&:strip) })
+            commits.joins(:branches)
+              .where(branches: { name: branch_name.split(",").map(&:strip) })
           end
         else
           commits
@@ -61,12 +62,12 @@ module Concerns
     def build_commits_by_repository_name_filter(repository_name)
       lambda do |commits|
         if repository_name.present?
-          if repository_name =~ /^\^.+/
-            commits.joins(branches: :repository) \
-              .where('repositories.name ~* ?', repository_name)
+          if /^\^.+/.match?(repository_name)
+            commits.joins(branches: :repository)
+              .where("repositories.name ~* ?", repository_name)
           else
-            commits.joins(branches: :repository) \
-              .where(repositories: { name: repository_name.split(',').map(&:strip) })
+            commits.joins(branches: :repository)
+              .where(repositories: { name: repository_name.split(",").map(&:strip) })
           end
         else
           commits
@@ -94,17 +95,16 @@ module Concerns
         else
           # a bit ugly but actually faster then the recursive with query we used before
           # if the depth is limited; the form offers only up to depth 3
-          query = commits \
-            .joins('JOIN branches AS heads ON commits.id = heads.current_commit_id') \
-            .reorder('').distinct .select('commits.id AS id, commits.depth AS depth' \
-                                        ', heads.id AS branch_id ')
+          query = commits.joins("JOIN branches AS heads ON commits.id = heads.current_commit_id")
+                         .reorder("").distinct.select("commits.id AS id, commits.depth AS depth" \
+                         ", heads.id AS branch_id ")
           sub_cs = query.map.with_index do |h, i|
             "(SELECT cs#{i}.id FROM commits AS cs#{i} " \
-              " JOIN branches_commits AS bcs#{i} ON bcs#{i}.commit_id = cs#{i}.id " \
-              " JOIN branches AS bs#{i} ON bcs#{i}.branch_id = bs#{i}.id " \
-              " WHERE bs#{i}.id = '#{h[:branch_id]}'::UUID " \
-              " AND cs#{i}.depth > #{h[:depth] - depth - 1} )"
-          end.join(' UNION ').squish
+            " JOIN branches_commits AS bcs#{i} ON bcs#{i}.commit_id = cs#{i}.id " \
+            " JOIN branches AS bs#{i} ON bcs#{i}.branch_id = bs#{i}.id " \
+            " WHERE bs#{i}.id = '#{h[:branch_id]}'::UUID " \
+            " AND cs#{i}.depth > #{h[:depth] - depth - 1} )"
+          end.join(" UNION ").squish
           if sub_cs.present?
             commits.where(" commits.id in ( #{sub_cs} )")
           else
@@ -113,6 +113,5 @@ module Concerns
         end
       end
     end
-
   end
 end

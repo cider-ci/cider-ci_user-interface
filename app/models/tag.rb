@@ -6,6 +6,6 @@ class Tag < ApplicationRecord
   has_and_belongs_to_many :jobs
 
   def self.tagify(s)
-    s.downcase.gsub(/[^0-9a-z\-\.]/i, '-').gsub(/-+/, '-')
+    s.downcase.gsub(/[^0-9a-z\-\.]/i, "-").squeeze("-")
   end
 end

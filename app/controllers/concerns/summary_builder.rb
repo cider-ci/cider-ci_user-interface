@@ -4,28 +4,29 @@ module Concerns
 
     DEFAULT_OPTIONS = {
       orientation: :horizontal,
-      embedded: true
+      embedded: true,
     }.freeze
 
     def build_summary_properties(reponame, branchname, job_names,
-      options = {})
-
+                                 options = {})
       defaults = DEFAULT_OPTIONS.merge options
 
       branch = find_branch_by_reponame_and_branchname(reponame, branchname)
 
       defaults.merge(
-        unless branch
-          build_404_summary_properties(reponame, branchname)
-        else
-          unless branch.repository.public_view_permission
-            build_403_summary_properties reponame
-          else
+        if branch
+          if branch.repository.public_view_permission
             build_200_summary_properties(
               branch,
-              find_jobs_by_branch_and_names(branch, job_names))
+              find_jobs_by_branch_and_names(branch, job_names)
+            )
+          else
+            build_403_summary_properties reponame
           end
-        end)
+        else
+          build_404_summary_properties(reponame, branchname)
+        end
+      )
     end
 
     def build_404_summary_properties(reponame, branchname)
@@ -54,16 +55,18 @@ module Concerns
           href: workspace_job_url(e) }
       else
         { text: "#{e}: Not available",
-          class: 'unavailable' }
+          class: "unavailable" }
       end
     end
 
     def job_info_result_summary(e)
-      e.result['summary'] rescue "#{e.stats_summary} #{e.state}"
+      e.result["summary"]
+    rescue
+      "#{e.stats_summary} #{e.state}"
     end
 
     def host_info_text
-      ('Cider-CI @ ' + ::Settings[:hostname]).squish
+      ("Cider-CI @ " + ::Settings[:hostname]).squish
     end
 
     def git_info_text(repository, branch)
@@ -72,15 +75,15 @@ module Concerns
 
     def find_branch_by_reponame_and_branchname(repository_name, branch_name)
       Branch.joins(:repository)
-        .where('lower(branches.name) = ?', branch_name.downcase)
-        .where('lower(repositories.name) = ?', repository_name.downcase)
+        .where("lower(branches.name) = ?", branch_name.downcase)
+        .where("lower(repositories.name) = ?", repository_name.downcase)
         .first
     end
 
     def find_jobs_by_branch_and_names(branch, names)
       canonicalize_job_names(names).map do |name|
-        branch.jobs \
-          .where('lower(jobs.name) = ?', name.downcase).first or name
+        branch.jobs
+          .where("lower(jobs.name) = ?", name.downcase).first or name
       end
     end
 
@@ -92,6 +95,5 @@ module Concerns
         job_names.map(&:squish)
       end
     end
-
   end
 end

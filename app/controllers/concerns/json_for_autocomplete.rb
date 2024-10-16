@@ -11,6 +11,5 @@ module Concerns
         end
       end.distinct.limit(25).pluck(column_name)
     end
-
   end
 end

@@ -5,8 +5,6 @@
 # require 'inshape'
 
 class Admin::StatusesController < AdminController
-
   def show
   end
-
 end

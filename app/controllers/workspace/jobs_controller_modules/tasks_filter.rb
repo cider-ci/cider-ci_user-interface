@@ -8,7 +8,7 @@ module Workspace::JobsControllerModules::TasksFilter
   def set_and_filter_tasks(params)
     @tasks = filter_tasks_by_substring_search \
       filter_tasks_by_condition set_per_page \
-        @job.tasks.reorder(:name).page(params[:page])
+                                  @job.tasks.reorder(:name).page(params[:page])
   end
 
   def set_per_page(jobs)
@@ -20,12 +20,12 @@ module Workspace::JobsControllerModules::TasksFilter
   end
 
   def filter_tasks_by_substring_search(tasks)
-    @name_substring_term = (params[:name_substring_term] || '')
+    @name_substring_term = params[:name_substring_term] || ""
     if @name_substring_term.blank?
       tasks
     else
       terms = @name_substring_term.split(/\s+OR\s+/)
-      ilike_where = terms.map { ' tasks.name ILIKE ? ' }.join(' OR ')
+      ilike_where = terms.map { " tasks.name ILIKE ? " }.join(" OR ")
       terms_matchers = terms.map { |term| "%#{term}%" }
       args = [ilike_where, terms_matchers].flatten
       tasks.where(*args)
@@ -50,12 +50,11 @@ module Workspace::JobsControllerModules::TasksFilter
       params[:tasks_select_condition].to_sym
     else
       case @job.state
-      when 'passed'
+      when "passed"
         :all
       else
         :unpassed
       end
     end
   end
-
 end

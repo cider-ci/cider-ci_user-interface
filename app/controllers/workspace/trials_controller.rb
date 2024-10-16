@@ -3,7 +3,6 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Workspace::TrialsController < WorkspaceController
-
   include ::Workspace::Trials::ScriptDependencyGraph
   helper_method :service_base_url, :api_browser_path
 
@@ -11,13 +10,11 @@ class Workspace::TrialsController < WorkspaceController
     only: [:show, :attachments]
 
   def show
-    begin
-      @trial = Trial.find params[:id]
-      require_sign_in unless @trial.task.job.public_view_permission?
-    rescue StandardError => e
-      Rails.logger.warn(e)
-      render 'show_raw'
-    end
+    @trial = Trial.find params[:id]
+    require_sign_in unless @trial.task.job.public_view_permission?
+  rescue => e
+    Rails.logger.warn(e)
+    render "show_raw"
   end
 
   def attachments
@@ -55,11 +52,8 @@ class Workspace::TrialsController < WorkspaceController
   private
 
   def script_order(s)
-    begin
-      Time.iso8601(s['started_at'] || s['skipped_at']).iso8601
-    rescue Exception => _
-      s['name'] || '0'
-    end
+    Time.iso8601(s["started_at"] || s["skipped_at"]).iso8601
+  rescue Exception => _
+    s["name"] || "0"
   end
-
 end

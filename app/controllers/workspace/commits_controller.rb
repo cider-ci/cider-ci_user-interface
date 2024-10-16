@@ -3,9 +3,7 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Workspace::CommitsController < WorkspaceController
-
   def show
     @commit = Commit.find(params[:id])
   end
-
 end

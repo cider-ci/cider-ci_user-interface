@@ -13,8 +13,8 @@ class Admin::RepositoriesController < AdminController
     redirect_to \
       admin_repositories_path,
       flash: {
-        successes:
-        ['The repository has been created. It will be initialized in the background.'] }
+        successes: ["The repository has been created. It will be initialized in the background."],
+      }
   end
 
   def destroy
@@ -38,7 +38,7 @@ class Admin::RepositoriesController < AdminController
     @repository.update! params[:repository].permit!
     redirect_to \
       admin_repository_path(@repository),
-      flash: { successes: ['The repository has been updated.'] }
+      flash: { successes: ["The repository has been updated."] }
   end
 
   def show
@@ -47,7 +47,6 @@ class Admin::RepositoriesController < AdminController
 
   def update_notification_url(repository)
     service_base_url(Settings[:services][:repository][:http]) +
-      '/update-notification/' + repository.update_notification_token
+      "/update-notification/" + repository.update_notification_token
   end
-
 end

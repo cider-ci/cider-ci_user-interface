@@ -1,5 +1,4 @@
 class Public::SummaryController < ApplicationController
-
   include Concerns::SummaryBuilder
   include Concerns::SummaryRenderer
 
@@ -24,7 +23,8 @@ class Public::SummaryController < ApplicationController
 
     summary_properties = build_summary_properties(
       params[:repository_name], params[:branch_name],
-      params[:job_names], options)
+      params[:job_names], options
+    )
 
     @svg = render_summary_svg summary_properties
 
@@ -38,5 +38,4 @@ class Public::SummaryController < ApplicationController
   def orientation_parameter
     params[:orientation].present? && params[:orientation]
   end
-
 end

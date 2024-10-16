@@ -5,6 +5,7 @@
 class JobStat < ApplicationRecord
   self.primary_key = :job_id
   belongs_to :job
+
   def to_s
     attributes.values.to_s
   end

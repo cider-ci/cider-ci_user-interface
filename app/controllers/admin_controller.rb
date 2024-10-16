@@ -3,14 +3,12 @@
 #  See the LICENSE.txt file provided with this software.
 
 class AdminController < ApplicationController
-
   before_action do
     unless admin?
-      render 'public/403', status: :forbidden
+      render "public/403", status: :forbidden
     end
   end
 
   def index
   end
-
 end

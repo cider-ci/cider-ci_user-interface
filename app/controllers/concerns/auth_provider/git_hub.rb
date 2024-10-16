@@ -10,8 +10,8 @@ module Concerns::AuthProvider::GitHub
       f.request :retry
       f.adapter Faraday.default_adapter
     end.post do |req|
-      req.headers['Accept'] = 'application/json'
-    end.body)['access_token']
+      req.headers["Accept"] = "application/json"
+    end.body)["access_token"]
   end
 
   def github_get_email_addresses(config, token)
@@ -20,7 +20,7 @@ module Concerns::AuthProvider::GitHub
       f.use Faraday::Response::RaiseError
       f.request :retry
       f.adapter Faraday.default_adapter
-    end.get.body).map(&:with_indifferent_access) \
+    end.get.body).map(&:with_indifferent_access)
       .select { |x| x[:verified] }.map { |x| x[:email] }
   end
 
@@ -37,7 +37,8 @@ module Concerns::AuthProvider::GitHub
     config = get_provider_config(:github)
     state = CiderCi::OpenSession::Encryptor.decrypt(
       Rails.application.secrets.secret_key_base,
-      params[:state]).with_indifferent_access
+      params[:state]
+    ).with_indifferent_access
 
     github_user_access_token = github_get_token(config)
 
@@ -45,25 +46,24 @@ module Concerns::AuthProvider::GitHub
 
     github_email_addresses = github_get_email_addresses config, github_user_access_token
 
-    if strategy = config['sign_in_strategies'].detect do |strategy|
-        case strategy['type']
-        when 'email-addresses'
-          (strategy['email_addresses'].map(&:downcase) &
-           github_email_addresses.map(&:downcase)).any?
-        when 'organization-membership'
-          github_satisfies_organization_membership_strategy? config, strategy,
-            github_user_properties, github_user_access_token
-        when 'team-membership'
-          github_satisfies_team_membership_strategy? config, strategy,
-            github_user_access_token, github_user_properties
-        end
-       end
+    if strategy = config["sign_in_strategies"].detect do |strategy|
+      case strategy["type"]
+      when "email-addresses"
+        (strategy["email_addresses"].map(&:downcase) &
+         github_email_addresses.map(&:downcase)).any?
+      when "organization-membership"
+        github_satisfies_organization_membership_strategy? config, strategy,
+          github_user_properties, github_user_access_token
+      when "team-membership"
+        github_satisfies_team_membership_strategy? config, strategy,
+          github_user_access_token, github_user_properties
+      end
+    end
+      user = github_create_and_update_user config, strategy,
+                                           github_user_properties, github_user_access_token, github_email_addresses
 
-        user = github_create_and_update_user config, strategy,
-          github_user_properties, github_user_access_token, github_email_addresses
-
-        create_services_session_cookie user
-        redirect_to state[:full_path]
+      create_services_session_cookie user
+      redirect_to state[:full_path]
     else
       raise CiderCI::NotAuthorized, <<-ERR.strip_heredoc
         None of the accepted sign-in criterias matches with your account.
@@ -73,23 +73,24 @@ module Concerns::AuthProvider::GitHub
   end
 
   def github_satisfies_organization_membership_strategy?(config, strategy,
-    github_user_properties, github_user_access_token)
+                                                         github_user_properties, github_user_access_token)
     url = "#{config[:api_endpoint]}/orgs/" \
-      << strategy['organization_login'] \
-      << '/members/' << github_user_properties['login'] \
+      << strategy["organization_login"] \
+      << "/members/" << github_user_properties["login"] \
       << "?access_token=#{strategy[:access_token].presence || github_user_access_token}"
     [204, 302].include?(
       Faraday.new(url) do |f|
         f.request :retry
         f.adapter Faraday.default_adapter
-      end.get.status)
+      end.get.status
+    )
   end
 
   def github_satisfies_team_membership_strategy?(config, strategy,
-    github_user_access_token, github_user_properties)
+                                                 github_user_access_token, github_user_properties)
     team_id_query_url = "#{config[:api_endpoint]}/orgs/" \
-      << strategy['organization_login'] << '/teams' \
-      << '?per_page=100&access_token=' \
+      << strategy["organization_login"] << "/teams" \
+      << "?per_page=100&access_token=" \
       << (strategy[:access_token].presence || github_user_access_token)
     # TODO: handle pagination properly; (are there orgs with +100 teams?)
     team_id_response = Faraday.new(team_id_query_url) do |f|
@@ -97,11 +98,10 @@ module Concerns::AuthProvider::GitHub
       f.adapter Faraday.default_adapter
     end.get
     if team_id_response.status.between?(200, 299)
-      if team_id = JSON.parse(team_id_response.body) \
-          .detect { |t| t['name'] == strategy['team_name'] } \
-          .try(:[], 'id')
-        membership_query =  "#{config[:api_endpoint]}/teams/" \
-          << team_id.to_s << '/memberships/' << github_user_properties['login'] \
+      if team_id = JSON.parse(team_id_response.body).detect { |t| t["name"] == strategy["team_name"] }
+        .try(:[], "id")
+        membership_query = "#{config[:api_endpoint]}/teams/" \
+          << team_id.to_s << "/memberships/" << github_user_properties["login"] \
           << "?access_token=#{strategy[:access_token].presence || github_user_access_token}"
         membership_response = Faraday.new(membership_query) do |f|
           f.request :retry
@@ -117,28 +117,27 @@ module Concerns::AuthProvider::GitHub
     uri = Addressable::URI.parse("#{config[:oauth_base_url]}/authorize")
     secret = Rails.application.secrets.secret_key_base
     state = CiderCi::OpenSession::Encryptor.encrypt(secret,
-      full_path: params[:current_fullpath])
+                                                    full_path: params[:current_fullpath])
     uri.query_values = { client_id: config[:client_id],
-                         scope: 'user:email,read_org',
+                         scope: "user:email,read_org",
                          state: state }
     redirect_to uri.to_s
   end
 
   def github_create_and_update_user(config, strategy,
-    github_user_properties, github_user_access_token, github_email_addresses)
-
-    github_id = github_user_properties['id']
-    user = User.find_by(github_id: github_id) || \
-      User.create!((strategy['create_attributes'] || {}) \
-                   .to_h.merge(github_id: github_id,
-                               login: login(github_user_properties, config)))
-    user.update! (strategy['update_attributes'] || {}).to_h.merge(
-      name: github_user_properties['name'],
+                                    github_user_properties, github_user_access_token, github_email_addresses)
+    github_id = github_user_properties["id"]
+    user = User.find_by(github_id: github_id) ||
+           User.create!((strategy["create_attributes"] || {})
+             .to_h.merge(github_id: github_id,
+                         login: login(github_user_properties, config)))
+    user.update! (strategy["update_attributes"] || {}).to_h.merge(
+      name: github_user_properties["name"],
       login: login(github_user_properties, config),
-      github_access_token: github_user_access_token)
+      github_access_token: github_user_access_token,
+    )
     create_or_associate_email_addresses_with_user(user,
-      github_email_addresses)
+                                                  github_email_addresses)
     user
   end
-
 end

@@ -1,0 +1,25 @@
+jobs:
+  lint:
+    name: Lint
+
+    run_when:
+      on_any_branch:
+        type: branch
+        include_match: ^.*$
+
+    context:
+
+      task_defaults:
+
+        include: 'cider-ci/shared/rails-defaults.yml'
+
+
+      tasks:
+        lint_ruby:
+          name: Lint Ruby
+          scripts:
+            test:
+              body: |
+                #!/usr/bin/env bash
+                set -euo pipefail
+                ./bin/rubyfmt

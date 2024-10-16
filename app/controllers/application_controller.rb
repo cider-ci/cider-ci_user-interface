@@ -22,15 +22,15 @@ class ApplicationController < ActionController::Base
   helper_method :current_user, :user?, :users?, :admin?, :api_browser_path
 
   before_action do
-    @alerts ||= { errors: (flash[:errors] || []),
-                  infos: (flash[:infos] || []),
-                  successes: (flash[:successes] || []),
-                  warnings: (flash[:warnings] || []) }
+    @alerts ||= { errors: flash[:errors] || [],
+                  infos: flash[:infos] || [],
+                  successes: flash[:successes] || [],
+                  warnings: flash[:warnings] || [] }
   end
 
   before_action do
     if defined?(Rack::MiniProfiler)
-      if current_user && current_user.mini_profiler_is_enabled
+      if current_user&.mini_profiler_is_enabled
         Rack::MiniProfiler.authorize_request
       else
         Rack::MiniProfiler.deauthorize_request
@@ -51,8 +51,11 @@ class ApplicationController < ActionController::Base
   end
 
   def current_user
-    @current_user ||=
-      validate_services_session_cookie_and_get_user rescue nil
+    @current_user ||= begin
+        validate_services_session_cookie_and_get_user
+      rescue
+        nil
+      end
   end
 
   def user?
@@ -65,7 +68,7 @@ class ApplicationController < ActionController::Base
 
   def render_404(msg = nil)
     @alerts[:warnings] << msg if msg
-    render 'public/404', status: 404
+    render "public/404", status: 404
   end
 
   def user_workspace_filter
@@ -77,5 +80,4 @@ class ApplicationController < ActionController::Base
     # render json: { memory: memory_status.content }, status: memory_status.is_ok ? 200 : 499
     render json: "disabled: inshape gem update required"
   end
-
 end

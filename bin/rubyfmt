@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+./bin/env/ruby-setup
+
+set -x
+
+bundle exec rufo app/ lib/ spec/
+git diff --exit-code spec/
+
+#vi ft=sh

@@ -1,5 +1,5 @@
-require 'factory_bot'
-require 'factory_bot_rails'
+require "factory_bot"
+require "factory_bot_rails"
 
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
@@ -10,5 +10,3 @@ RSpec.configure do |config|
   #    FactoryBot.find_definitions
   #  end
 end
-
-

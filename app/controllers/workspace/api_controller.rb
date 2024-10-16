@@ -3,5 +3,4 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Workspace::ApiController < WorkspaceController
-
 end

@@ -26,7 +26,7 @@ module Concerns
     end
 
     def commits_text_search_param
-      params.try('[]', 'commits_text_search').presence
+      params.try("[]", "commits_text_search").presence
     end
 
     def commits_per_page_param
@@ -38,7 +38,7 @@ module Concerns
     end
 
     def my_commits?
-      params[:my_commits].presence == 'true'
+      params[:my_commits].presence == "true"
     end
 
     def depth_param
@@ -50,6 +50,5 @@ module Concerns
     def integer_param(name, default)
       Integer(params[name].presence || default)
     end
-
   end
 end

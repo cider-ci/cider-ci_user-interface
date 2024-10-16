@@ -3,15 +3,14 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Branch < ApplicationRecord
-
   self.primary_key = :id
 
   belongs_to :repository
   has_and_belongs_to_many :commits
-  belongs_to :current_commit, class_name: 'Commit', foreign_key: 'current_commit_id'
+  belongs_to :current_commit, class_name: "Commit", foreign_key: "current_commit_id"
 
   def jobs
-    Job.joins(commits: :head_of_branches).where('branches.id = ?', id)
+    Job.joins(commits: :head_of_branches).where("branches.id = ?", id)
   end
 
   default_scope { order(name: :asc) }
@@ -23,5 +22,4 @@ class Branch < ApplicationRecord
   def to_s
     name
   end
-
 end

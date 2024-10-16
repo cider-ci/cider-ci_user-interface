@@ -6,5 +6,4 @@ class Script < ApplicationRecord
   belongs_to :trial
 
   default_scope { reorder(started_at: :asc, finished_at: :asc, key: :asc, name: :asc) }
-
 end

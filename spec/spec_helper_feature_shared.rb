@@ -1,4 +1,4 @@
-require 'addressable/uri'
+require "addressable/uri"
 
 # A few global functions shared between all rspec feature tests.
 #
@@ -28,7 +28,7 @@ def assert_change_of_current_path
 end
 
 def assert_error_alert(message = nil)
-  find('.ui-alert.error', text: message)
+  find(".ui-alert.error", text: message)
 end
 
 def assert_exact_url_path(path)
@@ -36,12 +36,12 @@ def assert_exact_url_path(path)
 end
 
 def assert_modal_not_visible
-  expect(page).not_to have_selector '.modal-backdrop'
+  expect(page).not_to have_selector ".modal-backdrop"
 end
 
 def assert_modal_visible(title = nil)
-  within('.modal .ui-modal-head') do
-    expect(find '*', text: title).to be if title
+  within(".modal .ui-modal-head") do
+    expect(find("*", text: title)).to be if title
   end
 end
 
@@ -54,20 +54,20 @@ def assert_selected_option(select_css_matcher, option_text)
 end
 
 def assert_success_message
-  expect(page).to have_selector('.alert-success,.ui-alert.success')
+  expect(page).to have_selector(".alert-success,.ui-alert.success")
 end
 
 def change_value_of_some_input_field
-  expect(page).to have_selector 'input[type=text]'
-  all('input[type=text]').sample.set '123'
+  expect(page).to have_selector "input[type=text]"
+  all("input[type=text]").sample.set "123"
 end
 
 def click_link_from_menu(text, parent_text = nil)
   if parent_text
-    find('.navbar-nav > li > a', text: parent_text).click
+    find(".navbar-nav > li > a", text: parent_text).click
   end
-  within find('.navbar-nav', match: :first) do
-    find('a', text: text).click
+  within find(".navbar-nav", match: :first) do
+    find("a", text: text).click
   end
 end
 
@@ -76,11 +76,11 @@ def click_on_button(text)
 end
 
 def click_on_text(text)
-  find('a, button', text: text, match: :first).click
+  find("a, button", text: text, match: :first).click
 end
 
 def click_primary_action_of_modal
-  find('.ui-modal .primary-button').click
+  find(".ui-modal .primary-button").click
 end
 
 def find_input_with_name(name)
@@ -94,16 +94,16 @@ def move_mouse_over(element)
   # element.hover
 end
 
-def sign_in_as(login, password = 'password')
-  visit '/public' unless current_path
+def sign_in_as(login, password = "password")
+  visit "/public" unless current_path
   find("input[type='text']").set login
   find("input[type='password']").set password
   find("button[type='submit']").click
 end
 
 def sign_out
-  find('#user-actions').click
-  click_on 'Sign out'
+  find("#user-actions").click
+  click_on "Sign out"
 end
 
 def submit_form(id = nil)
@@ -116,5 +116,5 @@ def current_fragment
 end
 
 def visit(_most_recent_job)
-  visit(Execufion.reorder('created_at DESC').first)
+  visit(Execufion.reorder("created_at DESC").first)
 end

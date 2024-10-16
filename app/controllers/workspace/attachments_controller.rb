@@ -3,17 +3,16 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Workspace::AttachmentsController < WorkspaceController
-
   skip_before_action :require_sign_in, only: [:show]
 
   def show
     klass = params[:kind].camelize.constantize
     @attachment = case klass.name
-                  when 'TreeAttachment'
-                    klass.find_by(tree_id: params[:path_id], path: params[:path])
-                  when 'TrialAttachment'
-                    klass.find_by(trial_id: params[:path_id], path: params[:path])
-                  end
+      when "TreeAttachment"
+        klass.find_by(tree_id: params[:path_id], path: params[:path])
+      when "TrialAttachment"
+        klass.find_by(trial_id: params[:path_id], path: params[:path])
+      end
     if @attachment
       require_sign_in unless public_view_permission?(@attachment)
     else
@@ -25,13 +24,10 @@ class Workspace::AttachmentsController < WorkspaceController
   def public_view_permission?(attachment)
     case attachment
     when TreeAttachment
-      Job.where(tree_id: @attachment.tree_id) \
-        .limit(1).first.public_view_permission?
+      Job.where(tree_id: @attachment.tree_id).limit(1).first.public_view_permission?
     when TrialAttachment
-      Job.joins(tasks: :trials) \
-        .where('trials.id = ? ', @attachment.trial_id) \
+      Job.joins(tasks: :trials).where("trials.id = ? ", @attachment.trial_id)
         .limit(1).first.public_view_permission?
     end
   end
-
 end

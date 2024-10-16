@@ -7,17 +7,16 @@ module Concerns
       with_rescue_flash do
         EmailAddress.where(user_id: @user.id).update_all primary: false
         EmailAddress.find_by(user_id: @user.id,
-                             email_address: params[:email_address])\
-          .update! primary: true
-        { successes: ['A new primary email address has been set.'] }
+                             email_address: params[:email_address]).update! primary: true
+        { successes: ["A new primary email address has been set."] }
       end
     end
 
     def add_email_address
       with_rescue_flash do
         EmailAddress.create! user_id: @user.id,
-                             email_address: params[:email_address]
-        { successes: ['The new email address has been added.'] }
+          email_address: params[:email_address]
+        { successes: ["The new email address has been added."] }
       end
     end
 
@@ -25,9 +24,8 @@ module Concerns
       with_rescue_flash do
         EmailAddress.find_by(user_id: @user.id,
                              email_address: params[:email_address]).destroy
-        { successes: ['The email address has been removed.'] }
+        { successes: ["The email address has been removed."] }
       end
     end
-
   end
 end

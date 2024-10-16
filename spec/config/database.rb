@@ -1,9 +1,10 @@
-require 'spec_helper'
+require "spec_helper"
 
 def clean_db
   ActiveRecord::Base.connection.tap do |connection|
-    connection.tables.reject { |tn| tn in ['schema_migrations', 'ar_internal_metadata']
-    }.join(', ').tap do |tables|
+    connection.tables.reject { |tn|
+      tn in ["schema_migrations", "ar_internal_metadata"]
+    }.join(", ").tap do |tables|
       connection.execute " TRUNCATE TABLE #{tables} CASCADE; "
     end
   end

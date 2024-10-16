@@ -15,7 +15,7 @@ module Concerns
 
     def service_path(conf)
       if conf.is_a? Hash
-        (conf[:path] || "#{conf[:context]}#{conf[:sub_context]}")
+        conf[:path] || "#{conf[:context]}#{conf[:sub_context]}"
       else
         conf.to_s
       end
@@ -25,9 +25,8 @@ module Concerns
       service_path("/cider-ci/api")
     end
 
-    def api_browser_path(resource_path = '')
+    def api_browser_path(resource_path = "")
       "#{api_path}/api-browser/index.html##{api_path}#{resource_path}"
     end
-
   end
 end

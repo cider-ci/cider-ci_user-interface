@@ -3,9 +3,7 @@
 #  See the LICENSE.txt file provided with this software.
 
 module ServiceCheck
-
   class << self
-
     include Concerns::HTTP
     include Concerns::UrlBuilder
 
@@ -14,45 +12,41 @@ module ServiceCheck
     end
 
     def check_service(http_opts)
-      url = service_base_url(http_opts) + '/status'
+      url = service_base_url(http_opts) + "/status"
       check_resource url
     end
 
     def basic_auth_password(username)
       OpenSSL::HMAC.hexdigest(
-        OpenSSL::Digest.new('sha1'),
-        Settings[:secret], username)
+        OpenSSL::Digest.new("sha1"),
+        Settings[:secret], username
+      )
     end
 
     def check_resource(url)
-      begin
-        response = http_get(url,
-          username: 'ui-service',
-          password: basic_auth_password('ui-service'),
-          raise_error: false)
-        res = OpenStruct.new
-        if response.status.between?(200, 299)
-          res.is_ok = true
-          res.content = JSON.parse(response.body)
-        else
-          res.is_ok = false
-          res.content =
-            if response.headers['content-type'] =~ /json/
-              JSON.parse(response.body)
-            else
-              { message: response.body }
-            end
-        end
-        res
-      rescue Exception => e
-        Rails.logger.warn Formatter.exception_to_log_s(e)
-        res = OpenStruct.new
+      response = http_get(url,
+                          username: "ui-service",
+                          password: basic_auth_password("ui-service"),
+                          raise_error: false)
+      res = OpenStruct.new
+      if response.status.between?(200, 299)
+        res.is_ok = true
+        res.content = JSON.parse(response.body)
+      else
         res.is_ok = false
-        res.content = { error: e.to_s }
-        res
+        res.content = if /json/.match?(response.headers["content-type"])
+            JSON.parse(response.body)
+          else
+            { message: response.body }
+          end
       end
+      res
+    rescue Exception => e
+      Rails.logger.warn Formatter.exception_to_log_s(e)
+      res = OpenStruct.new
+      res.is_ok = false
+      res.content = { error: e.to_s }
+      res
     end
-
   end
-
 end

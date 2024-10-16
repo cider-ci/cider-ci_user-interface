@@ -27,10 +27,9 @@ class User < ApplicationRecord
   end
 
   def create_password_if_blank
-    if self.password_digest.blank?
+    if password_digest.blank?
       self.password = SecureRandom.base64(24)
-      self.save
+      save
     end
   end
-
 end

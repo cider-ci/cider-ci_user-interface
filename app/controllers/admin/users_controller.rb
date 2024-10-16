@@ -10,31 +10,32 @@ class Admin::UsersController < AdminController
   def create
     @user = User.create! params.require(:user).permit!
     redirect_to admin_users_path,
-      flash: { successes: ['The user has been created'] }
+      flash: { successes: ["The user has been created"] }
   end
 
   def destroy
     User.find(params[:id]).destroy
     redirect_to admin_users_path,
-      flash: { successes: ['The user has been deleted'] }
+      flash: { successes: ["The user has been deleted"] }
   end
 
   def index
     @users = User.page(params[:page])
     @users = @users.per(Integer(params[:per_page])) unless params[:per_page].blank?
     @users = @users.where(is_admin: true) if admin_filter?
-    if search_term = user_text_search_filter
+    if (search_term = user_text_search_filter)
       # NOTE we include the email addresses; however, the pg parser recognizes
       # emails and does not break them apart: foo@bar.baz  will only be found
       # when the full email address is searched for and not by "foo", or "bar", or baz!
       # http://www.postgresql.org/docs/current/static/textsearch-parsers.html
-      search_options = { \
+      search_options = {
         users: { login: search_term, last_name: search_term,
-                 first_name: search_term }, \
-        email_addresses: { email_address: search_term } }
-      @users = \
-        @users.joins('LEFT OUTER JOIN email_addresses
-                     ON email_addresses.user_id = users.id'.squish) \
+                 first_name: search_term },
+        email_addresses: { email_address: search_term },
+      }
+      @users =
+        @users.joins("LEFT OUTER JOIN email_addresses
+                     ON email_addresses.user_id = users.id".squish)
           .basic_search(search_options, false).reorder(:last_name, :first_name).uniq
     end
   end
@@ -51,28 +52,27 @@ class Admin::UsersController < AdminController
     with_rescue_flash do
       @user = User.find(params[:id])
       @user.update! params.require(:user).permit!
-      { successes: ['The user has been updated.'] }
+      { successes: ["The user has been updated."] }
     end
   end
 
   def user_text_search_filter
-    params.try('[]', 'user').try('[]', :text).presence
+    params.try("[]", "user").try("[]", :text).presence
   end
 
   def admin_filter?
-    params['is_admin'].present?
+    params["is_admin"].present?
   end
 
   private
 
   def with_rescue_flash
     flash = begin
-             @user = User.find(params[:id])
-             yield
-           rescue Exception => e
-             { errors: [e.to_s] }
-           end
+        @user = User.find(params[:id])
+        yield
+      rescue Exception => e
+        { errors: [e.to_s] }
+      end
     redirect_to admin_user_path(@user), flash: flash
   end
-
 end

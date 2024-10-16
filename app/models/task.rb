@@ -3,7 +3,7 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Task < ApplicationRecord
-  self.primary_key = 'id'
+  self.primary_key = "id"
   # serialize :result, JSON
   before_create { self.id ||= SecureRandom.uuid }
   belongs_to :job
@@ -13,7 +13,7 @@ class Task < ApplicationRecord
 
   default_scope { order(created_at: :desc, id: :asc) }
 
-  scope :with_unpassed_trials, lambda{
+  scope :with_unpassed_trials, lambda {
     where("EXISTS (SELECT 1 FROM trials WHERE trials.task_id = tasks.id
           AND trials.state != 'passed')".squish)
   }

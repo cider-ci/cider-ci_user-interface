@@ -5,6 +5,5 @@
 class ExecutorWithLoad < Executor
   self.table_name = :executors_with_load
 
-  belongs_to :executor, primary_key: 'id', foreign_key: 'id'
-
+  belongs_to :executor, primary_key: "id", foreign_key: "id"
 end

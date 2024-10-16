@@ -3,7 +3,6 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Workspace::TasksController < WorkspaceController
-
   include ::Concerns::HTTP
   include ::Concerns::UrlBuilder
 
@@ -12,19 +11,19 @@ class Workspace::TasksController < WorkspaceController
   def retry
     set_task
     url = service_base_url("/cider-ci/dispatcher") +
-      "/tasks/#{@task.id}/retry"
+          "/tasks/#{@task.id}/retry"
     response = http_do(:post, url) do |c|
-      c.headers['content-type'] = 'application/json'
+      c.headers["content-type"] = "application/json"
       c.body = { created_by: current_user.id }.to_json
     end
     case response.status
     when 200..299
-      redirect_to workspace_trial_path(JSON.parse(response.body)['id']),
-        flash: { successes: ['A new trial has been created.'] }
+      redirect_to workspace_trial_path(JSON.parse(response.body)["id"]),
+        flash: { successes: ["A new trial has been created."] }
     else
       redirect_to workspace_task_path(@task.id),
         flash: { errors: [" #{response.status} " \
-                          "Retry of task failed! #{response.body}"] }
+        "Retry of task failed! #{response.body}"] }
     end
   end
 
@@ -54,9 +53,8 @@ class Workspace::TasksController < WorkspaceController
         render json: JSON.pretty_generate(@task.task_specification.data)
       end
       format.yaml do
-        render content_type: 'text/yaml', body: @task.task_specification.data.to_yaml
+        render content_type: "text/yaml", body: @task.task_specification.data.to_yaml
       end
     end
   end
-
 end

@@ -6,7 +6,6 @@ class Workspace::RepositoriesController < WorkspaceController
   include Concerns::JsonForAutocomplete
 
   def names
-    render json: build_single_column_json_for_autocomplete(Repository, 'name')
+    render json: build_single_column_json_for_autocomplete(Repository, "name")
   end
-
 end

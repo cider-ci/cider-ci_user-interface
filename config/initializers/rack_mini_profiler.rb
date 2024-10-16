@@ -1,4 +1,4 @@
-require 'rack-mini-profiler'
+require "rack-mini-profiler"
 # Rack::MiniProfilerRails.initialize!(Rails.application)
 
 # enable mini profiler on demand and not by default

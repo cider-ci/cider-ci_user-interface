@@ -5,7 +5,7 @@
 class Public::BadgesController < PublicController
   include Concerns::BadgeParamsBuilder
 
-  layout 'badge'
+  layout "badge"
 
   def medium
     build_find_by_args
@@ -18,15 +18,15 @@ class Public::BadgesController < PublicController
 
     @view_params = build_small_badge_params(@job, *@find_by_args)
 
-    if @job and (not @job.public_view_permission?)
+    if @job && !@job.public_view_permission?
       @view_params = build_small_badge_params_403(@view_params,
-        params[:job_name])
+                                                  params[:job_name])
       if params.key?(:respond_with_200)
         render
       else
         render status: 403
       end
-    elsif @job or params.key?(:respond_with_200)
+    elsif @job || params.key?(:respond_with_200)
       render
     else
       render status: 404
@@ -41,5 +41,4 @@ class Public::BadgesController < PublicController
   def set_job
     @job = Job.find_by_repo_branch_name(*@find_by_args)
   end
-
 end

@@ -7,9 +7,9 @@ class Executor < ApplicationRecord
 
   has_many :trials
   has_many :executor_issues
-  has_one :executor_with_load, primary_key: 'id', foreign_key: 'id'
+  has_one :executor_with_load, primary_key: "id", foreign_key: "id"
 
-  self.primary_key = 'id'
+  self.primary_key = "id"
 
   before_create { self.id ||= SecureRandom.uuid }
 
@@ -23,9 +23,9 @@ class Executor < ApplicationRecord
 
   def auth_password
     OpenSSL::HMAC.hexdigest(
-      OpenSSL::Digest.new('sha1'), Settings[:secret], name)
+      OpenSSL::Digest.new("sha1"), Settings[:secret], name
+    )
   end
 
   delegate :to_s, to: :name
-
 end

@@ -10,32 +10,28 @@ class WorkspaceController < ApplicationController
   before_action :require_sign_in
 
   def index
-    begin
-      ActiveRecord::Base.transaction do
-        @my = my_workspace?
-        set_commits_for_index
-        @jobs = Job.where(tree_id: @commits.map(&:tree_id)).reorder(created_at: :desc)
-      end
-    rescue ActiveRecord::StatementInvalid => error
-      if error.message =~ /statement timeout/
-        Rails.logger.warn error
-        @error = error
-        render :statement_timeout, status: 422
-      else
-        raise error
-      end
+    ActiveRecord::Base.transaction do
+      @my = my_workspace?
+      set_commits_for_index
+      @jobs = Job.where(tree_id: @commits.map(&:tree_id)).reorder(created_at: :desc)
+    end
+  rescue ActiveRecord::StatementInvalid => error
+    if /statement timeout/.match?(error.message)
+      Rails.logger.warn error
+      @error = error
+      render :statement_timeout, status: 422
+    else
+      raise error
     end
   end
 
   def my_workspace?
-    begin
-      if current_user and (not current_user.workspace_filters)
-        current_user.update! workspace_filters: get_filter_params
-      end
-      user_workspace_filter.deep_symbolize_keys == get_filter_params.deep_symbolize_keys
-    rescue Exception
-      false
+    if current_user && !current_user.workspace_filters
+      current_user.update! workspace_filters: get_filter_params
     end
+    user_workspace_filter.deep_symbolize_keys == get_filter_params.deep_symbolize_keys
+  rescue Exception
+    false
   end
 
   def set_commits_for_index
@@ -49,8 +45,8 @@ class WorkspaceController < ApplicationController
       .apply(build_commits_by_page(params[:page], commits_per_page_param))
       .distinct.reorder(committer_date: :desc, depth: :desc)
       .select(:author_email, :committer_email, :author_date, :author_name,
-        :committer_date, :committer_name,
-        :depth, :id, :subject, :tree_id, :updated_at)
+              :committer_date, :committer_name,
+              :depth, :id, :subject, :tree_id, :updated_at)
   end
 
   def get_filter_params
@@ -60,45 +56,43 @@ class WorkspaceController < ApplicationController
       commits_text_search: commits_text_search_param,
       depth: depth_param,
       my_commits: my_commits?,
-      per_page: commits_per_page_param
-    }
+      per_page: commits_per_page_param }
   end
 
   def filter
     case request.method
-    when 'GET'
-      redirect_to workspace_path(user_workspace_filter), flash: Hash[flash.to_a]
-    when 'POST'
+    when "GET"
+      redirect_to workspace_path(user_workspace_filter), flash: flash.to_a.to_h
+    when "POST"
       current_user.update! workspace_filters: get_filter_params
       redirect_to workspace_path(user_workspace_filter)
     end
   end
 
   def tree_id_filter
-    params.try('[]', 'tree_id').presence
+    params.try("[]", "tree_id").presence
   end
 
   def require_sign_in
-    render 'public/401', status: :unauthorized unless user?
+    render "public/401", status: :unauthorized unless user?
   end
 
-  SHOW_RAW_PERMITTED_TABLES = %w(trials scripts).freeze
+  SHOW_RAW_PERMITTED_TABLES = %w[trials scripts].freeze
 
   def show_raw
     @table_name = params[:table_name]
-    @where_condition = JSON.parse(params['where']).with_indifferent_access
-    @attributes = @table_name.singularize.camelize\
+    @where_condition = JSON.parse(params["where"]).with_indifferent_access
+    @attributes = @table_name.singularize.camelize
       .constantize.find_by(@where_condition).attributes
 
-    unless SHOW_RAW_PERMITTED_TABLES.include? @table_name
-      render 'public/403', status: :forbidden
-    else
+    if SHOW_RAW_PERMITTED_TABLES.include? @table_name
       respond_to do |format|
         format.html
         format.json { render json: @attributes }
-        format.yaml { render text:  @attributes.to_yaml, content_type: 'text/yaml' }
+        format.yaml { render text: @attributes.to_yaml, content_type: "text/yaml" }
       end
+    else
+      render "public/403", status: :forbidden
     end
   end
-
 end

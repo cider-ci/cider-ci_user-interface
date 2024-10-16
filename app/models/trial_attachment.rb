@@ -2,7 +2,7 @@ class TrialAttachment < ApplicationRecord
   include Concerns::UrlBuilder
 
   def url
-    service_path('/cider-ci/storage') \
+    service_path("/cider-ci/storage") \
       + "/trial-attachments/#{trial_id}/#{path}"
   end
 
@@ -11,5 +11,4 @@ class TrialAttachment < ApplicationRecord
   end
 
   default_scope { reorder(path: :asc) }
-
 end

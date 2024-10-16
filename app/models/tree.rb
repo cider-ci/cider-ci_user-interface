@@ -3,10 +3,9 @@
 #  See the LICENSE.txt file provided with this software.
 
 class Tree < ApplicationRecord
-  self.primary_key = 'id'
+  self.primary_key = "id"
   has_many :commits
   has_many :jobs
 
   default_scope { order(:id) }
-
 end

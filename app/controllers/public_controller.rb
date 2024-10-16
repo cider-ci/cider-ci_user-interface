@@ -3,7 +3,6 @@
 #  See the LICENSE.txt file provided with this software.
 
 class PublicController < ApplicationController
-
   skip_before_action :verify_authenticity_token, only: [:sign_out]
 
   include ActionView::Helpers::TextHelper
@@ -15,18 +14,20 @@ class PublicController < ApplicationController
   end
 
   def build_items(row)
-    row.try(:[], 'items').map(&:deep_symbolize_keys).map do |item|
+    row.try(:[], "items").map(&:deep_symbolize_keys).map do |item|
       render_summary_svg(
         build_summary_properties(
           item[:repository_name], item[:branch_name],
-          item[:job_name], orientation: :vertical))
+          item[:job_name], orientation: :vertical,
+        )
+      )
     end
   end
 
   def redirect_to_job
     if @job = Job.find_by_repo_branch_name(params[:repository_name],
-      params[:branch_name],
-      params[:job_name])
+                                           params[:branch_name],
+                                           params[:job_name])
       redirect_to workspace_job_path(@job)
     else
       render_404_job_not_found
@@ -35,11 +36,11 @@ class PublicController < ApplicationController
 
   def redirect_to_tree_attachment_content
     if @job = Job.find_by_repo_branch_name(params[:repository_name],
-      params[:branch_name],
-      params[:job_name])
-      if tree_attachment = TreeAttachment \
-          .find_by(path: "/#{@job.tree_id}/#{params[:path]}")
-        redirect_to workspace_attachment_path('tree_attachment', tree_attachment.path)
+                                           params[:branch_name],
+                                           params[:job_name])
+      if tree_attachment = TreeAttachment
+        .find_by(path: "/#{@job.tree_id}/#{params[:path]}")
+        redirect_to workspace_attachment_path("tree_attachment", tree_attachment.path)
       else
         render_404 "You are looking for the attchment `#{params[:path]}`
            with the tree-id `#{truncate(@job.tree_id, length: 10)}`.
@@ -59,9 +60,8 @@ class PublicController < ApplicationController
 
   def sign_out
     reset_session
-    cookies.delete 'cider-ci_services-session'
+    cookies.delete "cider-ci_services-session"
     redirect_to current_path,
-      flash: { successes: ['You have been signed out!'] }
+      flash: { successes: ["You have been signed out!"] }
   end
-
 end

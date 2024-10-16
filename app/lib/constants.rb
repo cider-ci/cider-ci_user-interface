@@ -3,5 +3,5 @@
 #  See the LICENSE.txt file provided with this software.
 
 module Constants
-  UPDATE_BRANCH_TOPIC_NAME = '/topics/branch_updates'.freeze
+  UPDATE_BRANCH_TOPIC_NAME = "/topics/branch_updates".freeze
 end

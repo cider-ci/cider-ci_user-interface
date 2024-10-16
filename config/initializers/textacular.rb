@@ -1,2 +1,2 @@
-require 'textacular'
+require "textacular"
 ActiveRecord::Base.extend(Textacular)

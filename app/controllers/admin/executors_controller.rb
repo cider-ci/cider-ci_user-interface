@@ -9,8 +9,8 @@ class Admin::ExecutorsController < AdminController
     @executor = Executor.create! processed_params
     redirect_to admin_executors_path,
       flash: {
-        successes:
-        [%( The new executor "#{@executor}" has been created.)] }
+        successes: [%( The new executor "#{@executor}" has been created.)],
+      }
   end
 
   def destroy
@@ -30,19 +30,18 @@ class Admin::ExecutorsController < AdminController
   end
 
   def update
-      @executor = Executor.find params[:id]
-      @executor.update! processed_params
-      redirect_to admin_executor_path(@executor),
-        flash: { successes: ['The executor has been updated.'] }
+    @executor = Executor.find params[:id]
+    @executor.update! processed_params
+    redirect_to admin_executor_path(@executor),
+      flash: { successes: ["The executor has been updated."] }
   end
 
   def processed_params
     params[:executor].try(:permit, :name, :enabled,
-      :upload_trial_attachments, :upload_tree_attachments)
+                          :upload_trial_attachments, :upload_tree_attachments)
   end
 
   def show
     @executor = ExecutorWithLoad.find params[:id]
   end
-
 end
