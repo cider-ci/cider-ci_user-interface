@@ -1,3 +1,6 @@
+include:
+  - cider-ci/task-components/env.yml
+
 git_options:
   submodules:
     include_match: '^.*$'
@@ -10,12 +13,6 @@ templates:
   database:
     src: 'cider-ci/templates/database.yml'
     dest: 'config/database.yml'
-
-environment_variables:
-  RAILS_ENV: test
-  RACK_ENV: test
-  PGVERSION: '15'
-  PGPORT: '54{{PGVERSION}}'
 
 scripts:
   bundle:

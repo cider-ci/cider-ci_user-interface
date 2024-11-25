@@ -20,7 +20,7 @@ jobs:
           test -f public/assets/application*js
       assets_up_to_date:
         name: Assets are up to date?
-        include: 'cider-ci/shared/rails-defaults.yml'
+        include: 'cider-ci/task-components/tests.yml'
         scripts:
           test:
             start_when:

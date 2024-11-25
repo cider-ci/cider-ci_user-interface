@@ -19,7 +19,7 @@ jobs:
 
       task_defaults:
 
-        include: 'cider-ci/shared/rails-defaults.yml'
+        include: 'cider-ci/task-components/test.yml'
 
         environment_variables:
           RAILS_ENV: test
