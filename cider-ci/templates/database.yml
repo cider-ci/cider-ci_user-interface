@@ -3,7 +3,7 @@ default: &default
   encoding: unicode
   host: localhost
   pool: 3
-  database: 'cider-ci_test_{{CIDER_CI_TRIAL_ID}}'
+  database: '{{CIDER_CI_TEST_DATABASE}}'
   username: '<%= ENV['PGUSER'] %>'
   password: '<%= ENV['PGPASSWORD'] %>'
   port: '<%= ENV['PGPORT'] %>'
