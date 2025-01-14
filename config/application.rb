@@ -12,11 +12,11 @@ Bundler.require(*Rails.groups)
 
 Settings = {}.with_indifferent_access
 ["../config/config_default.yml",
-  "config/settings.yml",
-  "../config/config.yml",
-  "../config/releases.yml",
-  "config/settings.local.yml",
-  "/cider-ci/data/config/config.yml"].each do |config_file|
+ "config/settings.yml",
+ "../config/config.yml",
+ "../config/releases.yml",
+ "config/settings.local.yml",
+ "/cider-ci/data/config/config.yml"].each do |config_file|
   if File.exist? config_file
     config = YAML.load_file(config_file).to_h.with_indifferent_access
     Settings.deep_merge! config
@@ -47,7 +47,7 @@ module CiderCI
       Rails.root.join("database", "app", "controllers", "concerns"),
       Rails.root.join("database", "app", "models"),
       Rails.root.join("database", "app", "lib"),
-      Rails.root.join("database", "app", "queries")
+      Rails.root.join("database", "app", "queries"),
     ]
 
     # Configuration for the application, engines, and railties goes here.

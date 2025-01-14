@@ -5,7 +5,7 @@ set -euo pipefail
 
 set -x
 
-bundle exec rufo app/ lib/ spec/
+bundle exec rufo app/ lib/ spec/ config/
 git diff --exit-code spec/
 
 #vi ft=sh
