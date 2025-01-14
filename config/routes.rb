@@ -1,6 +1,8 @@
 CiderCI::Application.routes.draw do
   # For details on the DSL available within this file, see https://guides.rubyonrails.org/routing.html
 
+  scope :path => "/cider-ci/ui" do
+
   get "/workspace", controller: "workspace", action: "index", as: "workspace"
 
   match "/workspace/filter", via: [:get, :post],
@@ -188,4 +190,7 @@ CiderCI::Application.routes.draw do
   get(/.*/, controller: "application", action: "redirect")
 
   root "application#redirect"
+
+  end
+
 end
