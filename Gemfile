@@ -8,7 +8,7 @@ gem "textacular",
 # FRONTEND
 gem "bootstrap-sass"
 gem "coffee-rails"
-gem "font-awesome-sass", "= 4.4.0"
+gem "font-awesome-sass", "= 4.6.2"
 gem "haml-contrib"
 gem "haml-rails", "~> 2.0"
 gem "jquery-rails"
